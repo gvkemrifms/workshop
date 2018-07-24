@@ -10,6 +10,9 @@ namespace Fleet_WorkShop.Models
 {
     public class VehicleModel
     {
+        [DisplayName("Mechanic Name")]
+        public string AllotedMechanicName { get; set; }
+   
         public SelectList Vehicle { get; set; }
         public int Id { get; set; }
         [DisplayName("Vehicle")]
@@ -71,7 +74,10 @@ namespace Fleet_WorkShop.Models
         [DisplayName("Model")]
         public int ModelNumber { get; internal set; }
         [DisplayName("Alloted Mechanic")]
-        public string AllotedMechanic { get; set; }
+        public int AllotedMechanic { get; set; }
+        public int JobCardId { get; set; }
+        public int HandOverTo { get; set; }
+        public List<JobCardPendingCases> itemmodel { get; set; }
     }
 }
 
@@ -100,8 +106,26 @@ public class VehicleJobCardModel
     public SelectList District { get; set; }
 
     [DisplayName("Alloted Mechanic")]
-    public string AllotedMechanic { get; set; }
+    public int AllotedMechanic { get; set; }
     [DisplayName("Service Incharge")]
-    public string ServiceEngineer { get; set; }
+    public int ServiceEngineer { get; set; }
 
+}
+
+
+public class JobCardPendingCases
+{
+    public Guid VehicleId { get; set; }
+    public string VehicleNumber { get; set; }
+public string DistrictName { get; set; }
+public DateTime DateOfRepair { get; set; }
+public string Complaint { get; set; }
+public string WorkShopName { get; set; }
+    public string EmployeeName { get; set; }
+    public string Status { get; set; }
+    public int SparePartId { get; set; }
+    public int Quantity { get; set; }
+    public int HandOverToId { get; set; }
+    public int JobCardNumber { get; set; }
+    public SelectList Vehicle { get; set; }
 }

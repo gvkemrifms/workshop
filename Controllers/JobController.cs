@@ -34,12 +34,12 @@ namespace Fleet_WorkShop.Controllers
                 ViewBag.Districts = new SelectList(dsVehicleDistrictDetails.Tables[0].AsDataView(), "Id", "District");
                 ViewBag.VehicleManufacturer = new SelectList(dsVehicleDistrictDetails.Tables[1].AsDataView(), "Id", "ManufacturerName");
                 ViewBag.NatureOfComplaint = new SelectList(dsVehicleDistrictDetails.Tables[2].AsDataView(), "Id", "Complaint");
-                ViewBag.AllotedMechanic= new SelectList(dsVehicleDistrictDetails.Tables[3].AsDataView(), "workshop_id", "name");
-                ViewBag.ServiceEngineer = new SelectList(dsVehicleDistrictDetails.Tables[4].AsDataView(), "workshop_id", "name");
+                ViewBag.AllotedMechanic= new SelectList(dsVehicleDistrictDetails.Tables[3].AsDataView(), "empId", "name");
+                ViewBag.ServiceEngineer = new SelectList(dsVehicleDistrictDetails.Tables[4].AsDataView(), "empId", "name");
                 _vehModel.DistrictId = Convert.ToInt32(Session["Id"]);
                 DataSet dsGetJobCardDetails = _helper.FillDropDownHelperMethodWithSp("spGetJobCardDetails");
                 Session["GetJobCardDetails"] = dsGetJobCardDetails;
-                model = dsGetJobCardDetails.Tables[0].AsEnumerable().ToList().Select(x => new VehicleModel {Id=x.Field<int>("JobCardNumber"), DistrictName = x.Field<string>("District"),NatureOfComplaint=x.Field<int>("NatureOfComplaint"), VehicleId = x.Field<string>("vehicleNumber"), DateOfDelivery = x.Field<DateTime>("Dor"), ModelNumber = x.Field<int>("Model"), Odometer = x.Field<int>("Odometer"), PilotName = x.Field<string>("PilotName"), ApproximateCost = x.Field<int>("ApproxCost"),AllotedMechanic= x.Field<string>("AllotedMechanic") });
+                model = dsGetJobCardDetails.Tables[0].AsEnumerable().ToList().Select(x => new VehicleModel {Id=x.Field<int>("JobCardNumber"), DistrictName = x.Field<string>("District"),NatureOfComplaint=x.Field<int>("NatureOfComplaint"), VehicleId = x.Field<string>("vehicleNumber"), DateOfDelivery = x.Field<DateTime>("Dor"), ModelNumber = x.Field<int>("Model"), Odometer = x.Field<int>("Odometer"), PilotName = x.Field<string>("PilotName"), ApproximateCost = x.Field<int>("ApproxCost"),AllotedMechanicName= x.Field<string>("employeeName") });
              
             }
             return View(model);
@@ -69,7 +69,7 @@ namespace Fleet_WorkShop.Controllers
               
 
             };
-            returnVal = _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", _vehDetails.DistrictId, _vehDetails.VehId, _vehDetails.DateOfRepair, _vehDetails.ModelNumber, _vehDetails.Odometer, _vehDetails.ReceivedLocation, _vehDetails.PilotId, _vehDetails.PilotName,_vehDetails.DateOfDelivery,_vehDetails.NatureOfComplaint,_vehDetails.ApproximateCost,_vehDetails.AllotedMechanic,_vehDetails.WorkShopId,_vehDetails.ServiceEngineer);
+            returnVal = _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", _vehDetails.DistrictId, _vehDetails.VehId, _vehDetails.DateOfRepair, _vehDetails.ModelNumber, _vehDetails.Odometer, _vehDetails.ReceivedLocation, _vehDetails.PilotId, _vehDetails.PilotName,_vehDetails.DateOfDelivery,_vehDetails.NatureOfComplaint,_vehDetails.ApproximateCost,Convert.ToInt32(_vehDetails.AllotedMechanic),_vehDetails.WorkShopId,Convert.ToInt32(_vehDetails.ServiceEngineer));
             return RedirectToAction("SaveJobCardDetails");
         }
 
