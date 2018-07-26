@@ -133,80 +133,72 @@ namespace Fleet_WorkShop.Controllers
             {
 
                 //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
-                _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails",model.BillNo, items.ManufacturerId, items.SparePartId, items.UnitPrice, items.Quantity, items.Amount);
+                _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails",model.BillNo, items.ManufacturerId, items.SparePartId, items.UnitPrice, items.Quantity, items.Amount,model.VendorId);
                 
             }
-
+            
             CommonMethod(model);
-           
-          
+
+
             return RedirectToAction("SaveInventoryDetails");
         }
         public void CommonMethod(InventoryModel model)
         {
-            
-            string query = "select workshopid from t_receipts where billnumber='" + model.BillNo + "'and vendorid="+model.VendorId+"";
+            string query = "select workshopid,receipt_id from t_receipts where billnumber='" + model.BillNo + "'and vendorid=" + model.VendorId + "";
             DataTable dtWorshopId = _helper.ExecuteSelectStmt(query);
             int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("workshopid")).FirstOrDefault();
-           DataTable dtGetTotalAmount= _helper.ExecuteSelectStmtusingSP("spGetTotalBillAmount", "@vendorid", model.VendorId.ToString(), "@workshopid", workShopId.ToString());
-            if(dtGetTotalAmount.Rows.Count>0)
+            var receiptId = dtWorshopId.AsEnumerable().Select(x => x.Field<long>("receipt_id")).FirstOrDefault();
+            foreach (var item in model.itemmodel)
             {
-                _helper.UpdateTotalBillDetails(dtGetTotalAmount);
-            }
-            DataTable dtQuantity = _helper.ExecuteSelectStmtusingSP("UpdateQuantityOnWorkShopID", "@workshopid", workShopId.ToString());
-            string workshopstocks = "select workshopid from t_SpareParts_Stock";
-            DataTable dtworkshopstocks = _helper.ExecuteSelectStmt(workshopstocks);
-            if (dtworkshopstocks.Rows.Count > 0)
-            {
-                var dtstoreRecords = dtworkshopstocks.AsEnumerable().Select(x => x/*new { WorkShopId=x.Field<int>("WorkShopId"), ManufacturerId = x.Field<int>("ManufacturerId"), SparePartId = x.Field<int>("SparePartId") }*/);
-                if (dtstoreRecords.AsEnumerable().Where(c => c.Field<int>("WorkShopId").Equals(workShopId)).Count() > 0)
-                {
-                    _helper.InsertStockDetals(dtQuantity, "1");
 
-                }
-                else
-                {
-                    _helper.InsertStockDetals(dtQuantity);
+                //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
+                _helper.ExecuteInsertStockDetails("spInsertInventoryStockDetails", workShopId, item.ManufacturerId, item.SparePartId, item.UnitPrice, item.Quantity, receiptId,model.BillNo,model.VendorId);
 
-                }
-            }
-            else
-            {
-                _helper.InsertStockDetals(dtQuantity);
             }
         }
 
         public void CommonMethodLubes(InventoryModel model)
         {
-            string query = "select workshopid from t_lubesreceipts where billnumber='" + model.BillNo + "'and vendorid=" + model.VendorId + "";
+            string query = "select workshopid,receipt_id from t_lubesreceipts where billnumber='" + model.BillNo + "'and vendorid=" + model.VendorId + "";
             DataTable dtWorshopId = _helper.ExecuteSelectStmt(query);
-            int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("WorkShopId")).FirstOrDefault();
-            DataTable dtGetTotalAmount = _helper.ExecuteSelectStmtusingSP("spGetTotalBillAmountLubes", "@vendorid", model.VendorId.ToString(), "@workshopid", workShopId.ToString());
-            if (dtGetTotalAmount.Rows.Count > 0)
+            int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("workshopid")).FirstOrDefault();
+            var receiptId = dtWorshopId.AsEnumerable().Select(x => x.Field<long>("receipt_id")).FirstOrDefault();
+            foreach (var item in model.itemmodel)
             {
-                _helper.UpdateTotalBillDetailsLubes(dtGetTotalAmount);
-            }
-            DataTable dtQuantity = _helper.ExecuteSelectStmtusingSP("UpdateLubesQuantityOnWorkShopID", "@workshopid", workShopId.ToString());
-            string workshopstocks = "select WorkShopId from t_lubes_stock";
-            DataTable dtworkshopstocks = _helper.ExecuteSelectStmt(workshopstocks);
-            if (dtworkshopstocks.Rows.Count > 0)
-            {
-                var dtstoreRecords = dtworkshopstocks.AsEnumerable().Select(x => x/*new { WorkShopId=x.Field<int>("WorkShopId"), ManufacturerId = x.Field<int>("ManufacturerId"), SparePartId = x.Field<int>("SparePartId") }*/);
-                if (dtstoreRecords.AsEnumerable().Where(c => c.Field<int>("WorkShopId").Equals(workShopId)).Count() > 0)
-                {
-                    _helper.InsertLubricantStockDetails(dtQuantity, "1");
 
-                }
-                else
-                {
-                    _helper.InsertLubricantStockDetails(dtQuantity);
+                //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
+                _helper.ExecuteInsertLubeStockDetails("spInsertLubesStockDetails", workShopId, item.ManufacturerId, item.LubricantId, item.UnitPrice, item.Quantity, receiptId, model.BillNo, model.VendorId);
 
-                }
             }
-            else
-            {
-                _helper.InsertLubricantStockDetails(dtQuantity);
-            }
+            //string query = "select workshopid from t_lubesreceipts where billnumber='" + model.BillNo + "'and vendorid=" + model.VendorId + "";
+            //DataTable dtWorshopId = _helper.ExecuteSelectStmt(query);
+            //int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("WorkShopId")).FirstOrDefault();
+            //DataTable dtGetTotalAmount = _helper.ExecuteSelectStmtusingSP("spGetTotalBillAmountLubes", "@vendorid", model.VendorId.ToString(), "@workshopid", workShopId.ToString());
+            //if (dtGetTotalAmount.Rows.Count > 0)
+            //{
+            //    _helper.UpdateTotalBillDetailsLubes(dtGetTotalAmount);
+            //}
+            //DataTable dtQuantity = _helper.ExecuteSelectStmtusingSP("UpdateLubesQuantityOnWorkShopID", "@workshopid", workShopId.ToString());
+            //string workshopstocks = "select WorkShopId from t_lubes_stock";
+            //DataTable dtworkshopstocks = _helper.ExecuteSelectStmt(workshopstocks);
+            //if (dtworkshopstocks.Rows.Count > 0)
+            //{
+            //    var dtstoreRecords = dtworkshopstocks.AsEnumerable().Select(x => x/*new { WorkShopId=x.Field<int>("WorkShopId"), ManufacturerId = x.Field<int>("ManufacturerId"), SparePartId = x.Field<int>("SparePartId") }*/);
+            //    if (dtstoreRecords.AsEnumerable().Where(c => c.Field<int>("WorkShopId").Equals(workShopId)).Count() > 0)
+            //    {
+            //        _helper.InsertLubricantStockDetails(dtQuantity, "1");
+
+            //    }
+            //    else
+            //    {
+            //        _helper.InsertLubricantStockDetails(dtQuantity);
+
+            //    }
+            //}
+            //else
+            //{
+            //    _helper.InsertLubricantStockDetails(dtQuantity);
+            //}
         }
         [HttpGet]
         public ActionResult Edit(int? Id = null)
@@ -229,11 +221,13 @@ namespace Fleet_WorkShop.Controllers
                 BillAmount = Convert.ToDecimal(row["BillAmount"]),
                 BillDate=DateTime.Parse(row["BillDate"].ToString()),
                 Manufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName"),
-                SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName")
+                SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName"),
+                VendorId= Convert.ToInt32(row["vendorid"])
             };
             Session["BillAmount"] = model.BillAmount;
             Session["Amt"] = model.Amt;
             Session["Bill"] = model.BillNo;
+            Session["VendorId"] = model.VendorId;
                                   
             return View(model);
         }
@@ -241,7 +235,9 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult Edit(InventoryModel postInventory)
         {
             DataSet dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetReceiptDetails");
-            DataRow row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().FirstOrDefault(x => x.Field<string>("BillNumber") ==postInventory.BillNo);
+            DataRow row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == postInventory.Id);
+       postInventory.VendorId = Convert.ToInt32(row["vendorId"]);
+            //string vendorQuery="select vendorid "
             postInventory.BillAmount = decimal.Parse(Session["BillAmount"].ToString());
             if (row["BillAmount"].ToString() != null)
             {
@@ -251,7 +247,7 @@ namespace Fleet_WorkShop.Controllers
                     _inventoryModel.Amt = Convert.ToDecimal(Session["Amt"].ToString());
                     var bill = Decimal.Parse(Session["BillAmount"].ToString());
                     postInventory.BillAmount = postInventory.BillAmount - (_inventoryModel.Amt - postInventory.Amt);
-                    _helper.ExecuteUpdateInventoryStatement(postInventory.ManufacturerId, "spEditInventory", postInventory.SparePartId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id);
+                    _helper.ExecuteUpdateInventoryStatement(postInventory.ManufacturerId, "spEditInventory", postInventory.SparePartId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id, postInventory.VendorId);
                     string query = "delete from t_receipts where billnumber='" + Session["Bill"].ToString() + "'";
                     _helper.ExecuteDeleteInvBillNumberStatement(query);
                 }
@@ -260,11 +256,20 @@ namespace Fleet_WorkShop.Controllers
                     _inventoryModel.Amt = Convert.ToDecimal(Session["Amt"].ToString());
                     var bill = Decimal.Parse(Session["BillAmount"].ToString());
                     postInventory.BillAmount = postInventory.BillAmount - (_inventoryModel.Amt - postInventory.Amt);
-                    _helper.ExecuteUpdateInventoryStatement(postInventory.ManufacturerId, "spEditInventory", postInventory.SparePartId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id);
+                    _helper.ExecuteUpdateInventoryStatement(postInventory.ManufacturerId, "spEditInventory", postInventory.SparePartId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id, postInventory.VendorId);
                 }
             }
-            CommonMethod(postInventory);
+            CommonEditSparesMethod(postInventory);
             return RedirectToAction("SaveInventoryDetails");
+        }
+
+        private void CommonEditSparesMethod(InventoryModel model)
+        {
+            string query = "select workshopid,receipt_id from t_receipts where billnumber='" + model.BillNo + "'and vendorid=" + model.VendorId + "";
+            DataTable dtWorshopId = _helper.ExecuteSelectStmt(query);
+            int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("workshopid")).FirstOrDefault();
+            var receiptId = dtWorshopId.AsEnumerable().Select(x => x.Field<long>("receipt_id")).FirstOrDefault();
+            _helper.ExecuteUpdateInventoryStocksStatement(workShopId, model.ManufacturerId, "spEditSParepartsInventory", model.SparePartId, model.Uprice, model.Qty, receiptId,model.BillNo,model.VendorId);
         }
 
         public ActionResult SaveLubesInventoryDetails()
@@ -291,7 +296,7 @@ namespace Fleet_WorkShop.Controllers
             {
 
                 //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
-                _helper.ExecuteInsertLubesDetails("spInsertLubricantDetails", model.BillNo, items.ManufacturerId, items.LubricantId, items.UnitPrice, items.Quantity, items.Amount);
+                _helper.ExecuteInsertLubesDetails("spInsertLubricantDetails", model.BillNo, items.ManufacturerId, items.LubricantId, items.UnitPrice, items.Quantity, items.Amount,billDetails.VendorId);
 
             }
             CommonMethodLubes(model);
@@ -319,11 +324,13 @@ namespace Fleet_WorkShop.Controllers
                 BillAmount = Convert.ToDecimal(row["BillAmount"]),
                 BillDate = DateTime.Parse(row["BillDate"].ToString()),
                 Manufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName"),
-                Lubricant = new SelectList(dsGetManufacturerVendor.Tables[3].AsDataView(), "Id", "OilName")
+                Lubricant = new SelectList(dsGetManufacturerVendor.Tables[3].AsDataView(), "Id", "OilName"),
+                VendorId = Convert.ToInt32(row["vendorid"])
             };
             Session["BillAmount"] = model.BillAmount;
             Session["Amt"] = model.Amt;
             Session["Bill"] = model.BillNo;
+            Session["VendorId"] = model.VendorId;
 
             return View(model);
      
@@ -334,7 +341,8 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult EditLubeDetails(InventoryModel postInventory)
         {
             DataSet dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetLubesReceiptDetails");
-            DataRow row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().FirstOrDefault(x => x.Field<string>("BillNumber") == postInventory.BillNo);
+            DataRow row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == postInventory.Id);
+            postInventory.VendorId = Convert.ToInt32(row["vendorid"]);
             postInventory.BillAmount = decimal.Parse(Session["BillAmount"].ToString());
             if (row["BillAmount"].ToString() != null)
             {
@@ -344,7 +352,7 @@ namespace Fleet_WorkShop.Controllers
                     _inventoryModel.Amt = Convert.ToDecimal(Session["Amt"].ToString());
                     var bill = Decimal.Parse(Session["BillAmount"].ToString());
                     postInventory.BillAmount = postInventory.BillAmount - (_inventoryModel.Amt - postInventory.Amt);
-                    _helper.ExecuteUpdateLubesStatement(postInventory.ManufacturerId, "spEditLubes", postInventory.LubricantId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id,postInventory.BillDate);
+                    _helper.ExecuteUpdateLubesStatement(postInventory.ManufacturerId, "spEditLubes", postInventory.LubricantId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id,postInventory.BillDate,postInventory.VendorId);
                     string query = "delete from t_Lubesreceipts where billnumber='" + Session["Bill"].ToString() + "'";
                     _helper.ExecuteDeleteInvBillNumberStatement(query);
                 }
@@ -353,12 +361,19 @@ namespace Fleet_WorkShop.Controllers
                     _inventoryModel.Amt = Convert.ToDecimal(Session["Amt"].ToString());
                     var bill = Decimal.Parse(Session["BillAmount"].ToString());
                     postInventory.BillAmount = postInventory.BillAmount - (_inventoryModel.Amt - postInventory.Amt);
-                    _helper.ExecuteUpdateLubesStatement(postInventory.ManufacturerId, "spEditLubes", postInventory.LubricantId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id, postInventory.BillDate);
+                    _helper.ExecuteUpdateLubesStatement(postInventory.ManufacturerId, "spEditLubes", postInventory.LubricantId, postInventory.Uprice, postInventory.Qty, postInventory.Amt, postInventory.BillAmount, postInventory.BillNo, postInventory.Id, postInventory.BillDate,postInventory.VendorId);
                 }
             }
-            CommonMethodLubes(postInventory);
+            CommonEditLubesMethod(postInventory);
             return RedirectToAction("saveLubesInventoryDetails");
         }
-
+        private void CommonEditLubesMethod(InventoryModel model)
+        {
+            string query = "select workshopid,receipt_id from t_lubesreceipts where billnumber='" + model.BillNo + "'and vendorid=" + model.VendorId + "";
+            DataTable dtWorshopId = _helper.ExecuteSelectStmt(query);
+            int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("workshopid")).FirstOrDefault();
+            var receiptId = dtWorshopId.AsEnumerable().Select(x => x.Field<long>("receipt_id")).FirstOrDefault();
+            _helper.ExecuteUpdateLubesStatement(workShopId, model.ManufacturerId, "spEditLubesInventory", model.LubricantId, model.Uprice, model.Qty, receiptId, model.BillNo, model.VendorId);
+        }
     }
 }

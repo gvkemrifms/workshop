@@ -15,12 +15,8 @@
     var vehicleNumber=0;
     $(function () {
         $('.myclass').click(function ()
-        {
-      
-                vehicleNumber = $(this).text()
-   
-                alert(vehicleNumber);
-            
+        {      
+                vehicleNumber = $(this).text()              
             //$.ajax({
             //    type: "Post",
             //    url: '/Vehicle/GetPendingStatusDetails',
@@ -74,6 +70,7 @@
                 Quantity: $('#txtQuantity').val().trim(),
                 HandOverToId: $('#HandOver').val(),
                 HandOverToName: $('#HandOver option:selected').text(),
+                Status: $('input[type="radio"]').val()
             });
             GeneratedItemsTable();
             return false;
@@ -120,7 +117,7 @@
         $('#btnSubmit').click(function () {
             var serviceURL = '/Vehicle/SaveCalculateFIFO';
             var data = {              
-                Status: $('input[type="radio"]').val(),
+                //Status: $('input[type="radio"]').val(),
                 itemmodel: orderItems
             };
             $.ajax({
@@ -244,13 +241,13 @@
     <div class="col-lg-6" style="margin-top:-70px;margin-left:100px;">
         <form class="form-horizontal">
 
-            <div class="form-group">
+            @*<div class="form-group">
                 <label class="control-label  col-lg-3">Spare Parts</label>
                 <div class="col-lg-4">
                    
                     @Html.DropDownList("SpareParts", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
                 </div>
-            </div>
+            </div>*@
             <div class="form-group">
                 <label class="control-label col-lg-2" style="margin-left:280px;margin-top:-50px;">Quantity</label>
                 <div class="col-lg-4">

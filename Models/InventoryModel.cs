@@ -80,6 +80,7 @@ namespace Fleet_WorkShop.Models
         public int Quantity { get; set; }
         public int LubricantId { get; set; }
         public decimal TotalAmount { get; set; }
-       
+        public int VendorId { get; set; }
+
     }
 }

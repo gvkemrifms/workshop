@@ -147,9 +147,9 @@ namespace Fleet_WorkShop.Controllers
             DataTable dtPendingStatus= _helper.ExecuteSelectStmt("spGetVehiclesWithPendingStatus");
             pendingCases = dtPendingStatus.AsEnumerable().Select(x => new JobCardPendingCases { VehicleId= x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"),DistrictName= x.Field<string>("District"),DateOfRepair= x.Field<DateTime>("DateOfRepair"),Complaint= x.Field<string>("Complaint"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("employeeName"), Status = x.Field<string>("status"), });
             Session["PendingStatus"] = dtPendingStatus;
-            DataTable dtSpareParts = _helper.ExecuteSelectStmtusingSP("spGetSpares");
-            Session["getSpares"] = dtSpareParts;
-            ViewBag.SpareParts =  new SelectList(dtSpareParts.AsDataView(), "Id", "PartName");
+            //DataTable dtSpareParts = _helper.ExecuteSelectStmtusingSP("spGetSpares");
+            //Session["getSpares"] = dtSpareParts;
+            //ViewBag.SpareParts =  new SelectList(dtSpareParts.AsDataView(), "Id", "PartName");
             DataTable dtHandOver = _helper.ExecuteSelectStmtusingSP("spGetDesidnationDetails");
             ViewBag.HandOver = new SelectList(dtHandOver.AsDataView(), "id", "Designation");
             return View(pendingCases);
@@ -162,15 +162,31 @@ namespace Fleet_WorkShop.Controllers
                 DataTable dtPendingStatus = Session["PendingStatus"] as DataTable;
                 pendingCases =  dtPendingStatus.AsEnumerable().Where(x=>x.Field<Guid>("Id") == id).Select(x => new JobCardPendingCases { VehicleId = x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"), DistrictName = x.Field<string>("District"), DateOfRepair = x.Field<DateTime>("DateOfRepair").Date, Complaint = x.Field<string>("Complaint"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("employeeName"), Status = x.Field<string>("status"),JobCardNumber= x.Field<int>("JobCardNumber") });
             }
+            DataTable dtVehicleSpareParts = _helper.ExecuteSelectStmtusingSP("spGetVehicleSpares",null,null,null,null, "@vehicleNumber",pendingCases.Select(x=>x.VehicleNumber).FirstOrDefault());
+            Session["getVehicleSpares"] = dtVehicleSpareParts;
+            ViewBag.SpareParts = new SelectList(dtVehicleSpareParts.AsDataView(), "Id", "PartName");
             Session["JobCardNumber"] = pendingCases.Select(x => x.JobCardNumber).FirstOrDefault();
             return PartialView("_EditPendingStatusDetails",pendingCases);
         }
 
         public void SaveCalculateFIFO(VehicleModel pendingCases)
-        {           
+        {
+              
             pendingCases.JobCardId = Convert.ToInt32(Session["JobCardNumber"]);
+            DataTable dtGetPartNumber = Session["getVehicleSpares"] as DataTable;
+            var spares = dtGetPartNumber.AsEnumerable().Select(x => x.Field<string>("partnumber"));
+            foreach (var spare in spares)
+            {
+                DataTable dtcostDetails = _helper.ExecuteSelectStmtusingSP("GetCostBySparePartNumber", null, null, null, null, "@partnumber", spare);
+                
+            }
+            //foreach (var items in pendingCases.itemmodel)
+            //{
 
+            //    //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
+            //    _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails", model.BillNo, items.ManufacturerId, items.SparePartId, items.UnitPrice, items.Quantity, items.Amount);
 
+            //}
         }
         public void GetSparePartCost(JobCardPendingCases pendingCases)
         {

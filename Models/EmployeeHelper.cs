@@ -216,6 +216,82 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+        internal int ExecuteInsertStockDetails(string insertStmt, int workShopId, int manufacturerId, int sparePartId, int unitPrice, int quantity, long receiptId,string billNumber,int vendorId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@workshopid", workShopId);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@sparepartid", sparePartId);
+                    comm.Parameters.AddWithValue("@unitprice", unitPrice);
+                    comm.Parameters.AddWithValue("@quantity", quantity);
+                    comm.Parameters.AddWithValue("@receiptid", receiptId);
+                    comm.Parameters.AddWithValue("@billnumber", billNumber);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int ExecuteInsertLubeStockDetails(string insertStmt, int workShopId, int manufacturerId, int lubricantId, int unitPrice, int quantity, long receiptId, string billNo, int vendorId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@workshopid", workShopId);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@lubricantid", lubricantId);
+                    comm.Parameters.AddWithValue("@unitprice", unitPrice);
+                    comm.Parameters.AddWithValue("@quantity", quantity);
+                    comm.Parameters.AddWithValue("@receiptid", receiptId);
+                    comm.Parameters.AddWithValue("@billnumber", billNo);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         internal int ExecuteInsertLubesMasterDetails(string insertStmt, int manufacturerId, string oilName, decimal costPerLitre)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
@@ -309,7 +385,7 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertInventoryDetails(string insertStmt,string billnumber,int manufacturerid,int sparepartid,decimal unitprice,int quantity,decimal amount)
+        internal int ExecuteInsertInventoryDetails(string insertStmt,string billnumber,int manufacturerid,int sparepartid,decimal unitprice,int quantity,decimal amount,int vendorId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -325,6 +401,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@unitprice", unitprice);
                     comm.Parameters.AddWithValue("@quantity", quantity);
                     comm.Parameters.AddWithValue("@amount", amount);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
                     try
                     {
                         conn.Open();
@@ -362,6 +439,43 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+        internal int ExecuteUpdateInventoryStocksStatement(int workshopId, int manufacturerId, string insertStmt, int sparePartId, decimal uprice, int qty, long receiptId,string billNumber,int vendorId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@workshopid", workshopId);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@sparepartsid", sparePartId);
+                    comm.Parameters.AddWithValue("@unitprice", uprice);
+                    comm.Parameters.AddWithValue("@quantity", qty);
+                    comm.Parameters.AddWithValue("@receiptid", receiptId);
+                    comm.Parameters.AddWithValue("@billnumber", billNumber);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
+
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
 
         internal void UpdateTotalBillDetailsLubes(DataTable dtGetTotalAmount)
         {
@@ -417,6 +531,44 @@ namespace Fleet_WorkShop.Models
                     ExecuteInsertLubesSummaryDetails("spLubesUpdateDetails", stocks.WorkShopId, stocks.ManufacturerId, stocks.LubricantId, stocks.Quantity, stocks.TotalAmount);
             }
         }
+
+        internal int ExecuteUpdateLubesStatement(int workShopId, int manufacturerId, string insertStmt, int lubricantId, decimal uprice, int qty, long receiptId, string billNo, int vendorId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@workshopid", workShopId);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@lubricantid", lubricantId);
+                    comm.Parameters.AddWithValue("@unitprice", uprice);
+                    comm.Parameters.AddWithValue("@quantity", qty);
+                    comm.Parameters.AddWithValue("@billnumber", billNo);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
+                    comm.Parameters.AddWithValue("@receiptid", receiptId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         internal int ExecuteInsertLubesSummaryDetails(string insertStmt, int workShopId, int manufacturerId, int lubricantid, int quantity, decimal totalAmount)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
@@ -488,7 +640,7 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertLubesDetails(string insertStmt, string billnumber, int manufacturerid, int Lubesid, decimal unitprice, int quantity, decimal amount)
+        internal int ExecuteInsertLubesDetails(string insertStmt, string billnumber, int manufacturerid, int Lubesid, decimal unitprice, int quantity, decimal amount,int vendorId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -504,6 +656,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@unitprice", unitprice);
                     comm.Parameters.AddWithValue("@quantity", quantity);
                     comm.Parameters.AddWithValue("@amount", amount);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
                     try
                     {
                         conn.Open();
@@ -553,7 +706,7 @@ namespace Fleet_WorkShop.Models
 
 
 
-        internal int ExecuteUpdateInventoryStatement(int manufacturerId, string insertStmt, int sparePartId, decimal uprice, int qty, decimal amt, decimal billAmount, string billNo, int id)
+        internal int ExecuteUpdateInventoryStatement(int manufacturerId, string insertStmt, int sparePartId, decimal uprice, int qty, decimal amt, decimal billAmount, string billNo, int id, int vendorId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -571,6 +724,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@id", id);
                     comm.Parameters.AddWithValue("@billamount", billAmount);
                     comm.Parameters.AddWithValue("@billnumber", billNo);
+                    comm.Parameters.AddWithValue("@vendorid", vendorId);
                     try
                     {
                         conn.Open();
@@ -589,7 +743,7 @@ namespace Fleet_WorkShop.Models
                 }
             }
         }
-        internal int ExecuteUpdateLubesStatement(int manufacturerId, string insertStmt, int LubricantId, decimal uprice, int qty, decimal amt, decimal billAmount, string billNo, int id,DateTime billdate)
+        internal int ExecuteUpdateLubesStatement(int manufacturerId, string insertStmt, int LubricantId, decimal uprice, int qty, decimal amt, decimal billAmount, string billNo, int id,DateTime billdate,int vendorid)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -608,6 +762,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@billamount", billAmount);
                     comm.Parameters.AddWithValue("@billnumber", billNo);
                     comm.Parameters.AddWithValue("@billdate", billdate);
+                    comm.Parameters.AddWithValue("@vendorid", vendorid);
                     try
                     {
                         conn.Open();
