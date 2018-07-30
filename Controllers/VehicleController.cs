@@ -161,6 +161,8 @@ namespace Fleet_WorkShop.Controllers
             {
                 DataTable dtPendingStatus = Session["PendingStatus"] as DataTable;
                 pendingCases =  dtPendingStatus.AsEnumerable().Where(x=>x.Field<Guid>("Id") == id).Select(x => new JobCardPendingCases { VehicleId = x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"), DistrictName = x.Field<string>("District"), DateOfRepair = x.Field<DateTime>("DateOfRepair").Date, Complaint = x.Field<string>("Complaint"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("employeeName"), Status = x.Field<string>("status"),JobCardNumber= x.Field<int>("JobCardNumber") });
+              Session["workshopName"]=  pendingCases.Select(x => x.WorkShopName).FirstOrDefault();
+
             }
             DataTable dtVehicleSpareParts = _helper.ExecuteSelectStmtusingSP("spGetVehicleSpares",null,null,null,null, "@vehicleNumber",pendingCases.Select(x=>x.VehicleNumber).FirstOrDefault());
             Session["getVehicleSpares"] = dtVehicleSpareParts;
@@ -171,29 +173,106 @@ namespace Fleet_WorkShop.Controllers
 
         public void SaveCalculateFIFO(VehicleModel pendingCases)
         {
-              
+            string workshopName = Session["workshopName"].ToString();
+            string query = "select workshop_id from m_workshop where workshop_name='" + workshopName + "'";
+            DataTable dtWorkShopId = _helper.ExecuteSelectStmt(query);
+            pendingCases.WorkShopId = dtWorkShopId.AsEnumerable().Select(x => x.Field<int>("workshop_id")).FirstOrDefault();
             pendingCases.JobCardId = Convert.ToInt32(Session["JobCardNumber"]);
             DataTable dtGetPartNumber = Session["getVehicleSpares"] as DataTable;
-            var spares = dtGetPartNumber.AsEnumerable().Select(x => x.Field<string>("partnumber"));
-            foreach (var spare in spares)
+            var spares = dtGetPartNumber.AsEnumerable().Select(x => new { PartName = x.Field<string>("partnumber"), PartId = x.Field<int>("Id") });
+            foreach (var itemm in pendingCases.itemmodel)
             {
-                DataTable dtcostDetails = _helper.ExecuteSelectStmtusingSP("GetCostBySparePartNumber", null, null, null, null, "@partnumber", spare);
-                
+                foreach (var spare in spares)
+                {
+                    if (itemm.SparePartId == spare.PartId)
+                    {
+                        DataTable dtcostDetails = _helper.ExecuteSelectStmtusingSP("GetCostBySparePartNumber", null, null, null, null, "@partnumber", spare.PartName);
+                        int sumOfQuantity = dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity")).Sum();
+                        if (itemm.Quantity <= sumOfQuantity)
+                        {
+                            if (itemm.Quantity <= dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity")).FirstOrDefault())
+                            {
+                                decimal Cost = dtcostDetails.AsEnumerable().Select(x => x.Field<decimal>("Cost")).FirstOrDefault();
+                                decimal totalAmount = Cost * itemm.Quantity;
+                                int res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, itemm.Quantity, totalAmount, itemm.HandOverToId, pendingCases.JobCardId);
+                                if (res == 1)
+                                {
+                                    int itemTotalQuantity = dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity")).FirstOrDefault();
+                                    long receiptId = dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Id")).FirstOrDefault();
+                                    int updatedQuantity = itemTotalQuantity - itemm.Quantity;
+
+                                    _helper.ExecuteUpdateSparesIssueStatement("UpdateSpareIssueQuantityDetails", receiptId, updatedQuantity);
+                                }
+
+                            }
+                            else
+                            {
+                                int count = dtcostDetails.Rows.Count;
+                                foreach (DataRow row in dtcostDetails.Rows)
+                                {
+                                    if (Convert.ToInt32(itemm.Quantity) != 0)
+                                    {
+                                        decimal Cost = Convert.ToDecimal(row["Cost"]);
+                                        decimal totalAmount = 0;
+                                        int Qty = 0;
+                                        if (itemm.Quantity <= Convert.ToInt32(row["Quantity"]))
+                                        {
+                                            totalAmount = Cost * itemm.Quantity;
+                                            Qty = itemm.Quantity;
+                                        }
+                                        else
+                                        {
+                                            totalAmount = Cost * Convert.ToInt32(row["Quantity"]);
+                                            Qty = Convert.ToInt32(row["Quantity"]);
+                                        }
+                                       
+                                        int res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, Qty, totalAmount, itemm.HandOverToId, pendingCases.JobCardId);
+                                        if (res == 1)
+                                        {
+                                            int itemTotalQuantity = Convert.ToInt32(row["Quantity"]);
+                                            long receiptId = Convert.ToInt32(row["Id"]);
+                                            int updatedQuantity = itemTotalQuantity - itemm.Quantity;
+                                            int remainingQuantity = updatedQuantity;
+                                            if (updatedQuantity <= 0)
+                                                updatedQuantity = 0;
+
+                                            int result = _helper.ExecuteUpdateSparesIssueStatement("UpdateSpareIssueQuantityDetails", receiptId, updatedQuantity);
+                                            if (result == 1)
+                                            {
+                                                if(remainingQuantity<=0)
+                                                itemm.Quantity = -(remainingQuantity);         
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }               
             }
-            //foreach (var items in pendingCases.itemmodel)
-            //{
-
-            //    //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
-            //    _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails", model.BillNo, items.ManufacturerId, items.SparePartId, items.UnitPrice, items.Quantity, items.Amount);
-
-            //}
         }
-        public void GetSparePartCost(JobCardPendingCases pendingCases)
+        public ActionResult GetSparePartCost(string spareId)
         {
-            string costQuery = "select cost from t_spareparts where id=" + pendingCases.SparePartId + "group by DateOfPurchase orderby DateOfPurchase";
-            //pendingCases.JobCardId = Convert.ToInt32(Session["JobCardNumber"]);
-
-
+            List<JobCardPendingCases> costDetails = new List<JobCardPendingCases>();
+            DataTable VehicleSpareParts = Session["getVehicleSpares"] as DataTable;
+            var item = VehicleSpareParts.AsEnumerable().Where(x => x.Field<int>("Id") == Convert.ToInt32(spareId)).Select(x => new { PartNumber = x.Field<string>("partnumber"),ManufacturerId= x.Field<int>("ManufacturerId"), VehicleNumber = x.Field<string>("VehicleNumber") }).FirstOrDefault();
+            DataTable dtSparePArtscostDetails = _helper.ExecuteSelectStmtusingSP("spGetSparePartCostDetails", "@manufacturerid", item.ManufacturerId.ToString(), null, null, "@partnumber", item.PartNumber);
+            foreach(DataRow row in dtSparePArtscostDetails.Rows)
+            {
+                JobCardPendingCases details = new JobCardPendingCases();
+                details.Manufacturer = row["ManufacturerName"].ToString();
+                details.SparePart = row["PartName"].ToString();
+                details.LastEntryDate = Convert.ToDateTime(row["lastentrydate"]).ToShortDateString();
+                details.Cost = Convert.ToInt32(row["Cost"]);
+                details.Quantity = Convert.ToInt32(row["Quantity"]);
+                costDetails.Add(details);
+            }
+           string costDetails1 = JsonConvert.SerializeObject(costDetails, Formatting.None, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            });
+            return Content(costDetails1, "application/json");
         }
     }
     }

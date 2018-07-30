@@ -77,7 +77,9 @@ namespace Fleet_WorkShop.Models
         public int AllotedMechanic { get; set; }
         public int JobCardId { get; set; }
         public int HandOverTo { get; set; }
+        public string WorkShopName { get; set; }
         public List<JobCardPendingCases> itemmodel { get; set; }
+        public int WorkShopId { get; set; }
     }
 }
 
@@ -128,4 +130,17 @@ public string WorkShopName { get; set; }
     public int HandOverToId { get; set; }
     public int JobCardNumber { get; set; }
     public SelectList Vehicle { get; set; }
+    public string Manufacturer { get; set; }
+    public string SparePart { get; set; }
+    public int Cost { get; set; }
+    public string ManufacturedDate { get; set; }
+    public string LastEntryDate { get; set; }
+}
+public class GetSparePartCostDetails
+{
+    public string Manufacturer { get; set; }
+    public string SparePart { get; set; }
+    public int Cost { get; set; }
+    public string ManufacturedDate { get; set; }
+   
 }

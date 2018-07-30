@@ -1,0 +1,55 @@
+﻿@{
+    WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
+}
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+
+<style>
+    a {   
+  font-family: helvetica;
+  text-decoration: none;
+  
+}
+
+/* Non-Demo Styles */
+body {
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  align-items: center;
+}
+</style>
+
+@Ajax.ActionLink("Manpower", "WorkShopManPowerReport", "Reports", new AjaxOptions()
+{
+    HttpMethod = "Get",
+    UpdateTargetId = "pendingDivId",
+    InsertionMode = InsertionMode.Replace,
+
+},new { style= "margin-right:20px;margin-top:30px;margin-top:40px;color:blue;text-transform: uppercase;" })
+
+@Ajax.ActionLink("Infrastructure", "InfraStructureReport", "Reports", new AjaxOptions()
+{
+    HttpMethod = "Get",
+    UpdateTargetId = "pendingDivId",
+    InsertionMode = InsertionMode.Replace
+},new { style = "margin-right:20px;margin-top:30px;margin-top:40px;color:blue;text-transform: uppercase;" })
+
+@Ajax.ActionLink("SpareParts", "WorkshopWiseSparepartsReport", "Reports", new AjaxOptions()
+{
+    HttpMethod = "Get",
+    UpdateTargetId = "pendingDivId",
+    InsertionMode = InsertionMode.Replace
+}, new { style = "margin-right:20px;margin-top:30px;margin-top:40px;color:blue;text-transform: uppercase;" })
+
+@Ajax.ActionLink("Lubes", "WorkshopWiseLubesReport", "Reports", new AjaxOptions()
+{
+    HttpMethod = "Get",
+    UpdateTargetId = "pendingDivId",
+    InsertionMode = InsertionMode.Replace
+}, new { style = "margin-right:20px;margin-top:30px;margin-top:40px;color:blue;text-transform: uppercase;" })
+
+<br />
+<div id="pendingDivId">
+
+</div>
+

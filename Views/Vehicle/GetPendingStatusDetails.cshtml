@@ -16,7 +16,8 @@
     $(function () {
         $('.myclass').click(function ()
         {      
-                vehicleNumber = $(this).text()              
+            vehicleNumber = $(this).text()
+            $('#tblCost').empty();
             //$.ajax({
             //    type: "Post",
             //    url: '/Vehicle/GetPendingStatusDetails',
@@ -70,7 +71,8 @@
                 Quantity: $('#txtQuantity').val().trim(),
                 HandOverToId: $('#HandOver').val(),
                 HandOverToName: $('#HandOver option:selected').text(),
-                Status: $('input[type="radio"]').val()
+                Status: $('input[type="radio"]').val(),
+                WorkShopName: $('#WorkShopName').text()
             });
             GeneratedItemsTable();
             return false;
@@ -234,7 +236,7 @@
 
     </table>
     <br />
-    
+
     <div style="width:400px;margin-top:20px;margin-bottom:140px" id="pendingDivId" align="center">
         
     </div>
@@ -251,7 +253,7 @@
             <div class="form-group">
                 <label class="control-label col-lg-2" style="margin-left:280px;margin-top:-50px;">Quantity</label>
                 <div class="col-lg-4">
-                    <input type="text"  class="form-control" style="margin-top:-50px;margin-left:350px" id="txtQuantity" placeholder="Quantity">
+                    <input type="text" class="form-control" style="margin-top:-50px;margin-left:350px" id="txtQuantity" placeholder="Quantity">
                 </div>
             </div>
             <div class="form-group">
@@ -259,30 +261,32 @@
                     <label class="control-label  col-lg-2" style="margin-left:490px;margin-top:-68px;">HandOver</label>
                 </div>
                 <div class="col-lg-4">
-                    @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control",@style= "margin-top:-67px;margin-left:500px", @placeholder = "HandOver To" })
+                    @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style = "margin-top:-67px;margin-left:500px", @placeholder = "HandOver To" })
                     @*<input type="text" class="form-control" style="margin-top:-67px;margin-left:490px" id="txtSalary" placeholder="Quantity">*@
                 </div>
 
             </div>
-
             <div class="form-group">
-                <div class="col-lg-2" >
+                <div class="col-lg-2">
                     <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue;margin-left:760px;margin-top:-150px; color: white">Add</button>
                 </div>
+                <div class="col-lg-6">
+                    <table id="tblCost" align="center"></table>
+                </div>
+            </div>
+            <div class="form-group">
                 <div class="col-lg-4">
                     <div class="panel-body" id="orderItems"></div>
-                    
+
                 </div>
-                
-                
-            </div>
-            <div class="col-lg-6">
-                <input name="clkradio" type="radio" value="Inprogress" />In progress
-                <input style="margin-left:30px" name="clkradio" type="radio" value="Completed" />Completed
-            </div>
-            <div>
-                <button type="submit" id="btnSubmit" class="btn btn-default" style="background-color: blue; color: white;">Submit</button>
-            </div>
+                </div>
+                <div class="col-lg-6">
+                    <input name="clkradio" type="radio" value="Inprogress" />In progress
+                    <input style="margin-left:30px" name="clkradio" type="radio" value="Completed" />Completed
+                </div>
+                <div>
+                    <button type="submit" id="btnSubmit" class="btn btn-default" style="background-color: blue; color: white;">Submit</button>
+                </div>
 </form>
     </div>
             <div class="panel-body" id="orderItems" style="margin-top:50px;" align="center" ></div>

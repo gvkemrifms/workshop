@@ -4,7 +4,73 @@
     WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
 }
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+   #tblCosts{
+       width:200%;
+       align:center;
+       align-content:center;
+       position:absolute;
+       color:red;
+   }
+    #tblCost{
+       width:200%;
+       margin-left:140px;
+       align-content:center;
+       position:relative;
+        
+   }
+   #datess
+   {
+       width:100px
+   }
+  
+</style>
+<script type="text/javascript">
+    
+    $(function () {
+        var serviceURL = '/Vehicle/GetSparePartCost';
+        $('#SpareParts').change(function () {
+            if ($('#SpareParts option:selected').text() == '--Select--')
+                $('#tblCost').empty();
+        var data = {
+            spareId: $('#SpareParts option:selected').val()         
+        };
+            //alert(JSON.stringify(data));
+        $.ajax({
+            type: "POST",
+            url: serviceURL,
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('#tblCost').empty();
+                CostDetails(response)              
+            },
+            failure: function (response) {
+                alert(response.responseText);
+            }
+            //error: function (response) {
+            //    alert(response.responseText);
+            //}
+        });
+    })
+    })
 
+    function CostDetails(data) {
+        var eTable = "<table id=tblCosts  ><thead><tr><th>Cost</th><th>Manufacturer</th><th>SparePart</th><th id=datess >LastEntryDate</th><th>Quantity</th></tr></thead><tbody>"
+        for (var i = 0; i < data.length; i++) {
+            eTable += "<tr>";
+            eTable += "<td>" + data[i]['Cost'] + "</td>";
+            eTable += "<td>" + data[i]['Manufacturer'] + "</td>";
+            eTable += "<td>" + data[i]['SparePart'] + "</td>";
+            eTable += "<td>" + data[i]['LastEntryDate'] + "</td>";
+            eTable += "<td>" + data[i]['Quantity'] + "</td>";
+            eTable += "</tr>";
+        }
+        eTable += "</tbody></table>";
+        $('#tblCost').html(eTable);
+    }
+</script>
 <table class="table">
     <tr>
         
@@ -59,3 +125,12 @@
         @Html.DropDownList("SpareParts", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control",@style= "margin-left:-90px" })
     </div>
 </div>
+
+
+
+
+
+
+
+
+

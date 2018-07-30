@@ -292,6 +292,74 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+        internal int ExecuteInsertSparesIssueStatement(string insertStmt, string vehicleNumber, int workShopId, int sparePartId, int quantity, decimal total, int handOverToId,int JobcardId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@WorkshopId", workShopId);
+                    comm.Parameters.AddWithValue("@VehicleNumber", vehicleNumber);
+                    comm.Parameters.AddWithValue("@SparePartId", sparePartId);                   
+                    comm.Parameters.AddWithValue("@Quantity", quantity);
+                    comm.Parameters.AddWithValue("@TotalAmount", total);
+                    comm.Parameters.AddWithValue("@HandOverTo", handOverToId);
+                    comm.Parameters.AddWithValue("@jobcardid", JobcardId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int ExecuteUpdateSparesIssueStatement(string insertStmt, long receiptId, int updatedQuantity)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@quantity", updatedQuantity);
+                    comm.Parameters.AddWithValue("@receipt_id", receiptId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         internal int ExecuteInsertLubesMasterDetails(string insertStmt, int manufacturerId, string oilName, decimal costPerLitre)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))

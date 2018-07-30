@@ -201,6 +201,7 @@
     <Compile Include="Controllers\InventoryController.cs" />
     <Compile Include="Controllers\JobController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Controllers\VehicleController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -212,6 +213,7 @@
     <Compile Include="Models\InfraStructure.cs" />
     <Compile Include="Models\InventoryModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ReportsModel.cs" />
     <Compile Include="Models\SparePartsModel.cs" />
     <Compile Include="Models\VehicleModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -343,6 +345,12 @@
     <Content Include="Views\Employee\SaveInfraStructureDetails.cshtml" />
     <Content Include="Views\Vehicle\GetPendingStatusDetails.cshtml" />
     <Content Include="Views\Vehicle\_EditPendingStatusDetails.cshtml" />
+    <Content Include="Views\Vehicle\GetSparePartCost.cshtml" />
+    <Content Include="Views\Reports\WorkShopManPowerReport.cshtml" />
+    <Content Include="Views\Reports\InfraStructureReport.cshtml" />
+    <Content Include="Views\Reports\WorkshopWiseSparepartsReport.cshtml" />
+    <Content Include="Views\Reports\WorkshopWiseLubesReport.cshtml" />
+    <Content Include="Views\Reports\Reports.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
