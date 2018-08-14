@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Aggregates>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CategoryId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CategoryName)
+        </th>
+        
+        <th>
+            @Html.DisplayNameFor(model => model.AggregateName)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AggregateName)
+            </td>
+
+            <td>
+                @Html.ActionLink("Edit", "EditCategories", new { id=item.IdCategory }) |
+                @Ajax.ActionLink("Delete", "DeleteCategories", new { id = item.IdCategory }, new AjaxOptions()
+           {
+               HttpMethod = "Delete",
+               Confirm = "Are you sure you want to delete this Record?",
+               OnComplete = "function() { $(this).parent().parent().remove() }"
+           })
+            </td>
+        </tr>
+    }
+
+</table>

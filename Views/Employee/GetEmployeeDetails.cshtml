@@ -7,7 +7,9 @@
 
     <table class="table" style="margin-top:30px">
         <tr>
-
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeId)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.EmployeeName)
             </th>
@@ -51,7 +53,9 @@
         @foreach (var item in Model)
         {
             <tr>
-
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmployeeId)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.EmployeeName)
                 </td>
@@ -89,8 +93,8 @@
                 }
 
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.EmpId })
-                    @Ajax.ActionLink("Delete", "Delete", new { id = item.EmpId }, new AjaxOptions()
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+                    @Ajax.ActionLink("Delete", "Delete", new { id = item.Id }, new AjaxOptions()
        {
            HttpMethod = "Delete",
            Confirm = "Are you sure you want to delete this Record?",

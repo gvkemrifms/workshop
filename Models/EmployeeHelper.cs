@@ -13,6 +13,7 @@ namespace Fleet_WorkShop.Models
 {
     public class EmployeeHelper
     {
+        
         public DataTable ExecuteSelectStmt(string query)
         {
             var cs = ConfigurationManager.AppSettings["Str"];
@@ -37,7 +38,7 @@ namespace Fleet_WorkShop.Models
                 connection.Close();
             }
         }
-        public int ExecuteInsertInfraStatement(string insertStmt, int CategoryId, string InfraName, int? Quantity)
+        public int ExecuteInsertInfraStatement(string insertStmt, int CategoryId, string InfraName, int? Quantity,int workshopid)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -50,6 +51,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@CategoryId", CategoryId);
                     comm.Parameters.AddWithValue("@InfraName", InfraName);
                     comm.Parameters.AddWithValue("@qty", Quantity);
+                    comm.Parameters.AddWithValue("@workshopid", workshopid);
                     try
                     {
                         conn.Open();
@@ -105,7 +107,39 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-   
+        internal int ExecuteUpdateSparesMaster(int sparesId, string insertStmt, int manufacturerId, string partName, decimal cost)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@id", sparesId);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@partname", partName);
+                    comm.Parameters.AddWithValue("@cost", cost);
+
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
 
         public DataTable ExecuteSelectStmtusingSP(string insertStmt,string parameterName1=null,string parameterValue1=null, string parameterName2 = null, string parameterValue2 = null, string parameterName3 = null, string parameterValue3 = null)
         {
@@ -172,7 +206,56 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertJobCardDetails(string insertStmt, int districtId, int vehId, DateTime dateOfRepair, int modelNumber, int odometer, string receivedLocation, string pilotId, string pilotName, DateTime dateOfDelivery, int natureOfComplaint, int approximateCost,int allotedmechanic,int workshopid,int serviceEngineer)
+        internal int ExecuteUpdateLubesMaster(int lubesId, string insertStmt, int manufacturerId, string oilName, decimal costPerLitre)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@oilname", oilName);
+                    comm.Parameters.AddWithValue("@costPerlitre", costPerLitre);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@id", lubesId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal DataSet getCost(string commandText, int estimatedCost)
+        {
+            var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
+            var ds = new DataSet();
+            conn.Open();
+            var cmd = new SqlCommand { Connection = conn, CommandType = CommandType.StoredProcedure, CommandText = commandText };
+            if (estimatedCost != 0)
+            {
+                cmd.Parameters.AddWithValue("@serviceid", estimatedCost);
+            }
+            var da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+            conn.Close();
+            return ds;
+        }
+
+        internal int ExecuteInsertJobCardDetails(string insertStmt, int districtId, int vehId, DateTime dateOfRepair, int modelNumber, int odometer, string receivedLocation, string pilotId, string pilotName, DateTime dateOfDelivery, int natureOfComplaint, int approximateCost,int allotedmechanic,int workshopid,int serviceEngineer,int laborCharges,int categoryid,int subCategory,int manufacturerId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -196,6 +279,10 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@allotedmechanic", allotedmechanic);
                     comm.Parameters.AddWithValue("@workshopid", workshopid);
                     comm.Parameters.AddWithValue("@serviceengineer", serviceEngineer);
+                    comm.Parameters.AddWithValue("@laborcharges", laborCharges);
+                    comm.Parameters.AddWithValue("@categories", categoryid);
+                    comm.Parameters.AddWithValue("@subcategory", subCategory);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
                     try
                     {
                         conn.Open();
@@ -254,6 +341,108 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+        internal int InsertJobAggregateDetails(string insertStmt, int manufacturerId, string aggregateName, int v2)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@createdby", v2);
+                    comm.Parameters.AddWithValue("@manufacturerId", manufacturerId);
+                    comm.Parameters.AddWithValue("@aggregateName", aggregateName);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal void ExecuteDeleteAggregates(string v, int? id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal int ExecuteJobAggregateUpdateStatement(string insertStmt, int manufacturerId, string aggregateName,int id)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@manufacturerId", manufacturerId);
+                    comm.Parameters.AddWithValue("@aggregateName", aggregateName);
+                    comm.Parameters.AddWithValue("@id", id);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int InsertJobCategoryDetails(string insertStmt, int v2, string categoryName)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@aggregateId", v2);
+                    comm.Parameters.AddWithValue("@categoryname", categoryName);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         internal int ExecuteInsertLubeStockDetails(string insertStmt, int workShopId, int manufacturerId, int lubricantId, int unitPrice, int quantity, long receiptId, string billNo, int vendorId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
@@ -292,7 +481,76 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertSparesIssueStatement(string insertStmt, string vehicleNumber, int workShopId, int sparePartId, int quantity, decimal total, int handOverToId,int JobcardId)
+        internal int InsertJobSubCategoriesDetails(string insertStmt, int manufacturerId, int serviceGroupId, string serviceName, int timeTaken, int v2)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@servicegroupid", serviceGroupId);
+                    comm.Parameters.AddWithValue("@servicename", serviceName);
+                    comm.Parameters.AddWithValue("@timetaken", timeTaken);
+                    comm.Parameters.AddWithValue("@createdby", v2);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int ExecuteJobSubCategoryUpdateStatement(string insertStmt, int manufacturerId, int serviceGroupId, string serviceName, int timeTaken, int v2)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@manufacturerId", manufacturerId);
+                    comm.Parameters.AddWithValue("@servicegroupid", serviceGroupId);
+                    comm.Parameters.AddWithValue("@servicename", serviceName);
+                    comm.Parameters.AddWithValue("@timetaken", timeTaken);
+                    comm.Parameters.AddWithValue("@ServiceId", v2);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int ExecuteInsertSparesIssueStatement(string insertStmt, string vehicleNumber, int workShopId, int sparePartId, int quantity, decimal total, int handOverToId,int JobcardId,string status)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -309,6 +567,91 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@TotalAmount", total);
                     comm.Parameters.AddWithValue("@HandOverTo", handOverToId);
                     comm.Parameters.AddWithValue("@jobcardid", JobcardId);
+                    comm.Parameters.AddWithValue("@status", status);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal DataSet FillDropDownHelperMethodWithSp1(string commandText, int aggregateId)
+        {
+            var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
+            var ds = new DataSet();
+            conn.Open();
+            var cmd = new SqlCommand { Connection = conn, CommandType = CommandType.StoredProcedure, CommandText = commandText };
+            if (aggregateId != 0)
+            {
+                cmd.Parameters.AddWithValue("@servicegroupid", aggregateId);
+            }
+            var da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+            conn.Close();
+            return ds;
+        }
+        internal DataSet FillDropDownHelperMethodWithSp2(string commandText, int manufacturerId)
+        {
+            var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
+            var ds = new DataSet();
+            conn.Open();
+            var cmd = new SqlCommand { Connection = conn, CommandType = CommandType.StoredProcedure, CommandText = commandText };
+            if (manufacturerId != 0)
+            {
+                cmd.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+            }
+            var da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+            conn.Close();
+            return ds;
+        }
+        internal DataSet FillDropDownHelperMethodWithSp3(string commandText, int aggregateId)
+        {
+            var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
+            var ds = new DataSet();
+            conn.Open();
+            var cmd = new SqlCommand { Connection = conn, CommandType = CommandType.StoredProcedure, CommandText = commandText };
+            if (aggregateId != 0)
+            {
+                cmd.Parameters.AddWithValue("@aggregateid", aggregateId);
+            }
+            var da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+            conn.Close();
+            return ds;
+        }
+
+        internal int ExecuteInsertLubesIssueStatement(string insertStmt, string vehicleNumber, int workShopId, int LubricantId, int quantity, decimal total, int handOverToId, int JobcardId,string status)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@WorkshopId", workShopId);
+                    comm.Parameters.AddWithValue("@VehicleNumber", vehicleNumber);
+                    comm.Parameters.AddWithValue("@LubricantId", LubricantId);
+                    comm.Parameters.AddWithValue("@Quantity", quantity);
+                    comm.Parameters.AddWithValue("@TotalAmount", total);
+                    comm.Parameters.AddWithValue("@HandOverTo", handOverToId);
+                    comm.Parameters.AddWithValue("@jobcardid", JobcardId);
+                    comm.Parameters.AddWithValue("@status", status);
                     try
                     {
                         conn.Open();
@@ -360,7 +703,7 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertLubesMasterDetails(string insertStmt, int manufacturerId, string oilName, decimal costPerLitre)
+        internal int ExecuteInsertLubesMasterDetails(string insertStmt, int manufacturerId, string oilName, decimal costPerLitre,string LubricantNumber,int IsActive)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -373,6 +716,8 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
                     comm.Parameters.AddWithValue("@oilname", oilName);
                     comm.Parameters.AddWithValue("@costperlitre", costPerLitre);
+                    comm.Parameters.AddWithValue("@lubricantnumber", LubricantNumber);
+                    comm.Parameters.AddWithValue("@isactive", IsActive);
 
                     try
                     {
@@ -417,7 +762,7 @@ namespace Fleet_WorkShop.Models
 
        
 
-        internal int ExecuteJobUpdateStatement(int districtId, string insertStmt, int vehId, int modelYear, int odometer, int approximateCost, DateTime dateOfRepair,int NatureOfComplaint)
+        internal int ExecuteJobUpdateStatement(int districtId, string insertStmt, int vehId, int modelYear, int odometer, int approximateCost, DateTime dateOfRepair,int NatureOfComplaint,int Id)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -434,6 +779,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@approxcost", approximateCost);
                     comm.Parameters.AddWithValue("@dor", dateOfRepair);
                     comm.Parameters.AddWithValue("@natureofcomplaint", NatureOfComplaint);
+                    comm.Parameters.AddWithValue("@jobcardnumber", Id);
                     try
                     {
                         conn.Open();
@@ -1171,7 +1517,21 @@ namespace Fleet_WorkShop.Models
               conn.Close();
             return ds;
         }
-
+        public DataSet FillDropDownHelperMethodWithSpCategory(string commandText, int districtId = 0)
+        {
+            var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
+            var ds = new DataSet();
+            conn.Open();
+            var cmd = new SqlCommand { Connection = conn, CommandType = CommandType.StoredProcedure, CommandText = commandText };
+            if (districtId != 0)
+            {
+                cmd.Parameters.AddWithValue("@categoryid", districtId);
+            }
+            var da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+            conn.Close();
+            return ds;
+        }
         public DataSet FillModelNumbers(string commandText, int vehicleId = 0)
         {
             var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);

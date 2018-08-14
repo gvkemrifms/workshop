@@ -85,6 +85,20 @@
         if (billDate === "") {
             return alert('Bill Date is Mandatory');
         }
+        var PoDate = $('#txtPODate').val();
+        if (PoDate === "") {
+            return alert('P.O Date is Mandatory');
+        }
+        var currentDate = new Date();
+        if (PoDate > currentDate) {
+            return alert("P.O Date should not be greater than current date");
+        }
+        var PoNumber = $('#txtPONumber').val();
+        if (PoNumber === "") {
+            return alert('P.O Number is Mandatory');
+        }
+        
+        
         var ddlmanufacturer = $('#ManufacturerName option:selected').text().toLowerCase();
         if (ddlmanufacturer === '--select--' || ddlmanufacturer === '') {
             return alert("Please select Manufacturer");
@@ -126,7 +140,7 @@
 
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetCostDetails/' + LubricantId,
+                url: '/Inventory/GetLubesCostDetails/' + LubricantId,
                 data: JSON.stringify(LubricantId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -156,14 +170,22 @@
         $('#lblBillAmount').text(sum)
 
     }
+    function getFinalBillAmount1() {
 
+        var sum = 0;
+        $('.amt').each(function () {
+            sum += parseFloat($(this).text());
+        });
+        $('#lblBillAmount').text(sum)
+
+    }
 
 
 </script>
 <script type="text/javascript">
 
     $(function() {
-        $('#txtBillDate').datepicker({
+        $('#txtBillDate,#txtPODate').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
@@ -217,6 +239,7 @@
                         e.preventDefault();
                         orderItems.splice(i, 1);
                         GeneratedItemsTable();
+                        getFinalBillAmount1();
                     });
                     $row.append($('<td/>').html($remove));
                     $tbody.append($row);
@@ -229,6 +252,8 @@
             }
             else {
                 $('#orderItems').html('');
+                $('#lblAmount').text('');
+                $('#txtQuantity').val('');
             }
         }
         $('#btn').click(function () {

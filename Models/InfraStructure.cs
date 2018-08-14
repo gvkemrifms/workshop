@@ -16,5 +16,6 @@ namespace Fleet_WorkShop.Models
         public string CategoryName { get; set; }
         public int? Quantity { get; set; }
         public int infra_id { get; set; }
+        public int WorkShopId { get; set; }
     }
 }

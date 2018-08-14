@@ -14,15 +14,19 @@ namespace Fleet_WorkShop.Models
         [DisplayName("WorkShop Name")]
         public string WorkShopName { get; set; }
         public string Designation { get; set; }
-        public string Experience { get; set; }
+        public int Experience { get; set; }
         [DisplayName("Date Of Joining")]
-        public string DateOfJoining { get; set; }
+        public DateTime DateOfJoining { get; set; }
         public string Infrastructure { get; set; }
         public string Category { get; set; }
         public int Quantity { get; set; }
         public string Manufacturer { get; set; }
+        [DisplayName("Spare Parts")]
         public string SparePart { get; set; }
         public string Lubricant { get; set; }
+        public long ID { get; set; }
+        [DisplayName("Employee Id")]
+        public string EmployeeId { get; set; }
 
     }
 }

@@ -45,7 +45,7 @@ namespace Fleet_WorkShop.Controllers
                 ViewBag.Payroll= new SelectList(dtPayroll.AsDataView(), "payroll_Id", "payroll_name");
                 DataSet dsGetEmployee = _helper.FillDropDownHelperMethodWithSp("spGetEmployeeDetails");
                 Session["GetEmployeeData"] = dsGetEmployee;
-                empModel = dsGetEmployee.Tables[0].AsEnumerable().ToList().Select(x => new EmployeeModel { EmpId = x.Field<int>("Id"), EmployeeName = x.Field<string>("name"), AadharNumber = x.Field<long?>("aadhar_no"), ContactNumber = x.Field<long?>("mobilenumber"), Dob = x.Field<DateTime>("dob"), EmpDesignation = x.Field<string>("Designation"), DepartName = x.Field<string>("dept_name"), Doj = x.Field<DateTime>("doj"), RelievingDate = x.Field<DateTime?>("dor"),Salary=x.Field<int>("Salary"), PayrollCompany = x.Field<string>("payroll_name") });
+                empModel = dsGetEmployee.Tables[0].AsEnumerable().ToList().Select(x => new EmployeeModel {Id= x.Field<int>("Id"), EmployeeId = x.Field<string>("empId"), EmployeeName = x.Field<string>("name"), AadharNumber = x.Field<long?>("aadhar_no"), ContactNumber = x.Field<long?>("mobilenumber"), Dob = x.Field<DateTime>("dob"), EmpDesignation = x.Field<string>("Designation"), DepartName = x.Field<string>("dept_name"), Doj = x.Field<DateTime>("doj"), RelievingDate = x.Field<DateTime?>("dor"),Salary=x.Field<int>("Salary"), PayrollCompany = x.Field<string>("payroll_name") });
                 empModel.ToList();
                 ViewBag.Email = UserName;               
             }
@@ -54,13 +54,14 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SaveEmployeeDetails(EmployeeModel employeeDetails)
         {
-           int retVal= SaveEmployee(employeeDetails);
-            if (retVal == 1)
-                return Json("Hello", JsonRequestBehavior.AllowGet);
+           
+                int retVal = SaveEmployee(employeeDetails);
+                if (retVal == 1)
+                    return Json("Hello", JsonRequestBehavior.AllowGet);              
             return RedirectToAction("EmployeeDetails", "Employee");
         }
         [HttpPost]
-        ////[ValidateAntiForgeryToken]
+ 
         public int SaveEmployee(EmployeeModel employeeDetails)
         {
             EmployeeModel _empDetails = new EmployeeModel()
@@ -93,30 +94,35 @@ namespace Fleet_WorkShop.Controllers
             {
                 return RedirectToAction("SaveEmployeeDetails");
             }
-            string query = "select * from m_departments";
-            string desigQuery = "select * from emp_designation";
-            EmployeeModel model = new EmployeeModel();
-            DataSet dsEditEmployee =  /*_helper.FillDropDownHelperMethodWithSp("spEditEmployee");*/Session["GetEmployeeData"] as DataSet;
-            DataRow row = dsEditEmployee.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == Id);
-            model.EmployeeName = row["name"].ToString();
-            model.EmpDesignation = row["Designation"].ToString();
-            model.ContactNumber = Convert.ToInt64(row["mobilenumber"]);
-            model.Dob =Convert.ToDateTime( row["dob"]);
-            model.DepartName = row["dept_name"].ToString();
-            DataTable dtDepartments = _helper.ExecuteSelectStmt(query);
-            DataTable dtDesignation = _helper.ExecuteSelectStmt(desigQuery);
-            model.DepartmentName = new SelectList(dtDepartments.AsDataView(), "dept_id", "dept_name");
-           model.Designation = new SelectList(dtDesignation.AsDataView(), "id", "Designation");
-            model.Doj = Convert.ToDateTime(row["doj"]);
-            model.AadharNumber = Convert.ToInt64(row["aadhar_no"]);
-            if(row["dor"] != DBNull.Value)
-            model.RelievingDate= Convert.ToDateTime(row["dor"]);
-            model.Salary = Convert.ToInt32(row["Salary"]);
-            model.PayrollCompany = row["payroll_name"].ToString();
-            model.PayrollId = Convert.ToInt32(row["payroll_id"]);
-            DataTable dtPayroll = Session["Payroll"] as DataTable;
-            model.Payroll = new SelectList(dtPayroll.AsDataView(), "payroll_id", "payroll_name");
-            return View(model);
+            if (ModelState.IsValid)
+            {
+                string query = "select * from m_departments";
+                string desigQuery = "select * from emp_designation";
+                EmployeeModel model = new EmployeeModel();
+                DataSet dsEditEmployee =  /*_helper.FillDropDownHelperMethodWithSp("spEditEmployee");*/Session["GetEmployeeData"] as DataSet;
+                DataRow row = dsEditEmployee.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == Id);
+                model.EmployeeName = row["name"].ToString();
+                model.EmpDesignation = row["Designation"].ToString();
+                model.ContactNumber = Convert.ToInt64(row["mobilenumber"]);
+                model.Dob = Convert.ToDateTime(row["dob"]);
+                model.DepartName = row["dept_name"].ToString();
+                DataTable dtDepartments = _helper.ExecuteSelectStmt(query);
+                DataTable dtDesignation = _helper.ExecuteSelectStmt(desigQuery);
+                model.DepartmentName = new SelectList(dtDepartments.AsDataView(), "dept_id", "dept_name");
+                model.Designation = new SelectList(dtDesignation.AsDataView(), "id", "Designation");
+                model.Doj = Convert.ToDateTime(row["doj"]);
+                model.AadharNumber = Convert.ToInt64(row["aadhar_no"]);
+                if (row["dor"] != DBNull.Value)
+                    model.RelievingDate = Convert.ToDateTime(row["dor"]);
+                model.Salary = Convert.ToInt32(row["Salary"]);
+                model.PayrollCompany = row["payroll_name"].ToString();
+                model.PayrollId = Convert.ToInt32(row["payroll_id"]);
+                DataTable dtPayroll = Session["Payroll"] as DataTable;
+                model.Payroll = new SelectList(dtPayroll.AsDataView(), "payroll_id", "payroll_name");
+
+                return View(model);
+            }
+            return RedirectToAction("SaveEmployeeDetails");
         }
         [HttpPost]
         public ActionResult Edit(EmployeeModel postEmployee)
@@ -164,15 +170,18 @@ namespace Fleet_WorkShop.Controllers
 
         public int SaveInfraStructureDetails(InfraStructure InfraModel)
         {
+            string workshopquery = "select workshop_id from m_employees where employeeId=" + Session["Employee_Id"] + "";
+           DataTable dtWorkshop= _helper.ExecuteSelectStmt(workshopquery);
+           int workshopId= dtWorkshop.AsEnumerable().Select(x => x.Field<int>("workshop_id")).FirstOrDefault();
             InfraStructure InfraDetails = new InfraStructure()
             {
                 InfraName = InfraModel.InfraName,
                 CategoryId = InfraModel.CategoryId,
                 Quantity = InfraModel.Quantity,
-
+                WorkShopId=workshopId
 
             };
-            int returnVal = _helper.ExecuteInsertInfraStatement("InsetInfraDetails", InfraDetails.CategoryId, InfraDetails.InfraName, InfraDetails.Quantity);
+            int returnVal = _helper.ExecuteInsertInfraStatement("InsetInfraDetails", InfraDetails.CategoryId, InfraDetails.InfraName, InfraDetails.Quantity,InfraDetails.WorkShopId);
             return returnVal;
         }
 
@@ -183,10 +192,10 @@ namespace Fleet_WorkShop.Controllers
             {
                 return RedirectToAction("SaveInfraStructureDetails");
             }
-
+            
             string infraQuery = "select * from m_infra_category";
             DataTable dtinfra = _helper.ExecuteSelectStmt(infraQuery);
-
+          
             InfraStructure model = new InfraStructure();
             DataSet dsEditInfra =  /*_helper.FillDropDownHelperMethodWithSp("spEditEmployee");*/ Session["InfraTable"] as DataSet;
             DataRow row = dsEditInfra.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("infra_id") == Id);
@@ -211,6 +220,19 @@ namespace Fleet_WorkShop.Controllers
         {
             _helper.ExecuteDeleteStatement("spDeleteInfra", id);
             return RedirectToAction("SaveInfraStructureDetails");
+        }
+        public ActionResult CheckEmployeeId(int empId)
+        {
+            string list = null;
+            if (ModelState.IsValid)
+            {
+                DataTable dtCheckIds = _helper.ExecuteSelectStmtusingSP("CheckEmployeeId", "@empid", empId.ToString());
+                list = dtCheckIds.AsEnumerable().Select(x => x.Field<string>("empid")).FirstOrDefault();
+                if (list == null)
+                    return null;
+            }
+
+            return Json(list.ToString(), JsonRequestBehavior.AllowGet);
         }
     }
 }

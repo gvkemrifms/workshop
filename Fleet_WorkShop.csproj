@@ -351,6 +351,27 @@
     <Content Include="Views\Reports\WorkshopWiseSparepartsReport.cshtml" />
     <Content Include="Views\Reports\WorkshopWiseLubesReport.cshtml" />
     <Content Include="Views\Reports\Reports.cshtml" />
+    <Content Include="Views\Vehicle\GetLubesPendingStatusDetails.cshtml" />
+    <Content Include="Views\Vehicle\EditLubesPendingStatusDetails.cshtml" />
+    <Content Include="Views\Inventory\_LubesMaster.cshtml" />
+    <Content Include="Views\Inventory\LubesMasterEdit.cshtml" />
+    <Content Include="Views\Vehicle\EditPendingStatusDetails1.cshtml" />
+    <Content Include="Views\Job\_ServiceGroup.cshtml" />
+    <Content Include="Views\Job\ServiceGroup.cshtml" />
+    <Content Include="Views\Job\EditAggregates.cshtml" />
+    <Content Include="Views\Job\_Category.cshtml" />
+    <Content Include="Views\Job\CategoryGroup.cshtml" />
+    <Content Include="Views\Job\EditCategories.cshtml" />
+    <Content Include="Views\Job\_SubCategories.cshtml" />
+    <Content Include="Views\Job\SubCategoryGroup.cshtml" />
+    <Content Include="Views\Job\EditSubCategories.cshtml" />
+    <Content Include="Views\Job\GetAggregateCostDetails.cshtml" />
+    <Content Include="Views\Job\GetManufacturerAggregatesDetails.cshtml" />
+    <Content Include="Views\Job\_getCategorySubCategoryCostDetails.cshtml" />
+    <Content Include="Views\Reports\GetVehicleWiseStockReport.cshtml" />
+    <Content Include="Views\Inventory\_DisplaySparePartsDetails.cshtml" />
+    <Content Include="Views\Vehicle\GetPreviousRepairs.cshtml" />
+    <Content Include="Views\Vehicle\AddIssues.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

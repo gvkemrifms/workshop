@@ -66,7 +66,7 @@
     function Validations() {              
         var billNumber = $('#txtBillNumber').val();
         if (billNumber === "") {
-            return alert('Bill Number is Mandatory');
+            return alert('BillNumber is Mandatory');
         }
         var ddlvendor = $('#Vendor option:selected').text().toLowerCase();
         if (ddlvendor === '--select--' || ddlvendor === '') {
@@ -74,8 +74,20 @@
         }
         var billDate = $('#txtBillDate').val();
         if (billDate === "") {
-            return alert('Bill Date is Mandatory');
+            return alert('BillDate is Mandatory');
         }
+        var PoDate = $('#txtPODate').val();
+        if (PoDate === "") {
+            return alert('P.O Date is Mandatory');
+        }
+        if (PoDate > currentDate) {
+            return alert("P.O Date should not be greater than current date");
+        }
+        var PoNumber = $('#txtPONumber').val();
+        if (PoNumber === "") {
+            return alert('P.O Number is Mandatory');
+        }
+
         var ddlmanufacturer = $('#ManufacturerName option:selected').text().toLowerCase();
         if (ddlmanufacturer === '--select--' || ddlmanufacturer === '') {
             return alert("Please select Manufacturer");
@@ -110,9 +122,53 @@
         });
        
     });
+    $(document).ready(function () {
 
+        $("#SparePart").prop("disabled", true);
+
+        $("#ManufacturerName").change(function () {
+            if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
+                $('#SparePart option:selected').text("");
+                $('#SparePart').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
+           
+            var data = {
+                ManufacturerId: $('#ManufacturerName option:selected').val()
+            }
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#SparePart').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#SparePart').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#SparePart').prop("disabled", false);
+
+
+                }
+                //error : function (err) {
+                //    alert("Error in Getting Vehicles!!");
+                //}
+
+            });
+
+
+        });
+    });
     $(function () {
-        debugger;
+      
         $('#SparePart').change(function () {
             var SparePartId = $('#SparePart option:selected').val();
       
@@ -138,9 +194,7 @@
     //function getValueOfSpares(dropDownValue) {
     //    window.location.href = '/Inventory/GetCostDetails/' + dropDownValue;
     //}
-    function getFinalBillAmount()
-    {
-
+    function getFinalBillAmount() {
         var sum = parseFloat($("#lblAmount").text());
         $('.amt').each(function () {
             sum += parseFloat($(this).text());
@@ -148,8 +202,15 @@
         $('#lblBillAmount').text(sum)
 
     }
-        
 
+    function getFinalBillAmount1() {
+        var sum = 0;
+        $('.amt').each(function () {
+            sum += parseFloat($(this).text());
+        });
+        $('#lblBillAmount').text(sum)
+
+    }
  
 </script>
 <script type="text/javascript">
@@ -177,11 +238,12 @@
                 Quantity: $('#txtQuantity').val().trim(),
                 Amount: $('#lblAmount').text(),
             });
-
-            //Clear fields
-            //$('#txtunitprice').val('').focus();
-            //$('#txtQuantity,#lblAmount').val('');
             GeneratedItemsTable();
+            $('#ManufacturerName option:selected').val(0);
+            $('#SparePart option:selected').text('--Select--');
+            $('#txtunitprice').val('');
+            $('#txtQuantity').val('');
+            $('#lblAmount').text('');
             return false;
 
         });
@@ -209,7 +271,8 @@
                     $remove.click(function (e) {
                         e.preventDefault();
                         orderItems.splice(i, 1);
-                        GeneratedItemsTable();
+                        GeneratedItemsTable();                 
+                        getFinalBillAmount1();
                     });
                     $row.append($('<td/>').html($remove));
                     $tbody.append($row);                  
@@ -222,6 +285,8 @@
             }
             else {
                 $('#orderItems').html('');
+                $('#lblAmount').text('');
+                $('#txtQuantity').val('');
             }
         }
         $('#btn').click(function () {
@@ -307,7 +372,7 @@
                 <div class="form-group" >
                     <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">P.O Date</label>
                     <div class="col-lg-8">
-                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPODate" placeholder="P.O Date">
+                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPODate" onkeypress="return false" placeholder="P.O Date">
                     </div>
                 </div>
 
@@ -315,14 +380,6 @@
 
         </div>
 
-       
-        
-  
-        
-        
-        
-        
-        
         <hr />
         <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
             <div class="panel-heading">
@@ -398,7 +455,7 @@
                     <form class="form-horizontal">
                         <div class="form-group">
                             <div class="col-sm-4">
-                                <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                                <button type="submit" id="btn" class="btn btn-default"  onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
                             </div>
                             <div class="col-sm-2">
                                 <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>

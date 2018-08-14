@@ -10,6 +10,7 @@ namespace Fleet_WorkShop.Models
 {
     public class InventoryModel
     {
+        public string SpareName { get; set; }
         public int WorkShopId { get; set; }
         public int Id { get; set; }
         [DisplayName("Manufacturer Name")]

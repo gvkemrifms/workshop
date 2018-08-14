@@ -1,0 +1,131 @@
+﻿@model IEnumerable<Aggregates>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#Manufacturer").prop("disabled", true);
+
+            $("#Aggregates").change(function () {
+                if ($('#Aggregates option:selected').text().toLowerCase() == "--select--") {
+                    $('#Manufacturer option:selected').text("");
+                    $('#Manufacturer').prop("disabled", true);
+                    return false;
+                }
+                var serviceURL = '/Job/GetManufacturerNameForAggregates';
+                debugger;
+                var data = {
+                    AggregateId: $('#Aggregates').val()
+
+                };
+                $.ajax({
+                    url: serviceURL,
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: 'application/json',
+
+                    success: function (Response) {
+
+                        $('#Manufacturer').empty();
+                        //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                        for (var i = 0; i < Response.length; i++) {
+
+                            $('#Manufacturer').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                        }
+
+                        $('#Manufacturer').prop("disabled", false);
+
+
+                    }
+                    //error : function (err) {
+                    //    alert("Error in Getting Vehicles!!");
+                    //}
+
+                });
+
+
+            });
+        });
+        $(function () {
+            $('#btn').click(function () {
+                var serviceURL = '/Job/getCategorySubCategoryCostDetails';
+                var data = {
+                    aggregateid: $('#Aggregates option:selected').val(),
+                    manufacturerid : $('#Manufacturer option:selected').val()
+                }
+               
+                $.ajax({
+                    type: "POST",
+                    url: serviceURL,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response != 0) {
+                            alert('Record Inserted');
+                        }
+                        //else {
+                        //    alert("Failed to Insert Please check ");
+                        //}
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    }
+                    //error: function (response) {
+                    //    alert(response.responseText);
+                    //}
+                });
+            })
+        })
+    </script>
+
+    <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+        <div class="panel-heading">
+            Cost
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Aggregates</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Aggregates", ViewBag.Aggr as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Manufacturer</label>
+                        <div class="col-lg-8">
+                            <select id="Manufacturer" class="form-control"> </select>
+                            <input type="submit" value="Submit" id="btn" class="btn btn-default" style="background-color:blue;margin-top:-60px;margin-left:350px;color:white" />
+                                @*@Html.DropDownList("Manufacturers", ViewBag.Manufacture as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
+                      
+                        </div>
+                    </div>
+
+                </form>
+            </div>  
+            <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 100px;" align="center" >
+                <div class="panel-heading" >
+                    Category Details
+                </div>
+                </div>
+            <div class="panel-body" style="margin-bottom:100px;">
+                @if (Model != null)
+                {
+                    <div class="col-lg-6" style="width:100%">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div style="margin-top:-20px">
+                                    @Html.Partial("_getCategorySubCategoryCostDetails");
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+                }
+                </div>
+            </div>
+        </div>
+

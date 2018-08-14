@@ -1,0 +1,240 @@
+﻿@model IEnumerable<Aggregates>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#Aggregates").prop("disabled", true);
+
+        $("#Manufacturer").change(function () {
+            if ($('#Manufacturer option:selected').text().toLowerCase() == "--select--") {
+                $('#Aggregates option:selected').text("");
+                $('#Aggregates').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Job/GetManufacturerNameForAggregates';
+            debugger;
+            var data = {
+                ManufacturerId: $('#Manufacturer').val()
+
+            };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#Aggregates').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#Aggregates').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#Aggregates').prop("disabled", false);
+
+
+                }
+                //error : function (err) {
+                //    alert("Error in Getting Vehicles!!");
+                //}
+
+            });
+
+
+        });
+    });
+
+    $(document).ready(function () {
+
+        $("#Category").prop("disabled", true);
+
+        $("#Aggregates").change(function () {
+            if ($('#Aggregates option:selected').text().toLowerCase() == "--select--") {
+                $('#Category option:selected').text('');
+                $('#Category').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Job/GetCategoriesForAggregates';
+            var data = {
+                AggregateId: $('#Aggregates').val()
+
+            };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#Category').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#Category').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#Category').prop("disabled", false);
+
+
+                }
+                //error : function (err) {
+                //    alert("Error in Getting Vehicles!!");
+                //}
+
+            });
+
+
+        });
+    });
+
+
+    function Validations() {
+        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+            return alert("Please select Manufacturer");
+        }
+
+
+        var AggregateName = $('#Aggregates option:selected').text().toLowerCase();
+        if (AggregateName === "" || AggregateName === '--select--') {
+            return alert('Aggregate is Mandatory');
+        }
+        var CategoryName = $('#Category option:selected').text().toLowerCase();
+        if (CategoryName === "" || CategoryName === '--select--') {
+            return alert('Category is Mandatory');
+        }
+        var SubCategory = $('#txtSubCategories').val();
+        if (SubCategory === "") {
+            return alert('SubCategory is Mandatory');
+        }
+        var TimeTaken = $('#txtTimeTaken').val();
+        if (TimeTaken === "") {
+            return alert('Time Taken field is Mandatory');
+        }
+
+        return true;
+    }
+
+        $(function () {
+            $('#btn').click(function () {
+                var serviceURL = '/Job/SubCategoryGroup';
+                var data = {
+                    ServiceGroupId: $('#Category option:selected').val(),
+                    ServiceName: $('#txtSubCategories').val(),
+                    IdAggregate: $('#Aggregates option:selected').val(),
+                    timeTaken: $('#txtTimeTaken').val(),
+                    ManufacturerId:$('#Manufacturer option:selected').val()
+                };
+                alert(JSON.stringify(data))
+                $.ajax({
+                    type: "POST",
+                    url: serviceURL,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response != 0) {
+                            alert('Record Inserted');
+                        }
+                        //else {
+                        //    alert("Failed to Insert Please check ");
+                        //}
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    }
+                    //error: function (response) {
+                    //    alert(response.responseText);
+                    //}
+                });
+            })
+        })
+
+</script>
+
+<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+    <div class="panel-heading">
+        Aggregates
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Manufacturer</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        @*<select id="Manufacturer" class="form-control"> </select>*@
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Aggregates</label>
+                    <div class="col-lg-8">
+                        <select id="Aggregates" class="form-control"> </select>
+                        @*@Html.DropDownList("Aggregates", ViewBag.AggregatesDrop as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
+                    </div>
+                </div>
+                
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Category</label>
+                    <div class="col-lg-8">
+                        <select id="Category" class="form-control"> </select>
+                        @*@Html.DropDownList("Category", ViewBag.CategoryDrop as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:50px">
+                    <label class="control-label col-lg-4">Sub Category</label>
+                    <div class="col-lg-8">
+                        @*@Html.TextBoxFor(x => x.EmployeeName, new { @class = "form-control", placeholder = "Name",id="txtEmployeeName" })*@
+                        <input type="text" class="form-control" id="txtSubCategories" placeholder="Sub Category">
+                        @*@Html.ValidationMessageFor(m => m.EmployeeName, "", new { @class = "text-danger" })*@
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+        <div class="col-lg-6" style="margin-top:-15px">
+            <form class="form-horizontal">
+
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Time Taken(In Min)</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtTimeTaken" placeholder="Time Taken" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-4">
+                <input type="submit" value="Save" id="btn" class="btn btn-default" style="background-color:blue;margin-top:-30px;margin-left:500px;color:white" onclick="if (!Validations()) return false;" />
+            </div>
+        </div>
+    </div>
+<div class="col-lg-6" style="width:100%">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div style="margin-top:30px">
+                @Html.Partial("_SubCategories");
+            </div>
+
+        </div>
+    </form>
+
+</div>
+<div class="panel-footer">
+
+</div>

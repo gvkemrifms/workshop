@@ -4,75 +4,146 @@
     ViewBag.Title = "SpareParts Master";
 }
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    #tblSpares {
+        width: 70px;
+        margin-left:-300px;
+        position: absolute;
+        color: red;
+
+    }
+     #SearchDisplay{
+       width:200%;
+       margin-left:140px;
+       align-content:center;
+       position:relative;
+        
+   }
+    </style>
 <script type="text/javascript">
    
-    //function Validations() {
-    //    var ddlDepartment = $('#Department option:selected').text().toLowerCase();
-    //    if (ddlDepartment === '--select--' || ddlDepartment === '') {
-    //        return alert("Please select Department");
-    //    }
-    //    var ddlDesignation = $('#Designation option:selected').text().toLowerCase();
-    //    if (ddlDesignation === '--select--' || ddlDesignation === '') {
-    //        return alert("Please select Designation");
-    //    }
+    $(function () {
+        debugger;
+        $('#myInput').blur(function () {
+            var data = {
+                search : $(this).val().toLowerCase()
+            };
 
-    //    var empName = $('#txtEmployeeName').val();
-    //    if (empName === "") {
-    //        return alert('Employee Name is Mandatory');
-    //    }
-    //    var contactNumber = $('#txtContactNumber').val();
-    //    if (contactNumber === "") {
-    //        return alert('Contact Number is Mandatory');
-    //    }
-    //    var dob = $('#txtDob').val();
-    //    if (dob === "") {
-    //        return alert('Date Of Birth is Required');
-    //    }
-    //    var aadhar = $('#txtAadhar').val();
-    //    if (aadhar === "") {
-    //        return alert('Aadhar Number is Required');
-    //    }
-    //    var doj = $('#txtJoiningDate').val();
-    //    if (doj === "") {
-    //        return alert('Date of Joining is Required');
-    //    }
-    //    //.replace(/\D/g, '/')
-    //    //.replace(/\D/g, '/')
-    //    var dateOfJoining = doj;
-    //    var dob = dob;
-    //    var ordFromDate = new Date(dob);
-    //    var ordToDate = new Date(dateOfJoining);
-    //    var currentDate = new Date();
-    //    if (ordFromDate > currentDate) {
-    //        return alert("Current Date Should be greater than Birth date");
-    //    }
-    //    if (ordToDate < ordFromDate) {
-    //        return alert("Date of Joining date should be greater than birth date");
-    //    }
-    //    var phoneno = /^\d{10}$/;
-    //    if (!($('#txtContactNumber').val().match(phoneno))) {
-    //        return alert("Contact Number is not in correct format");
-    //    }
-    //    var aadharregex = /^\d{12}$/;
-    //    if (!($('#txtAadhar').val().match(aadharregex))) {
-    //        return alert("Aadhar Number is not in correct format");
-    //    }
-    //    var empId = $('#txtEmpId').val();
-    //    if (empId === "") {
-    //        return alert('Employee Id is Required');
-    //    }
-    //    return true;
-    //}
+
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/DisplaySparePartsDetails',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    $('#tblSpares').empty();
+                    SpareDetails(response);
+
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+
+        //$(function () {
+        //    $("#myInput").on("blur", function () {
+        //        var value = $(this).val().toLowerCase();
+        //        $("table tr").filter(function () {
+        //            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        //            $(this).prevAll('thead').first().show();
+        //        });
+
+        //    });
+    //});
+    function SpareDetails(data) {
+     
+        var eTable = "<table id=tblSpares  ><thead><tr><th>Manufacturer Name</th><th>Part Name</th><th>Cost</th></tr></thead><tbody>"
+        for (var i = 0; i < data.length; i++) {
+            
+                eTable += "<tr>";
+                eTable += "<td>" + data[i]['ManufacturerName'] + "</td>";
+                eTable += "<td>" + data[i]['PartName'] + "</td>";
+                eTable += "<td>" + data[i]['Cost'] + "</td>";
+                eTable += "</tr>";
+            
+        }
+        eTable += "</tbody></table>";
+        
+        $('#SearchDisplay').html(eTable);
+    }
+
+</script>
+
+
+<script type="text/javascript">
+
+    function Validations() {
+        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+            return alert("Please select Manufacturer");
+        }
+     
+
+        var partName = $('#txtpartName').val();
+        if (partName === "") {
+         
+            return alert('partName is Mandatory');
+        }
+        var PartNumber = $('#txtPartNumber').val();
+        if (PartNumber === "") {
+      
+            return alert('PartNumber is Mandatory');
+        }
+        var Cost = $('#txtCost').val();
+        if (Cost === "") {
+           
+            return alert('Cost is Required');
+        }
+        return true;
+    }
+    $(function () {
+        $('#txtPartNumber').blur(function () {
+            var serviceURL = '/Inventory/CheckSparePartsNumber';
+            var data = {
+                PartNumber: $(this).val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceURL,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response) {
+                        $('#txtPartNumber').val('');
+                        alert('PartNumber alredy Exists');
+
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        })
+    })
+
+
+
     $(function () {
         $('#btn').click(function () {
-            debugger;
             var serviceURL = '/Inventory/SparePartsMaster';
             var data = {
                 ManufacturerId: $('#Manufacturer').val(),
                 PartName: $('#txtpartName').val(),
                 PartNumber: $('#txtPartNumber').val(),
                 Cost: $('#txtCost').val()
-               
+
             };
             $.ajax({
                 type: "POST",
@@ -101,7 +172,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
     <div class="panel-heading">
-        Employee Information
+        Spare Parts Master
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -109,13 +180,13 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Manufacturer</label>
                     <div class="col-lg-8">
-                 @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                 @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control",@required=true })
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Part Name</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtpartName" placeholder="Part Name">
+                        <input type="text" class="form-control" id="txtpartName" placeholder="Part Name" required="required">
                     </div>
                 </div>
 
@@ -126,24 +197,24 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">Part Number</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtPartNumber" placeholder="Part Number">
+                        <input type="text" class="form-control" id="txtPartNumber" placeholder="Part Number" required="required">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Cost</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtCost" placeholder="Cost" >
+                        <input type="text" class="form-control" id="txtCost" placeholder="Cost" required="required" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" >
                     </div>
                 </div>
 
             </form>
         </div>
-  
-        <div style="margin-bottom: 90px" class="col-lg-6">
+
+        <div style="margin-bottom: 150px" class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
+                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white" onclick="if (!Validations()) return false;">Submit</button>
                     </div>
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
@@ -152,18 +223,25 @@
             </form>
 
         </div>
+       
     </div>
-    <div class="col-lg-6" style="width:100%">
+    <input type="text" id="myInput" class="form-control" placeholder="Search Part Number.." style="width:300px;float:left;margin-top:-90px;margin-left:30px" align="left">
+ 
+    
+    @*<div class="col-lg-6" style="width:100%">
         <form class="form-horizontal">
             <div class="form-group">
-                <div style="margin-top:30px">
-                    @Html.Partial("SparePartsPartial");
+                <div id="SearchDisplay" style="margin-top:30px">
+
                 </div>
 
             </div>
         </form>
 
-    </div>
+    </div>*@
+
+        <table id="SearchDisplay" align="center" style="width:50%"></table>
+
     <div class="panel-footer">
 
     </div>

@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Aggregates>
+
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.SubCategory)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.IdCategory)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.ApproxCost)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.SubCategory)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.IdCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApproxCost)
+            </td>
+            <td>
+                @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+
+                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+            </td>
+        </tr>
+    }
+
+</table>

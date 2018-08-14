@@ -2,6 +2,23 @@
 
 @{ ViewContext.FormContext = new FormContext(); }
 <script>
+    function Validations() {
+        var ddlCategory = $('#Category option:selected').text().toLowerCase();
+        if (ddlCategory === '--select--' || ddlCategory === '') {
+            return alert("Please select Category");
+        }
+        
+
+        var CategoryName = $('#txtCategoryName').val();
+        if (CategoryName === "") {
+            return alert('Category Name is Mandatory');
+        }
+        var Quantity = $('#txtQuantity').val();
+        if (Quantity === "") {
+            return alert('Quantity is Mandatory');
+        }      
+        return true;
+    }
     $(function () {
         $('#btn').click(function () {
             debugger;
@@ -68,7 +85,7 @@
                     <label class="control-label col-lg-4">Quantity</label>
                     <div class="col-lg-8">
                         @*@Html.TextBoxFor(x => x.EmployeeName, new { @class = "form-control", placeholder = "Name",id="txtEmployeeName" })*@
-                        <input type="text" class="form-control" id="txtQuantity" placeholder="Name">
+                        <input type="text" class="form-control" id="txtQuantity" placeholder="Name" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
                         @*@Html.ValidationMessageFor(m => m.EmployeeName, "", new { @class = "text-danger" })*@
                     </div>
                 </div>
@@ -83,7 +100,7 @@
             <form class="form-horizontal">
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                        <button type="submit" id="btn" class="btn btn-default"  style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
+                        <button type="submit" id="btn" class="btn btn-default"  style="margin-bottom: -150px; background-color: blue; color: white" onclick="if (!Validations()) return false;">Submit</button>
                     </div>
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>

@@ -1,68 +1,61 @@
-﻿@model Fleet_WorkShop.Models.LubesModel
+﻿@model IEnumerable<Fleet_WorkShop.Models.LubesModel>
 
 @{
     ViewBag.Title = "SpareParts Master";
 }
 
 <script type="text/javascript">
+    $(function () {
+        $('#txtLubricantNumber').blur(function () {
+            var serviceURL = '/Inventory/CheckLubricantNumber';
+            var data = {
+                LubricantNumber: $(this).val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceURL,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response) {
+                        $('#txtLubricantNumber').val('');
+                        alert('Lubricant Number alredy Exists');
 
-    //function Validations() {
-    //    var ddlDepartment = $('#Department option:selected').text().toLowerCase();
-    //    if (ddlDepartment === '--select--' || ddlDepartment === '') {
-    //        return alert("Please select Department");
-    //    }
-    //    var ddlDesignation = $('#Designation option:selected').text().toLowerCase();
-    //    if (ddlDesignation === '--select--' || ddlDesignation === '') {
-    //        return alert("Please select Designation");
-    //    }
+                    }
 
-    //    var empName = $('#txtEmployeeName').val();
-    //    if (empName === "") {
-    //        return alert('Employee Name is Mandatory');
-    //    }
-    //    var contactNumber = $('#txtContactNumber').val();
-    //    if (contactNumber === "") {
-    //        return alert('Contact Number is Mandatory');
-    //    }
-    //    var dob = $('#txtDob').val();
-    //    if (dob === "") {
-    //        return alert('Date Of Birth is Required');
-    //    }
-    //    var aadhar = $('#txtAadhar').val();
-    //    if (aadhar === "") {
-    //        return alert('Aadhar Number is Required');
-    //    }
-    //    var doj = $('#txtJoiningDate').val();
-    //    if (doj === "") {
-    //        return alert('Date of Joining is Required');
-    //    }
-    //    //.replace(/\D/g, '/')
-    //    //.replace(/\D/g, '/')
-    //    var dateOfJoining = doj;
-    //    var dob = dob;
-    //    var ordFromDate = new Date(dob);
-    //    var ordToDate = new Date(dateOfJoining);
-    //    var currentDate = new Date();
-    //    if (ordFromDate > currentDate) {
-    //        return alert("Current Date Should be greater than Birth date");
-    //    }
-    //    if (ordToDate < ordFromDate) {
-    //        return alert("Date of Joining date should be greater than birth date");
-    //    }
-    //    var phoneno = /^\d{10}$/;
-    //    if (!($('#txtContactNumber').val().match(phoneno))) {
-    //        return alert("Contact Number is not in correct format");
-    //    }
-    //    var aadharregex = /^\d{12}$/;
-    //    if (!($('#txtAadhar').val().match(aadharregex))) {
-    //        return alert("Aadhar Number is not in correct format");
-    //    }
-    //    var empId = $('#txtEmpId').val();
-    //    if (empId === "") {
-    //        return alert('Employee Id is Required');
-    //    }
-    //    return true;
-    //}
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        })
+    })
+
+    function Validations() {
+        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+            return alert("Please select Manufacturer");
+        }
+
+        var oilName = $('#txtOil').val();
+        if (oilName === "") {
+            return alert('Oil Name is Mandatory');
+        }
+        var cost = $('#txtCost').val();
+        if (cost === "") {
+            return alert('Cost is Mandatory');
+        }
+        var lubricantNumber = $('#txtLubricantNumber').val();
+        if (lubricantNumber === "") {
+            return alert('Lubricant Number is Required');
+        }
+  
+    
+      
+        return true;
+    }
     $(function () {
         $('#btn').click(function () {
             debugger;
@@ -70,7 +63,8 @@
             var data = {
                 ManufacturerId: $('#Manufacturer').val(),
                 OilName: $('#txtOil').val(),
-                CostPerLitre: $('#txtCost').val()
+                CostPerLitre: $('#txtCost').val(),
+                LubricantNumber: $('#txtLubricantNumber').val()
 
             };
             $.ajax({
@@ -114,7 +108,7 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Oil Name</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtOil" placeholder="Part Name">
+                        <input type="text" class="form-control" id="txtOil" placeholder="Oil Name">
                     </div>
                 </div>
 
@@ -126,10 +120,15 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Cost Per Litre</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtCost" placeholder="Cost">
+                        <input type="text" class="form-control" id="txtCost" placeholder="Cost Per Litre" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
                     </div>
                 </div>
-
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Lubricant Number</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtLubricantNumber" placeholder="Lubricant Number">
+                    </div>
+                </div>
             </form>
         </div>
 
@@ -137,7 +136,7 @@
             <form class="form-horizontal">
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
+                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white" onclick="if (!Validations()) return false;">Submit</button>
                     </div>
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
@@ -146,6 +145,17 @@
             </form>
 
         </div>
+    </div>
+    <div class="col-lg-6" style="width:100%">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div style="margin-top:30px">
+                   @Html.Partial("_LubesMaster");
+                </div>
+
+            </div>
+        </form>
+
     </div>
     <div class="panel-footer">
 

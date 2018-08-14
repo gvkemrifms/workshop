@@ -73,31 +73,31 @@
                     <div class="form-group">
                         @Html.LabelFor(model => model.Manufacturer, htmlAttributes: new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
-                            @foreach (var man in Model.Manufacturer)
+                            @*@foreach (var man in Model.Manufacturer)
                             {
 
                                 if (man.Text == Model.ManName)
-                                {
-                                    Model.ManufacturerId = Convert.ToInt32(man.Value);
+                                {*@
+                                    @*Model.ManufacturerId = Convert.ToInt32(man.Value);*@
                                     @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new { @class = "form-control" })
                                     @Html.ValidationMessageFor(model => model.Manufacturer, "", new { @class = "text-danger" })
-                                }
-                            }
+                                @*}
+                            }*@
                         </div>
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(model => model.SpareParts, htmlAttributes: new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
-                            @foreach (var spare in Model.SpareParts)
+                            @*@foreach (var spare in Model.SpareParts)
                             {
 
                                 if (spare.Text == Model.PartName)
-                                {
-                                    Model.SparePartId = Convert.ToInt32(spare.Value);
+                                {*@
+                                    @*Model.SparePartId = Convert.ToInt32(spare.Value);*@
                                     @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new { @class = "form-control" })
                                     @Html.ValidationMessageFor(model => model.SpareParts, "", new { @class = "text-danger" })
-                                }
-                            }
+                                @*}
+                            }*@
                         </div>
                     </div>
                 </form>

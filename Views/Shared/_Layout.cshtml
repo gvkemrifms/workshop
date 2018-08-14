@@ -96,12 +96,22 @@
                         <li>
                             <a href="/Employee/SaveInfraStructureDetails">Infrastructure</a>
                         </li>
-                        @*<li>
-                            <a href="#">Tools</a>
+                        <li>
+                            <a href="/job/ServiceGroup">Aggregates</a>
                         </li>
                         <li>
-                            <a href="#">Equipments</a>
-                        </li>*@
+                            <a href="/job/CategoryGroup">Category</a>
+                        </li>
+                        <li>
+                            <a href="/job/SubCategoryGroup">Sub Category</a>
+                        </li>
+                        @*<li>
+        <a href="#">Tools</a>
+    </li>
+    <li>
+        <a href="#">Equipments</a>
+        ///job/ServiceGroup
+    </li>*@
                     </ul>
                 </li>
                 <li>
@@ -116,9 +126,12 @@
                         <li>
                             <a href="~/Inventory/LubesMaster">Lubes</a>
                         </li>
-                        @*<li>
-                            <a href="#">General items</a>
-                        </li>*@
+                        <li>
+                            <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
+                        </li>
+                        <li>
+                            <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
+                        </li>
                      
                     </ul>
                 </li>
@@ -137,9 +150,9 @@
                         <li>
                             <a href="~/job/SaveJobCardDetails">Repair & Maintenance</a>
                         </li>
-                        <li>
+                        @*<li>
                             <a href="~/Vehicle/GetPendingStatusDetails">Job Card</a>
-                        </li>
+                        </li>*@
                         @*<li>
                             <a href="#">Release of Vehicle</a>
                         </li>
@@ -150,8 +163,22 @@
                             <a href="grid.html">Grid</a>
                         </li>*@
                     </ul>
-                    <!-- /.nav-second-level -->
-                </li>
+                    </li>
+                    <li>
+                    <a href="~/Vehicle/GetPendingStatusDetails">
+                        <i class="fa fa-wrench fa-fw"></i> Job Card
+                        @*<span class="fa arrow"></span>*@
+                    </a>
+                    @*<ul class="nav nav-second-level">
+                        <li>
+                            <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
+                        </li>
+                        <li>
+                            <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
+            </li>
+                        </ul>*@
+                        <!-- /.nav-second-level -->
+</li>
                 @*<li>
                     <a href="#">
                         <i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown
@@ -188,16 +215,16 @@
                     <!-- /.nav-second-level -->
                 </li>*@
                 <li>
-                    <a href="#">
+                    <a href="~/Reports/Reports">
                         <i class="fa fa-files-o fa-fw"></i> Reports
-                        <span class="fa arrow"></span>
+                        @*<span class="fa arrow"></span>*@
                     </a>
-                    <ul class="nav nav-second-level">
+                    @*<ul class="nav nav-second-level">
                         <li>
-                            <a href="~/Reports/Reports">Reports</a>
+                            <a href="#"></a>
                         </li>
                         
-                    </ul>
+                    </ul>*@
                 </li>
                 <li>
                     <a href="#">
@@ -210,12 +237,12 @@
                             <a href="#">Receipts</a>
                            
                             <ul class="nav nav-third-level">
-                                <li>
+                                @*<li>
                                     <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
                                 </li>
                                 <li>
                                     <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
-                                </li>
+                                </li>*@
                             </ul>                
                         </li>
                     

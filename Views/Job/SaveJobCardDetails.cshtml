@@ -1,8 +1,4 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleModel>
-
-@{
-    ViewBag.Title = "EmployeeDetails";
-}
 @*<style>
     .ui-datepicker-month {
         display: none;
@@ -15,7 +11,7 @@
 <script type="text/javascript">
 
     $(function () {
-        $('#txtDor,#txtDateOfDelivary').datepicker({
+        $('#txtDor,#txtDateOfDelivery').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
@@ -32,120 +28,17 @@
         //    }
         //});
     });
-
-    //function Validations() {
-    //    var ddlDistrict = $('#District option:selected').text().toLowerCase();
-    //    if (ddlDistrict === '--select--' || ddlDistrict === '') {
-    //        return alert("Please select District");
-    //    }
-    //    var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
-    //    if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
-    //        return alert("Please select Manufacturer");
-    //    }
-
-    //    var txtmodel = $('#txtModel').val();
-    //    if (txtmodel === "") {
-    //        return alert('Please select Model');
-    //    }
-    //    var txtengineNumber = $('#txtEngineNumber').val();
-    //    if (txtengineNumber === "") {
-    //        return alert('Please enter Engine Number');
-    //    }
-    //    var txtchasis = $('#txtChasis').val();
-    //    if (txtchasis === "") {
-    //        return alert('Please enter Chasis Number');
-    //    }
-    //    var txtloc = $('#txtLoc').val();
-    //    if (txtloc === "") {
-    //        return alert('Please enter Location Of Commission');
-    //    }
-
-    //    return true;
-    //}
-    //$(function () {
-    //    $("#District").change(function () {
-    //        //alert($(this).val());
-    //        $.post("/Vehicle/GetDistrictIds", { districtId: $(this).val() })
-    //    });
-    //});
     $(function () {
-
-        var serviceURL = '/Job/GetModelNumber';
-        $('#District').change(function () {
-            $('#txtModel').val('')
-        })
-        $("#Vehicle").change(function () {
-            var data = { vehicleid: $(this).val() };
-            $.ajax({
-                url: serviceURL,
-                type: "POST",
-                data: JSON.stringify(data),
-                datatype: "json",
-                contentType: 'application/json',
-
-                success: function (Response) {
-                    $('#txtModel').val('')
-                    $('#txtModel').val(Response)
-                    
-                }
-
-            });
-        })
-    })
-    $(document).ready(function () {
-       
-        $("#Vehicle").prop("disabled", true);
-       
-        $("#District").change(function () {
-            if ($('#District option:selected').text().toLowerCase() == "--select--") {
-                $('#Vehicle option:selected').text("");
-                $('#Vehicle').prop("disabled", true);
-            }
-            var serviceURL = '/Job/GetDistrictIds';
-            debugger;
-            var data = {
-                districtId: $('#District').val()
-             
-            };
-            $.ajax({
-                url: serviceURL,
-                type : "POST",
-                data: JSON.stringify(data),
-                datatype : "json",
-                contentType : 'application/json',
-
-                success: function (Response)
-                {
-                 
-                    $('#Vehicle').empty();
-                    //$('#Vehicle').append("<option value='--Select--'></option>");
-                    for (var i = 0; i < Response.length; i++)
-                    {
-                        
-                        $('#Vehicle').append("<option value='"+Response[i].split('-')[1]+"' >" + Response[i].split('-')[0] + "</option>");
-
-                    }
-                    
-                    $('#Vehicle').prop("disabled", false);
-
-
-                }
-                    //error : function (err) {
-                    //    alert("Error in Getting Vehicles!!");
-                    //}
-
-            });
-
-
-        });
-    });
-   
-
-    $(function () {
-     
-        $('#btn').click(function () {
-            var serviceURL = '/Job/SaveJobCardDetails';
-            var data = {
+        var orderItems = [];
+        $('#btnAddtest').click(function () {        
+            //$('#btnSubmit').show();
+            orderItems.push({
+                VehicleNumberString: $('#Vehicle option:selected').text(),
+                Category: $('#txtCategory option:selected').text(),
+                CategoryIdd:$('#txtCategory option:selected').val(),
+                SubCategoryName: $('#SubCategory option:selected').text(),
+                SubCategory: $('#SubCategory option:selected').val(),
+                EstimatedCost: $('#txtEstimatedCost').val(),
                 DistrictId: $('#District').val(),
                 VehId: $('#Vehicle option:selected').val(),
                 ModelNumber: $('#txtModel').val(),
@@ -153,14 +46,66 @@
                 Odometer: $('#txtOdo').val(),
                 PilotName: $('#txtPilotName').val(),
                 PilotId: $('#txtpilotid').val(),
-                ApproximateCost: $('#txtCostApprox').val(),
+                ApproximateCost: $('#txtEstimatedCost').val(),
                 NatureOfComplaint: $('#txtNatureOfComplaint').val(),
-                DateOfDelivery: $('#txtDateOfDelivary').val(),
+                DateOfDelivery: $('#txtDateOfDelivery').val(),
                 ReceivedLocation: $('#txtVehicleRecivedLoc').val(),
                 AllotedMechanic: $('#AllotedMechanic option:selected').val(),
-                ServiceEngineer: $('#ServiceEngineer option:selected').val()
+                ServiceEngineer: $('#ServiceEngineer option:selected').val(),
+                LaborCharges: $('#txtLaborCharges').val(),
+                Aggregates: $('#txtNatureOfComplaint option:selected').text(),
+                SubCat: $('#SubCategory option:selected').val(),
+                SubCatName: $('#SubCategory option:selected').text(),
+                ManufacturerId: $('#Manufacturer option:selected').val()
+                
+            });
+            if ($('#txtNatureOfComplaint option:selected').text()!='--Select--') {
+                GeneratedItemsTable();
+            }
+            return false;
+
+        });
+        function GeneratedItemsTable() {
+           
+
+                var $table = $('<table id=tbl/>');
+
+                $table.append('<thead><tr><th>Aggregates</th><th>Category</th><th>Sub Category</th><th>Cost</th></tr></thead>');
+
+                var $tbody = $('<tbody/>');
+                $.each(orderItems, function (i, val) {
+
+                    var $row = $('<tr/>');
+
+                    $row.append($('<td/>').html(val.Aggregates));
+                    $row.append($('<td/>').html(val.Category));
+                    $row.append($('<td/>').html(val.SubCategoryName));
+
+                    $row.append($('<td/>').html(val.EstimatedCost));
+                    var $remove = $('<a href="#">Remove</a>');
+                    $remove.click(function (e) {
+                        e.preventDefault();
+                        orderItems.splice(i, 1);
+                        GeneratedItemsTable();
+                    });
+                    $row.append($('<td/>').html($remove));
+                    $tbody.append($row);
+
+                });
+
+                $table.append($tbody);
+
+                $('#orderItems').html($table);          
+        }
+
+        $('#btn').click(function () {
+            
+            var serviceURL = '/Job/SaveJobCardDetails';
+            var data = {
+                //Status: $('input[type="radio"]').val(),
+                jobcarditems: orderItems
             };
-       
+
             $.ajax({
                 type: "POST",
                 url: serviceURL,
@@ -184,13 +129,413 @@
             });
 
         })
+    });
+
+  
+    $(function () {
+        $("#District").change(function () {
+            //alert($(this).val());
+            $.post("/Vehicle/GetDistrictIds", { districtId: $(this).val() })
+        });
+    });
+
+    $(function () {
+        $('#txtOdo').blur(function () {
+            var serviceURL = '/Job/CheckOdoReading';
+            var data = {
+                Odo: $(this).val(),
+                vehicleid: $('#Vehicle option:selected').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceURL,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response!=null) {
+                        $('#txtOdo').val('');
+                        alert('Odometer reading should be greater than'+" "+response);
+
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        })
+    })
+
+
+
+    $(function () {
+
+        var serviceURL = '/Job/GetModelNumber';
+        $('#District').change(function () {
+            $('#txtModel').val('')
+        })
+        $("#Vehicle").blur(function () {
+            var data = { vehicleid: $(this).val() };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+                    $('#txtModel').val('')
+                    $('#txtModel').val(Response)
+                    
+                }
+
+            });
+        })
+    })
+
+    
+
+
+
+    $(document).ready(function () {
+       
+        $("#Vehicle").prop("disabled", true);
+       
+        $("#District").change(function () {
+            if ($('#District option:selected').text().toLowerCase() == "--select--") {
+                $('#Vehicle option:selected').text("");
+                $('#Vehicle').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Job/GetDistrictIds';
+            debugger;
+            var data = {
+                districtId: $('#District').val()
+             
+            };
+            $.ajax({
+                url: serviceURL,
+                type : "POST",
+                data: JSON.stringify(data),
+                datatype : "json",
+                contentType : 'application/json',
+
+                success: function (Response)
+                {
+                 
+                    $('#Vehicle').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++)
+                    {
+                        
+                        $('#Vehicle').append("<option value='"+Response[i].split('-')[1]+"' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+                    
+                    $('#Vehicle').prop("disabled", false);
+                    
+
+                }
+                    //error : function (err) {
+                    //    alert("Error in Getting Vehicles!!");
+                    //}
+
+            });
+
+
+        });
+    });
+    //GetAggregatesBasedOnManufacturers
+    $(document).ready(function () {
+
+        $("#txtNatureOfComplaint").prop("disabled", true);
+
+        $("#Manufacturer").change(function () {
+            if ($('#Manufacturer option:selected').text().toLowerCase() == "--select--") {
+                $('#txtNatureOfComplaint option:selected').text("");
+                $('#txtNatureOfComplaint').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Job/GetAggregatesBasedOnManufacturers';
+            debugger;
+            var data = {
+                manufacturerId: $('#Manufacturer').val()
+
+            };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#txtNatureOfComplaint').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#txtNatureOfComplaint').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#txtNatureOfComplaint').prop("disabled", false);
+
+
+                }
+                
+
+            });
+
+
+        });
+    });
+
+
+
+
+
+   
+    $(document).ready(function () {
+
+        $("#txtCategory").prop("disabled", true);
+
+        $("#txtNatureOfComplaint").change(function () {
+            if ($('#txtNatureOfComplaint option:selected').text().toLowerCase() == "--select--") {
+                $('#txtCategory option:selected').text("");
+                $('#txtCategory').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Job/GetCategoryIds';
+            debugger;
+            var data = {
+                aggregatedId: $('#txtNatureOfComplaint').val()
+
+            };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#txtCategory').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#txtCategory').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#txtCategory').prop("disabled", false);
+
+
+                }
+                //error : function (err) {
+                //    alert("Error in Getting Vehicles!!");
+                //}
+
+            });
+
+
+        });
+    });
+
+    $(document).ready(function () {
+
+        $("#SubCategory").prop("disabled", true);
+
+        $("#txtCategory").change(function () {
+            if ($('#txtCategory option:selected').text().toLowerCase() == "--select--") {
+                $('#SubCategory option:selected').text("");
+                $('#SubCategory').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Job/GetSubCategoryIds';
+            debugger;
+            var data = {
+                categoryId: $('#txtCategory').val()
+
+            };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#SubCategory').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#SubCategory').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#SubCategory').prop("disabled", false);
+
+
+                }
+                //error : function (err) {
+                //    alert("Error in Getting Vehicles!!");
+                //}
+
+            });
+
+
+        });
+    });
+    $(document).ready(function () {
+
+     
+
+        $("#SubCategory").change(function () {
+            if ($('#SubCategory option:selected').text().toLowerCase() == "--select--") {
+                
+                return false;
+            }
+            var serviceURL = '/Job/GetEstimatedCostDetails';
+            debugger;
+            var data = {
+                categoryId: $('#SubCategory').val()
+
+            };
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+                
+                success: function (Response) {
+
+                    $('#txtEstimatedCost').val('');
+                    $('#txtEstimatedCost').val(Response);
+                }
+
+            });
+
+
+        });
+    });
+
+
+    
+    $(function () {
+     
+        //$('#btn').click(function () {
+        //    var serviceURL = '/Job/SaveJobCardDetails';
+        //    var data = {
+        //        DistrictId: $('#District').val(),
+        //        VehId: $('#Vehicle option:selected').val(),
+        //        ModelNumber: $('#txtModel').val(),
+        //        DateOfRepair: $('#txtDor').val(),
+        //        Odometer: $('#txtOdo').val(),
+        //        PilotName: $('#txtPilotName').val(),
+        //        PilotId: $('#txtpilotid').val(),
+        //        ApproximateCost: $('#txtCostApprox').val(),
+        //        NatureOfComplaint: $('#txtNatureOfComplaint').val(),
+        //        DateOfDelivery: $('#txtDateOfDelivary').val(),
+        //        ReceivedLocation: $('#txtVehicleRecivedLoc').val(),
+        //        AllotedMechanic: $('#AllotedMechanic option:selected').val(),
+        //        ServiceEngineer: $('#ServiceEngineer option:selected').val()
+        //    };
+       
+        //    $.ajax({
+        //        type: "POST",
+        //        url: serviceURL,
+        //        data: JSON.stringify(data),
+        //        contentType: "application/json; charset=utf-8",
+        //        dataType: "json",
+        //        success: function (response) {
+        //            if (response != 0) {
+        //                alert('Record Inserted');
+        //            }
+        //            //else {
+        //            //    alert("Failed to Insert Please check ");
+        //            //}
+        //        },
+        //        failure: function (response) {
+        //            alert(response.responseText);
+        //        }
+        //        //error: function (response) {
+        //        //    alert(response.responseText);
+        //        //}
+        //    });
+
+        //})
 
     });
+
+    function Validations() {
+        var ddlDistrict = $('#District option:selected').text().toLowerCase();
+        if (ddlDistrict === '--select--' || ddlDistrict === '') {
+          return  alert("Please select District");
+            
+        }
+        var txtDOR = $('#txtDor').val();
+        if (txtDOR === '') {
+            return alert("Please select Date Of Repair");
+        }
+
+        var txtmodel = $('#txtModel').val();
+        if (txtmodel === "") {
+            return alert('Please select Model');
+        }
+        var txtODO = $('#txtOdo').val();
+        if (txtODO === "") {
+            return alert('Please enter ODO');
+        }
+        var txtRecivedLoc = $('#txtVehicleRecivedLoc').val();
+        if (txtRecivedLoc === "") {
+            return alert('Please enter Receiving Location');
+        }
+        var txtpilotId = $('#txtpilotid').val();
+        if (txtpilotId === "") {
+            return alert('Please enter Pilot Id');
+        }
+        var ddlAggregates = $('#txtNatureOfComplaint option:selected').text().toLowerCase();
+        if (ddlAggregates === '--select--' || ddlAggregates === '') {
+            return alert('Please select Aggregates');
+        }
+        var ddlCategory = $('#txtCategory option:selected').text().toLowerCase();
+        if (ddlCategory === '--select--' || ddlCategory === '') {
+            return alert('Please select Category');
+        }
+        var ddlSubCategory = $('#SubCategory option:selected').text().toLowerCase();
+        if (ddlSubCategory === '--select--' || ddlSubCategory === '') {
+            return alert('Please select SubCategory');
+        }
+        var txtCost = $('#txtEstimatedCost').val();
+        if (txtCost === "") {
+            return alert('Please enter Cost');
+        }
+        var txtLabour = $('#txtLaborCharges').val();
+        if (txtLabour === "") {
+            return alert('Please enter Labour Charges');
+        }
+        var ddlAllotedMechanic = $('#AllotedMechanic option:selected').text().toLowerCase();
+        if (ddlAllotedMechanic === '--select--' || ddlAllotedMechanic === '') {
+            return alert('Please select Mechanic');
+        }
+        var ddlEngineer = $('#ServiceEngineer option:selected').text().toLowerCase();
+        if (ddlEngineer === '--select--' || ddlEngineer === '') {
+            return alert('Please select Service Engineer');
+        }
+       
+        return true;
+    }
 </script>
 
 <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
     <div class="panel-heading">
-        Job Card Information
+        Repair And Maintanence
     </div>
     <div class="panel-body" style="margin-top:30px">
         <div class="col-lg-6">
@@ -260,98 +605,153 @@
                 </div>
             </form>
         </div>
+
         
-        <div class="col-lg-6" >
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Cost(Approx)</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtCostApprox" placeholder="Cost(Approx)">
-                    </div>
+                <div class="col-lg-6" >
+                    <form class="form-horizontal">
+                        <div class="form-group">
+
+                            <label class="control-label col-lg-4">Manufacturer</label>
+                            <div class="col-lg-8">
+                                @*<input type="text" class="form-control" id="txtNatureOfComplaint" placeholder="Nature Of Complaint">*@
+                                @Html.DropDownList("Manufacturer", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-lg-4">Aggregates</label>
+                            <div class="col-lg-8">
+                                @*<input type="text" class="form-control" id="txtNatureOfComplaint" placeholder="Nature Of Complaint">*@
+                                @Html.DropDownList("txtNatureOfComplaint", ViewBag.NatureOfComplaint as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                            </div>
+                        </div>
+                       
+                       
+                    </form>
                 </div>
+                <div class="col-lg-6">
+                    <form class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label col-lg-4">Category</label>
+                            <div class="col-lg-8">
+                                @*<input type="text" class="form-control" id="txtNatureOfComplaint" placeholder="Nature Of Complaint">*@
+                                <select id="txtCategory" class="form-control"> </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:40px">
+                            <label class="control-label col-lg-4">SubCategory</label>
+                            <div class="col-lg-8">
+                                @*<input type="text" class="form-control" id="txtNatureOfComplaint" placeholder="Nature Of Complaint">*@
+                                <select id="SubCategory" class="form-control"> </select>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-6">
+                    <form class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label col-lg-4">Cost</label>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" id="txtEstimatedCost" placeholder="Cost">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-lg-6">
+                    <form class="form-horizontal">
+                        <div class="form-group" style="margin-top:-30px">
+                            <label class="control-label col-lg-4">Alloted Mechanic </label>
+                            <div class="col-lg-8">
+                                @Html.DropDownList("AllotedMechanic", ViewBag.AllotedMechanic as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-lg-4">Service Engineer </label>
+                            <div class="col-lg-8">
+                                @Html.DropDownList("ServiceEngineer", ViewBag.ServiceEngineer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                                @*<button type="submit"  class="btn btn-default" style="background-color: blue;margin-left:330px;margin-top:-50px; color: white">Add</button>*@
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-6">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-lg-4">Labor Charges</label>
+                            <div class="col-lg-8">
+                                <input type="text" id="txtLaborCharges" placeholder="Labor Charges" class="form-control" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                @*<div class="col-lg-6">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-lg-4">Service Engineer </label>
+                                <div class="col-lg-8">
+                                    @Html.DropDownList("ServiceEngineer", ViewBag.ServiceEngineer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>*@
+        <div class="col-lg-6">
+
+            <form class="form-horizontal">
                 <div class="form-group">
                     <label class="control-label col-lg-4">Date Of Delivary(Approx)</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtDateOfDelivary" placeholder="Date Of Delivary(Approx)">
-                    </div>
-                </div>
-                
-            </form>
-        </div>
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Nature Of Complaint</label>
-                    <div class="col-lg-8">
-                        @*<input type="text" class="form-control" id="txtNatureOfComplaint" placeholder="Nature Of Complaint">*@
-                        @Html.DropDownList("txtNatureOfComplaint", ViewBag.NatureOfComplaint as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
-                    </div>
-                </div>
-                
-            </form>
-        </div>
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Alloted Mechanic </label>
-                    <div class="col-lg-8">
-                        @Html.DropDownList("AllotedMechanic", ViewBag.AllotedMechanic as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-4" style="margin-left:-500px">Service Engineer </label>
-                    <div class="col-lg-8">
-                        @Html.DropDownList("ServiceEngineer", ViewBag.ServiceEngineer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style = "margin-left:-670px" })
+                        <input type="text" class="form-control" id="txtDateOfDelivery" placeholder="Date Of Delivery(Approx)">
                     </div>
                 </div>
             </form>
         </div>
 
-        @*<div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Service Engineer </label>
-                    <div class="col-lg-8">
-                        @Html.DropDownList("ServiceEngineer", ViewBag.ServiceEngineer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                <br />
+                <div class="form-group" style="position:relative;margin-bottom:-200px">
+                    <div class="col-lg-4">
+                        <div class="panel-body" id="orderItems"></div>
+
                     </div>
                 </div>
-
-            </form>
-        </div>*@
+                <br />
 
 
 
+                <div style="margin-bottom: 90px;" class="col-lg-4">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                                <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white" onclick="if (!Validations()) return false;">Submit</button>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="submit" id="btnAddtest" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Add SubCategories</button>
+                            </div>
+                        </div>
+                    </form>
 
-
-
-        <div style="margin-bottom: 90px" class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
-                    </div>
                 </div>
-            </form>
+
+                <div class="col-lg-6" style="width:100%">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div style="margin-top:30px">
+                                @Html.Partial("GetJobCardDetails");
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
 
         </div>
-
-        <div class="col-lg-6" style="width:100%">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <div style="margin-top:30px">
-                        @Html.Partial("GetJobCardDetails");
-                    </div>
-
-                </div>
-            </form>
-
-        </div>
-
     </div>
-</div>
 
     <div class="panel-footer">
 

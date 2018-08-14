@@ -3,14 +3,14 @@
 @{
     ViewBag.Title = "EmployeeDetails";
 }
-<style>
+@*<style>
     .ui-datepicker-month {
         display: none;
     }
     .ui-datepicker-calendar {
     display: none;
     }
-</style>
+</style>*@
 <script type="text/javascript">
    
     $(function () {
@@ -187,7 +187,7 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Model</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtModel" placeholder="Model Number" maxlength="10">
+                        <input type="text" class="form-control" id="txtModel" placeholder="Model Number" maxlength="10" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
                     </div>
                 </div>
 
@@ -220,7 +220,7 @@
                     <div class="form-group">
                         <label class="control-label col-lg-4">Date Of Commission</label>
                         <div class="col-lg-8">
-                            <input type="text" class="form-control" id="txtDoc" placeholder="Date Of Commission">
+                            <input type="text" class="form-control" id="txtDoc" placeholder="Date Of Commission" onkeypress="return false;">
                         </div>
                     </div>
                 </form>

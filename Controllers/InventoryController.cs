@@ -1,4 +1,5 @@
 ﻿using Fleet_WorkShop.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,15 +17,20 @@ namespace Fleet_WorkShop.Controllers
 
             public ActionResult SparePartsMaster()
         {
-            IEnumerable<SparePartsModel> sparemodel;
+            IEnumerable<SparePartsModel> sparemodel=null;
             string query = "select * from m_VehicleManufacturer";
            DataTable dtSpares= _helper.ExecuteSelectStmt(query);
             Session["Manufacturer"] = dtSpares;
             ViewBag.Manufacturers= new SelectList(dtSpares.AsDataView(), "Id", "ManufacturerName");
-            DataTable dtSpareParts=_helper.ExecuteSelectStmtusingSP("spGetSpares");
-            Session["getSpares"] = dtSpareParts;
-            sparemodel = dtSpareParts.AsEnumerable().ToList().Select(x => new SparePartsModel {Id=x.Field<int>("Id"), ManufacturerName = x.Field<string>("ManufacturerName"), PartName = x.Field<string>("PartName"), Cost = x.Field<decimal>("Cost") });
-            return View(sparemodel);
+            //DataTable dtSpareParts=_helper.ExecuteSelectStmtusingSP("spGetSpares");
+            //Session["getSpares"] = dtSpareParts;
+       
+         
+         
+                //sparemodel = dtDisplaySpares.AsEnumerable().ToList().Select(x => new SparePartsModel { Id = x.Field<int>("Id"), ManufacturerName = x.Field<string>("ManufacturerName"), PartName = x.Field<string>("PartName"), Cost = x.Field<decimal>("Cost") });
+           
+            
+            return View();
         }
         [HttpPost]
         public ActionResult SparePartsMaster(SparePartsModel spareModel)
@@ -33,6 +39,13 @@ namespace Fleet_WorkShop.Controllers
             if (returnVal == 1)
                 return Json("Hello", JsonRequestBehavior.AllowGet);
             return RedirectToAction("SparePartsMaster");
+        }
+        public ActionResult DisplaySparePartsDetails(string search)
+        {
+            IEnumerable<SparePartsModel> sparemodel;
+            DataTable dtSpareParts = _helper.ExecuteSelectStmtusingSP("spGetSparesForPartNumber",null,null,null,null, "@partnumber", search);
+            sparemodel = dtSpareParts.AsEnumerable().ToList().Select(x => new SparePartsModel { Id = x.Field<int>("Id"), ManufacturerName = x.Field<string>("ManufacturerName"), PartName = x.Field<string>("PartName"), Cost = x.Field<decimal>("Cost") });
+            return Json(sparemodel, JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
         public ActionResult EditSpares(int? id)
@@ -44,6 +57,7 @@ namespace Fleet_WorkShop.Controllers
             SparePartsModel spmodel = new SparePartsModel();
             DataTable dtGetSpareDetails = Session["getSpares"] as DataTable;
             DataRow row = dtGetSpareDetails.AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
+            Session["SparesMasterId"] = row["Id"];
             DataTable dtManufacturers = Session["Manufacturer"] as DataTable;
             spmodel.Manufacturer = new SelectList(dtManufacturers.AsDataView(), "Id", "ManufacturerName");
             spmodel.ManufacturerId = Convert.ToInt32(row["ManufacturerId"]);
@@ -55,16 +69,48 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult EditSpares(SparePartsModel spmodel)
         {
+            int sparesId = Convert.ToInt32(Session["SparesMasterId"]);
+           _helper.ExecuteUpdateSparesMaster(sparesId, "spEditSparePartsMaster", spmodel.ManufacturerId, spmodel.PartName, spmodel.Cost);
             return RedirectToAction("SparePartsMaster");
         }
         public ActionResult LubesMaster()
         {
-            string query = "select * from m_VehicleManufacturer";
+            string query = "select * from m_LubesManufactures";
             DataTable dtLubes = _helper.ExecuteSelectStmt(query);
             ViewBag.Manufacturers = new SelectList(dtLubes.AsDataView(), "Id", "ManufacturerName");
-            return View();
+            string lubesQuery = "select * from m_lubes";
+            DataTable dtLubesData = _helper.ExecuteSelectStmt(lubesQuery);
+            Session["LubesData"] = dtLubesData;
+            IEnumerable<LubesModel> lubesModel = dtLubesData.AsEnumerable().ToList().Select(x => new LubesModel {Id=x.Field<int>("Id"), ManufacturerId = x.Field<int>("ManufacturerId"), OilName = x.Field<string>("OilName"), CostPerLitre = x.Field<Decimal>("CostPerLitre"), LubricantNumber = x.Field<string>("LubricantNumber") });
+            return View(lubesModel);
         }
+        [HttpPost]
+        public ActionResult GetSparePartsDetailsForManufacturer(string ManufacturerId)
+        {
+            string list = "";
+            if (ModelState.IsValid)
+            {
+                _inventoryModel.ManufacturerId = int.Parse(ManufacturerId);
+                Session["Id"] = _inventoryModel.ManufacturerId;
+                DataSet dsFillSparesOfManufacturers = _helper.FillDropDownHelperMethodWithSp("spGetSparesForManufacturer", _inventoryModel.ManufacturerId);
+                List<DataRow> data = dsFillSparesOfManufacturers.Tables[0].AsEnumerable().ToList();
+                List<string> names = new List<string>();
+                foreach (DataRow row in data)
+                {
+                    _inventoryModel.SparePartId = Convert.ToInt32(row["Id"]);
+                    _inventoryModel.SpareName = row["PartName"].ToString();
 
+                    names.Add(_inventoryModel.SpareName + "-" + _inventoryModel.SparePartId);
+                }
+                list = JsonConvert.SerializeObject(names, Formatting.None, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                });
+
+            }
+            return Content(list, "application/json");
+
+        }
         public ActionResult GetCostDetails(int id)
         {
             string query = "select cost from m_spareparts where Id='" + id + "'";
@@ -97,9 +143,41 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult LubesMaster(LubesModel lubesModel)
         {
-           int returnVal= _helper.ExecuteInsertLubesMasterDetails("spLubesMaster", lubesModel.ManufacturerId, lubesModel.OilName, lubesModel.CostPerLitre);
+           int returnVal= _helper.ExecuteInsertLubesMasterDetails("spLubesMaster", lubesModel.ManufacturerId, lubesModel.OilName, lubesModel.CostPerLitre,lubesModel.LubricantNumber,1);
             if (returnVal == 1)
                 return Json("Hello", JsonRequestBehavior.AllowGet);
+            return RedirectToAction("LubesMaster");
+        }
+        [HttpGet]
+        public ActionResult LubesMasterEdit(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("LubesMaster");
+            }
+            LubesModel spmodel = new LubesModel();
+            DataTable dtGetSpareDetails = Session["LubesData"] as DataTable;
+            DataRow row = dtGetSpareDetails.AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
+            spmodel.Id = Convert.ToInt32(row["Id"]);
+            Session["Id"] = spmodel.Id;
+            string query = "select * from m_VehicleManufacturer";
+            DataTable dtLubes = _helper.ExecuteSelectStmt(query);
+            spmodel.Manufacturer = new SelectList(dtLubes.AsDataView(), "Id", "ManufacturerName");
+            spmodel.ManufacturerId = Convert.ToInt32(row["ManufacturerId"]);
+            spmodel.OilName = row["OilName"].ToString();
+            spmodel.CostPerLitre = Convert.ToDecimal(row["CostPerLitre"]);
+            return View(spmodel);
+        }
+        [HttpPost]
+        public ActionResult LubesMasterEdit(LubesModel lubesModel)
+        {
+            int lubesId = Convert.ToInt32(Session["Id"]);
+            _helper.ExecuteUpdateLubesMaster(lubesId, "spEditLubesMaster", lubesModel.ManufacturerId, lubesModel.OilName, lubesModel.CostPerLitre);
+            return RedirectToAction("LubesMaster");
+        }
+        public ActionResult DeleteLubesMaster(int? id)
+        {
+            _helper.ExecuteDeleteStatement("spDeleteLubesMaster", id);
             return RedirectToAction("LubesMaster");
         }
         public ActionResult getSparePartsDetails()
@@ -278,7 +356,7 @@ namespace Fleet_WorkShop.Controllers
                 return RedirectToAction("Login", "Account");
             IEnumerable<InventoryModel> invModel = null;
             DataSet dsGetManufacturerVendor = _helper.FillDropDownHelperMethodWithSp("spGetManufacturerVendor");
-            ViewBag.VehicleManufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName");
+            ViewBag.VehicleManufacturer = new SelectList(dsGetManufacturerVendor.Tables[4].AsDataView(), "Id", "ManufacturerName");
             ViewBag.Vendors = new SelectList(dsGetManufacturerVendor.Tables[1].AsDataView(), "id", "vendor_name");
             ViewBag.Lubes = new SelectList(dsGetManufacturerVendor.Tables[3].AsDataView(), "Id", "OilName");
             DataSet dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetLubesReceiptDetails");
@@ -374,6 +452,36 @@ namespace Fleet_WorkShop.Controllers
             int workShopId = dtWorshopId.AsEnumerable().Select(x => x.Field<int>("workshopid")).FirstOrDefault();
             var receiptId = dtWorshopId.AsEnumerable().Select(x => x.Field<long>("receipt_id")).FirstOrDefault();
             _helper.ExecuteUpdateLubesStatement(workShopId, model.ManufacturerId, "spEditLubesInventory", model.LubricantId, model.Uprice, model.Qty, receiptId, model.BillNo, model.VendorId);
+        }
+        public ActionResult DeleteSpares(int? id)
+        {
+            _helper.ExecuteDeleteStatement("spDeleteSpares", id);
+            return RedirectToAction("SparePartsMaster");
+        }
+        public ActionResult CheckSparePartsNumber(string PartNumber)
+        {
+            string list = "";
+            if(ModelState.IsValid)
+            {
+                DataTable dtPartNumber = _helper.ExecuteSelectStmtusingSP("getPartNumber", null, null, null, null, "@partnumber", PartNumber);
+                list = dtPartNumber.AsEnumerable().Select(x => x.Field<string>("partNumber")).FirstOrDefault();
+
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+         
+           
+            
+        }
+        public ActionResult CheckLubricantNumber(string LubricantNumber)
+        {
+            string list = "";
+            if (ModelState.IsValid)
+            {
+                DataTable dtLubesNumber = _helper.ExecuteSelectStmtusingSP("getLubricantNumber", null, null, null, null, "@lubricantnumber", LubricantNumber);
+                list = dtLubesNumber.AsEnumerable().Select(x => x.Field<string>("LubricantNumber")).FirstOrDefault();
+
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -3,14 +3,14 @@
 
 <table class="table" style="margin-top:30px">
     <tr>
-     
+        <th>
+            @Html.DisplayNameFor(model => model.ID)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.WorkShopName)
         </th>
         
-        <th>
-            @Html.DisplayNameFor(model => model.Quantity)
-        </th>
+       
         <th>
             @Html.DisplayNameFor(model => model.Manufacturer)
         </th>
@@ -18,19 +18,21 @@
         <th>
             @Html.DisplayNameFor(model => model.Lubricant)
         </th>
-        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </th>
     </tr>
 
 @foreach (var item in Model) {
     <tr>
-  
+        <td>
+            @Html.DisplayFor(modelItem => item.ID)
+        </td>
         <td>
             @Html.DisplayFor(modelItem => item.WorkShopName)
         </td>
        
-        <td>
-            @Html.DisplayFor(modelItem => item.Quantity)
-        </td>
+       
         <td>
             @Html.DisplayFor(modelItem => item.Manufacturer)
         </td>
@@ -38,7 +40,9 @@
         <td>
             @Html.DisplayFor(modelItem => item.Lubricant)
         </td>
- 
+        <td>
+            @Html.DisplayFor(modelItem => item.Quantity)
+        </td>
     </tr>
 }
 

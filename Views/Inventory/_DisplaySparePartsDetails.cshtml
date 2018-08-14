@@ -6,6 +6,7 @@
         <th>
             @Html.DisplayNameFor(model => model.ManufacturerName)
         </th>
+        
         <th>
             @Html.DisplayNameFor(model => model.PartName)
         </th>
@@ -20,15 +21,17 @@
         <td>
             @Html.DisplayFor(modelItem => item.ManufacturerName)
         </td>
+        
         <td>
             @Html.DisplayFor(modelItem => item.PartName)
         </td>
+  
         <td>
             @Html.DisplayFor(modelItem => item.Cost)
         </td>
         <td>
-            @Html.ActionLink("Edit", "EditSpares", new {  id=item.Id}) |
-            @Html.ActionLink("Delete", "DeleteSpares", new { id= item.Id })
+            @Html.ActionLink("Edit", "EditSpares", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "DeleteSpares", new { id = item.Id })
         </td>
     </tr>
 }
