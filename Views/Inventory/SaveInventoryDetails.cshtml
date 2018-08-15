@@ -228,6 +228,14 @@
     $(function () {
         var orderItems = [];
         $('#btnAdd').click(function () {
+            if ($('#ManufacturerName option:selected').text() == "--Select--" || $('#ManufacturerName option:selected').text() == "")
+            {
+                return false;
+            }
+            if ($('#txtQuantity').val().trim() == "")
+            {
+                return false;
+            }
             getFinalBillAmount();            
             orderItems.push({
                 ManufacturerName: $('#ManufacturerName option:selected').text(),

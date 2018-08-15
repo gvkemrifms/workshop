@@ -739,6 +739,35 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+        internal void ExecuteJobSubCategoryUpdateCost(string insertStmt, int? approxCost,int subcategoryId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@cost", Convert.ToInt32(approxCost));
+                    comm.Parameters.AddWithValue("@subcategoryid", Convert.ToInt32(subcategoryId));
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         public void TraceService(string content)
         {
             var str = @"C:\smslog_1\Log.txt";

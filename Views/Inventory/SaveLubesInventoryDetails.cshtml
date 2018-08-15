@@ -133,6 +133,51 @@
         });
 
     });
+    $(document).ready(function () {
+
+        $("#Lubes").prop("disabled", true);
+
+        $("#ManufacturerName").change(function () {
+            if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
+                $('#Lubes option:selected').text("");
+                $('#Lubes').prop("disabled", true);
+                return false;
+            }
+            var serviceURL = '/Inventory/GetLubesDetailsForManufacturer';
+
+            var data = {
+                ManufacturerId: $('#ManufacturerName option:selected').val()
+            }
+            $.ajax({
+                url: serviceURL,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (Response) {
+
+                    $('#Lubes').empty();
+                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#Lubes').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+                    }
+
+                    $('#Lubes').prop("disabled", false);
+
+
+                }
+                //error : function (err) {
+                //    alert("Error in Getting Vehicles!!");
+                //}
+
+            });
+
+
+        });
+    });
     $(function () {
         debugger;
         $('#Lubes').change(function () {
@@ -196,6 +241,12 @@
     $(function () {
         var orderItems = [];
         $('#btnAdd').click(function () {
+            if ($('#ManufacturerName option:selected').text() == "--Select--" || $('#ManufacturerName option:selected').text() == "") {
+                return false;
+            }
+            if ($('#txtQuantity').val().trim() == "") {
+                return false;
+            }
             getFinalBillAmount();
             orderItems.push({
                 ManufacturerName: $('#ManufacturerName option:selected').text(),
@@ -211,6 +262,11 @@
             //$('#txtunitprice').val('').focus();
             //$('#txtQuantity,#lblAmount').val('');
             GeneratedItemsTable();
+            $('#ManufacturerName option:selected').val(0);
+            $('#Lubes option:selected').text('--Select--');
+            $('#txtunitprice').val('');
+            $('#txtQuantity').val('');
+            $('#lblAmount').text('');
             return false;
 
         });

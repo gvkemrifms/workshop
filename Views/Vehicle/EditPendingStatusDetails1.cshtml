@@ -425,7 +425,7 @@
     }
 </style>
 @Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass" })
-@Html.ActionLink("Add Issues", "SaveJobCardDetails", "Job", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass1" })
+@Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass1" })
 <table class="table1" style="margin-top:5px;width:700px;margin-left:150px">
     <tr>
         <th>

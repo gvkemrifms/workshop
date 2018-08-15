@@ -170,7 +170,16 @@ namespace Fleet_WorkShop.Controllers
             Session["JobCardNumber"] = LubespendingCases.Select(x => x.JobCardNumber).FirstOrDefault();
             return PartialView("EditLubesPendingStatusDetails", LubespendingCases);
         }
-
+        public ActionResult CheckVehicleNumber(string vehicleNumber)
+        {
+            string vehicleNumberStringLower = vehicleNumber.ToLower().ToString();
+          DataTable dtCheckVehicles=  _helper.ExecuteSelectStmtusingSP("spCheckVehicleDetails", null, null, null, null, "@vehiclenumber", vehicleNumber);
+            if(dtCheckVehicles.Rows.Count==0)
+            {
+                return null;
+            }
+            return Json(dtCheckVehicles.Rows.Count, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult GetPendingStatusDetails()
         {
             IEnumerable<JobCardPendingCases> pendingCases = new List<JobCardPendingCases>();
@@ -324,6 +333,7 @@ namespace Fleet_WorkShop.Controllers
                                     int updatedQuantity = itemTotalQuantity - itemm.Quantity;
 
                                     _helper.ExecuteUpdateSparesIssueStatement("UpdateSpareIssueQuantityDetails", receiptId, updatedQuantity);
+                                    return Json(res, JsonRequestBehavior.AllowGet);
                                 }
 
                             }
@@ -359,12 +369,14 @@ namespace Fleet_WorkShop.Controllers
                                                 updatedQuantity = 0;
 
                                            result = _helper.ExecuteUpdateSparesIssueStatement("UpdateSpareIssueQuantityDetails", receiptId, updatedQuantity);
+                                           
                                             if (result == 1)
                                             {
                                                 if(remainingQuantity<=0)
                                                 itemm.Quantity = -(remainingQuantity);
                                                
                                             }
+                                            return Json(res, JsonRequestBehavior.AllowGet);
                                         }
                                     }
                                 }

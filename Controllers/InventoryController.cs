@@ -111,6 +111,33 @@ namespace Fleet_WorkShop.Controllers
             return Content(list, "application/json");
 
         }
+
+        public ActionResult GetLubesDetailsForManufacturer(string ManufacturerId)
+        {
+            string list = "";
+            if (ModelState.IsValid)
+            {
+                _inventoryModel.ManufacturerId = int.Parse(ManufacturerId);
+                Session["Id"] = _inventoryModel.ManufacturerId;
+                DataSet dsFillLubesOfManufacturers = _helper.FillDropDownHelperMethodWithSp("spGetLubesForManufacturer", _inventoryModel.ManufacturerId);
+                List<DataRow> data = dsFillLubesOfManufacturers.Tables[0].AsEnumerable().ToList();
+                List<string> names = new List<string>();
+                foreach (DataRow row in data)
+                {
+                    _inventoryModel.LubricantId = Convert.ToInt32(row["Id"]);
+                    _inventoryModel.LubricantName = row["OilName"].ToString();
+
+                    names.Add(_inventoryModel.LubricantName + "-" + _inventoryModel.LubricantId);
+                }
+                list = JsonConvert.SerializeObject(names, Formatting.None, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                });
+
+            }
+            return Content(list, "application/json");
+
+        }
         public ActionResult GetCostDetails(int id)
         {
             string query = "select cost from m_spareparts where Id='" + id + "'";
@@ -297,10 +324,12 @@ namespace Fleet_WorkShop.Controllers
                 Qty = Convert.ToInt32(row["Quantity"]),
                 Amt = Convert.ToDecimal(row["Amount"]),
                 BillAmount = Convert.ToDecimal(row["BillAmount"]),
-                BillDate=DateTime.Parse(row["BillDate"].ToString()),
+                BillDate = DateTime.Parse(row["BillDate"].ToString()),
+                ManufacturerId = Convert.ToInt32(row["ManufacturerId"]),
                 Manufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName"),
                 SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName"),
-                VendorId= Convert.ToInt32(row["vendorid"])
+                VendorId= Convert.ToInt32(row["vendorid"]),
+                SparePartId=Convert.ToInt32(row["SparePartId"])
             };
             Session["BillAmount"] = model.BillAmount;
             Session["Amt"] = model.Amt;
@@ -403,7 +432,9 @@ namespace Fleet_WorkShop.Controllers
                 BillDate = DateTime.Parse(row["BillDate"].ToString()),
                 Manufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName"),
                 Lubricant = new SelectList(dsGetManufacturerVendor.Tables[3].AsDataView(), "Id", "OilName"),
-                VendorId = Convert.ToInt32(row["vendorid"])
+                VendorId = Convert.ToInt32(row["vendorid"]),
+                ManufacturerId=Convert.ToInt32(row["ManufacturerId"]),
+                LubricantId= Convert.ToInt32(row["LubricantId"])
             };
             Session["BillAmount"] = model.BillAmount;
             Session["Amt"] = model.Amt;

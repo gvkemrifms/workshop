@@ -48,38 +48,37 @@ namespace Fleet_WorkShop.Controllers
 
         [HttpPost]
         public ActionResult SaveJobCardDetails(VehicleModel model)
-        {
-        
+        {       
             int returnVal = 0;
-           
-            foreach (var item in model.jobcarditems)
-            {
-                VehicleJobCardModel _vehDetails = new VehicleJobCardModel()
+                foreach (var item in model.jobcarditems)
                 {
-                    WorkShopId = Convert.ToInt32(Session["WorkshopId"]),
-                    DistrictId = item.DistrictId,
-                    VehId = item.VehId,
-                    DateOfDelivery = item.DateOfDelivery,
-                    ApproximateCost = item.ApproximateCost,
-                    ModelNumber = item.ModelNumber,
-                    NatureOfComplaint = item.NatureOfComplaint,
-                    Odometer = item.Odometer,
-                    PilotId = item.PilotId,
-                    PilotName = item.PilotName,
-                    ReceivedLocation = item.ReceivedLocation,
-                    DateOfRepair = item.DateOfRepair,
-                    AllotedMechanic = item.AllotedMechanic,
-                    ServiceEngineer = item.ServiceEngineer,
-                    LaborCharges=item.LaborCharges,
-                    CategoryIdd=item.CategoryIdd,
-                    SubCat=item.SubCat,
-                    ManufacturerId=item.ManufacturerId
+                    VehicleJobCardModel _vehDetails = new VehicleJobCardModel()
+                    {
+                        WorkShopId = Convert.ToInt32(Session["WorkshopId"]),
+                        DistrictId = item.DistrictId,
+                        VehId = item.VehId,
+                        DateOfDelivery = item.DateOfDelivery,
+                        ApproximateCost = item.ApproximateCost,
+                        ModelNumber = item.ModelNumber,
+                        NatureOfComplaint = item.NatureOfComplaint,
+                        Odometer = item.Odometer,
+                        PilotId = item.PilotId,
+                        PilotName = item.PilotName,
+                        ReceivedLocation = item.ReceivedLocation,
+                        DateOfRepair = item.DateOfRepair,
+                        AllotedMechanic = item.AllotedMechanic,
+                        ServiceEngineer = item.ServiceEngineer,
+                        LaborCharges = item.LaborCharges,
+                        CategoryIdd = item.CategoryIdd,
+                        SubCat = item.SubCat,
+                        ManufacturerId = item.ManufacturerId
 
-                };
-            
-                returnVal = _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", _vehDetails.DistrictId, _vehDetails.VehId, _vehDetails.DateOfRepair, _vehDetails.ModelNumber, _vehDetails.Odometer, _vehDetails.ReceivedLocation, _vehDetails.PilotId, _vehDetails.PilotName, _vehDetails.DateOfDelivery, _vehDetails.NatureOfComplaint, _vehDetails.ApproximateCost, Convert.ToInt32(_vehDetails.AllotedMechanic), _vehDetails.WorkShopId, Convert.ToInt32(_vehDetails.ServiceEngineer),Convert.ToInt32(_vehDetails.LaborCharges), Convert.ToInt32(_vehDetails.CategoryIdd),Convert.ToInt32(item.SubCat),Convert.ToInt32(item.ManufacturerId));
-                
-            }
+                    };
+
+                    returnVal = _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", _vehDetails.DistrictId, _vehDetails.VehId, _vehDetails.DateOfRepair, _vehDetails.ModelNumber, _vehDetails.Odometer, _vehDetails.ReceivedLocation, _vehDetails.PilotId, _vehDetails.PilotName, _vehDetails.DateOfDelivery, _vehDetails.NatureOfComplaint, _vehDetails.ApproximateCost, Convert.ToInt32(_vehDetails.AllotedMechanic), _vehDetails.WorkShopId, Convert.ToInt32(_vehDetails.ServiceEngineer), Convert.ToInt32(_vehDetails.LaborCharges), Convert.ToInt32(_vehDetails.CategoryIdd), Convert.ToInt32(item.SubCat), Convert.ToInt32(item.ManufacturerId));
+
+                }
+           
             return RedirectToAction("SaveJobCardDetails");
 
         }
@@ -208,7 +207,7 @@ namespace Fleet_WorkShop.Controllers
             {
                 _vehModel.EstimatedCost = int.Parse(categoryId);
                 DataSet dsgetCostBySubCategory = _helper.getCost("spGetCostDetails", _vehModel.EstimatedCost);
-                list = dsgetCostBySubCategory.Tables[0].AsEnumerable().Select(x => x.Field<decimal>("EstimatedCost")).FirstOrDefault();
+                list = dsgetCostBySubCategory.Tables[0].AsEnumerable().Select(x => x.Field<int>("EstimatedCost")).FirstOrDefault();
 
             }
             return Content(list.ToString(), "application/json");
@@ -474,7 +473,7 @@ namespace Fleet_WorkShop.Controllers
             if (ModelState.IsValid)
             {
                 _jobModel.ManufacturerId = int.Parse(ManufacturerId);
-                Session["AggregateId"] = _jobModel.ManufacturerId;
+                Session["ManufacturerId"] = _jobModel.ManufacturerId;
                 DataSet dsFillAggregatesByManufacturers = _helper.FillDropDownHelperMethodWithSp2("spGetAggregatesForManufacturers", _jobModel.ManufacturerId);
                 //DataSet dsFillManufacturersByAggregates = _helper.FillDropDownHelperMethodWithSp1("getManufacturerNameForAggregate", _jobModel.AggregateId);
                 List<DataRow> data = dsFillAggregatesByManufacturers.Tables[0].AsEnumerable().ToList();
@@ -528,31 +527,56 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult getCategorySubCategoryCostDetails(int aggregateid,int manufacturerid)
         {
            DataTable dtDetails=  _helper.ExecuteSelectStmtusingSP("getAggregateCategoryDetails", "@aggregateid", aggregateid.ToString(), "@manufacturerid", manufacturerid.ToString());
-          var aggregates=  dtDetails.AsEnumerable().Select(x => new Aggregates { IdCategory = x.Field<int>("categories"), SubCategory = x.Field<int>("subcategory"), ApproxCost = x.Field<int>("ApproxCost") });
+          var aggregates=  dtDetails.AsEnumerable().Select(x => new Aggregates { CategoryName = x.Field<string>("categories"), SubCategoryName = x.Field<string>("subcategories"), ApproxCost = x.Field<int>("ApproxCost")});
             Session["Aggregates"] = dtDetails;
-            return RedirectToAction("GetManufacturerAggregatesDetails");
-           
+            return RedirectToAction("GetManufacturerAggregatesDetails");          
         }
 
         public ActionResult GetManufacturerAggregatesDetails()
         {
-           
-            string Agrregates = "select * from M_FMS_MaintenanceWorksServiceGroupDetails";
-            DataTable dtAgregates = _helper.ExecuteSelectStmt(Agrregates);
-            ViewBag.Aggr = new SelectList(dtAgregates.AsDataView(), "ServiceGroup_Id", "ServiceGroup_Name");
-            //DataSet dsVehicleDistrictDetails = _helper.FillDropDownHelperMethodWithSp("GetDistrictsAndVehicleManufacturers");
-            //ViewBag.Manufacture = new SelectList(dsVehicleDistrictDetails.Tables[1].AsDataView(), "Id", "ManufacturerName");
+            string queryManufacturers = "select * from m_VehicleManufacturer";
+            DataTable dtManufacturers = _helper.ExecuteSelectStmt(queryManufacturers);
+            ViewBag.Manufacturer = new SelectList(dtManufacturers.AsDataView(), "Id", "ManufacturerName");
             _helper.ExecuteSelectStmtusingSP("getAggregateCategoryDetails");
             if (Session["Aggregates"] != null)
             {
-                var dtDetails = Session["Aggregates"] as DataTable;
-                var aggregates = dtDetails.AsEnumerable().Select(x => new Aggregates { IdCategory = x.Field<int>("categories"), SubCategory = x.Field<int>("subcategory"), ApproxCost = x.Field<int>("ApproxCost") });
-                return View(aggregates);
+                var dtDetails = Session["Aggregates"] as DataTable;            
+                    var aggregates = dtDetails.AsEnumerable().Select(x => new Aggregates {IdCategory= x.Field<int>("Category_Id"), CategoryName = x.Field<string>("categories"), SubCategoryName = x.Field<string>("SubCategories"),ApproxCost = x.Field<int?>("ApproxCost"),ServiceId= x.Field<int>("Service_Id") });
+               
+                    return View(aggregates);
+                
             }
             else
             {
                 return View();
             }
+        }
+
+        public ActionResult EditSubCategoryCostDetails(int? id=0)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("GetManufacturerAggregatesDetails");
+            }
+            string categorystr = "select * from [M_FMS_Categories]";
+            string subCategorystr = "select Service_Id,Service_Name from [dbo].[M_FMS_MaintenanceWorksMasterDetails] ";
+            DataTable dtCategories=_helper.ExecuteSelectStmt(categorystr);
+            DataTable dtSubcatStr= _helper.ExecuteSelectStmt(subCategorystr);
+            DataTable dtcategoryIdd = Session["Aggregates"] as DataTable; 
+            DataRow categoryIdd = dtcategoryIdd.AsEnumerable().Where(x => x.Field<int>("Service_Id") == id).FirstOrDefault();
+            DataTable dtSubCostDetails= _helper.ExecuteSelectStmtusingSP("getJobCardVehicleDetails", "@jobcardnumber",id.ToString());
+            _jobModel.Categories= new SelectList(dtCategories.AsDataView(), "Category_Id", "Categories");
+            _jobModel.SubCategories= new SelectList(dtSubcatStr.AsDataView(), "Service_Id", "Service_Name");
+            _jobModel.IdCategory = Convert.ToInt32(categoryIdd["Category_Id"]);
+            _jobModel.SubCategory= dtSubCostDetails.AsEnumerable().Select(x => x.Field<int>("Service_Id")).FirstOrDefault();
+            _jobModel.ApproxCost= dtSubCostDetails.AsEnumerable().Select(x => x.Field<int?>("CostFor_A_Grade")).FirstOrDefault();
+            return View(_jobModel);
+        }
+        [HttpPost]
+        public ActionResult EditSubCategoryCostDetails(Aggregates aggregates)
+        {
+            _helper.ExecuteJobSubCategoryUpdateCost("spEditJobSubCategoryCostDetails",aggregates.ApproxCost,aggregates.SubCategory );
+            return RedirectToAction("SubCategoryGroup");
         }
     }
 }

@@ -102,6 +102,8 @@ namespace Fleet_WorkShop.Models
 
 public class Aggregates
 {
+    public int IdSubCategory { get; set; }
+    public int JobCardNumber { get; set; }
     [DisplayName("Time Taken")]
     public int timeTaken { get; set; }
     public int AggregateId { get; internal set; }
@@ -111,7 +113,7 @@ public class Aggregates
     public string CategoryName { get; internal set; }
     [DisplayName("Category Id")]
     public string CategoryId { get; internal set; }
-    public int SubCategory { get; internal set; }
+    public int SubCategory { get;  set; }
     public string SubCategoryName { get; internal set; }
     public string SubCategoryId { get; internal set; }
     public int CreatedBy { get; set; }
@@ -134,7 +136,8 @@ public class Aggregates
     [DisplayName("Manufacturer Name")]
     public string ManufacturerName { get; set; }
     public int IdAggregate { get; set; }
-    public int ApproxCost { get; set; }
+    public int? ApproxCost { get; set; }
+    public SelectList SubCategories { get; set; }
 
 }
 public class VehicleJobCardModel
