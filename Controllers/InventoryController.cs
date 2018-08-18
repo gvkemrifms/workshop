@@ -17,7 +17,9 @@ namespace Fleet_WorkShop.Controllers
 
             public ActionResult SparePartsMaster()
         {
-            IEnumerable<SparePartsModel> sparemodel=null;
+            string queryScrap = "select * from m_ScrapBin";
+            DataTable dtScrap= _helper.ExecuteSelectStmt(queryScrap);
+            ViewBag.ScrapBin= new SelectList(dtScrap.AsDataView(), "ScrapBinId", "ScrapBinName");
             string query = "select * from m_VehicleManufacturer";
            DataTable dtSpares= _helper.ExecuteSelectStmt(query);
             Session["Manufacturer"] = dtSpares;
@@ -35,7 +37,7 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SparePartsMaster(SparePartsModel spareModel)
         {
-            int returnVal=_helper.ExecuteInsertSparePartsMasterDetails("spSparePartsMaster", spareModel.ManufacturerId, spareModel.PartName, spareModel.PartNumber, spareModel.Cost);
+            int returnVal=_helper.ExecuteInsertSparePartsMasterDetails("spSparePartsMaster", spareModel.ManufacturerId, spareModel.PartName, spareModel.PartNumber, spareModel.Cost,spareModel.ScrapBinId);
             if (returnVal == 1)
                 return Json("Hello", JsonRequestBehavior.AllowGet);
             return RedirectToAction("SparePartsMaster");
@@ -140,20 +142,22 @@ namespace Fleet_WorkShop.Controllers
         }
         public ActionResult GetCostDetails(int id)
         {
-            string query = "select cost from m_spareparts where Id='" + id + "'";
+            if (id == 0) return null;
+            string query = "select cost,partNumber from m_spareparts where Id='" + id + "'";
             DataTable dtCost=_helper.ExecuteSelectStmt(query);
-           decimal cost= dtCost.AsEnumerable().ToList().Select(x => x.Field<decimal>("Cost")).First();
-            if (cost != 1)
+            var cost = dtCost.AsEnumerable().ToList().Select(x => new { Cost = x.Field<decimal>("Cost"), PartNumber = x.Field<string>("partNumber") }).FirstOrDefault();
+            if (cost != null)
                 return Json(cost, JsonRequestBehavior.AllowGet);
             return View();
         }
         [HttpPost]
         public ActionResult GetLubesCostDetails(int id)
         {
-            string query = "select CostPerLitre from m_lubes where Id='" + id + "'";
+            if (id == 0) return null;
+            string query = "select CostPerLitre,LubricantNumber from m_lubes where Id='" + id + "'";
             DataTable dtCost = _helper.ExecuteSelectStmt(query);
-            decimal cost = dtCost.AsEnumerable().ToList().Select(x => x.Field<decimal>("CostPerLitre")).First();
-            if (cost != 1)
+            var cost = dtCost.AsEnumerable().ToList().Select(x => new { Cost = x.Field<decimal>("CostPerLitre"), LubricantNumber = x.Field<string>("LubricantNumber") }).FirstOrDefault();
+            if (cost != null)
                 return Json(cost, JsonRequestBehavior.AllowGet);
             return View();
         }
@@ -331,6 +335,8 @@ namespace Fleet_WorkShop.Controllers
                 VendorId= Convert.ToInt32(row["vendorid"]),
                 SparePartId=Convert.ToInt32(row["SparePartId"])
             };
+            DataTable dtgetAllSpares = _helper.ExecuteSelectStmtusingSP("getSparesForBillNumberAndVendors", "@vendorid", model.VendorId.ToString(), null, null, "@billnumber", model.BillNo);
+            ViewBag.CartItems = dtgetAllSpares;
             Session["BillAmount"] = model.BillAmount;
             Session["Amt"] = model.Amt;
             Session["Bill"] = model.BillNo;
@@ -344,6 +350,7 @@ namespace Fleet_WorkShop.Controllers
             DataSet dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetReceiptDetails");
             DataRow row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == postInventory.Id);
        postInventory.VendorId = Convert.ToInt32(row["vendorId"]);
+            postInventory.SparePartId = Convert.ToInt32(row["SparePartId"]);
             //string vendorQuery="select vendorid "
             postInventory.BillAmount = decimal.Parse(Session["BillAmount"].ToString());
             if (row["BillAmount"].ToString() != null)

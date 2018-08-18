@@ -29,4 +29,17 @@ namespace Fleet_WorkShop.Models
         public string EmployeeId { get; set; }
 
     }
+    public class VehicleReport
+    {
+        public long Id { get; set; }
+        public string Workshop { get; set; }
+        public string Vehicle { get; set; }
+        public string Sparepart { get; set; }
+        public int Quantity { get; set; }
+        public decimal Amount { get; set; }
+        public int JobcardId { get; set; }
+        public string HandOverTo { get; set; }
+        public DateTime IssuedDate { get; set; }
+        public string Status { get; set; }
+    }
 }

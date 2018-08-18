@@ -1,5 +1,54 @@
 ﻿@model Fleet_WorkShop.Models.InventoryModel
+    <style>
+    hr {
+        display: block;
+        border-style: solid;
+        border-width: 1px;
+    }
+</style>
+<style>
+    span.error {
+        display: block;
+        visibility: hidden;
+        color: red;
+        font-size: 90%;
+    }
+
+
+    .container td {
+        vertical-align: top;
+    }
+
+    .tablecontainer table {
+        display: block;
+        width: 100%;
+        border-collapse: collapse;
+        border-top: 1px solid #BFAEAE;
+        border-right: 1px solid #BFAEAE;
+    }
+
+    .tablecontainer th {
+        border-bottom: 2px solid #BFAEAE !important;
+    }
+
+    .tablecontainer th, .tablecontainer td {
+        text-align: left;
+        border-left: 1px solid #BFAEAE;
+        padding: 5px;
+        border-bottom: 1px solid #BFAEAE;
+    }
+
+    .ui-widget {
+        font-size: 12px !important;
+    }
+
+    #lblAmount, #lblBillAmount {
+        text-align: left;
+    }
+</style>
+
 <script type="text/javascript">
+    
     $(function () {
         var prevAmount = $("#Amt").val();
         var $bill = 0;
@@ -37,17 +86,119 @@
 
     });
     
+    $(function () {
+        var orderItems = [];
+        @*$('#orderItems').html(@ViewBag.CartItems);*@
+       
+        $('#btnAdd').click(function () {
+        //    if ($('#Manufacturer option:selected').text() == "--Select--" || $('#Manufacturer option:selected').text() == "") {
+        //        return false;
+        //    }
+        //    if ($('#Qty').val().trim() == "") {
+        //        return false;
+        //    }
+           // getFinalBillAmount();
+            orderItems.push({
+                ManufacturerName: $('#ManufacturerId option:selected').text(),
+                ManufacturerId: $('#ManufacturerId option:selected').val(),
+                SparePartId: $('#SparePartId').val(),
+                SparePartName: $('#SparePartId option:selected').text(),
+                UnitPrice: $('#Uprice').val().trim(),
+                Quantity: $('#Qty').val().trim(),
+                Amount: $('#Amt').val(),
+            });
+            GeneratedItemsTable();
+            //$('#ManufacturerId option:selected').val(0);
+            $('#SparePartId option:selected').text('--Select--');
+            $('#Uprice').val('');
+            $('#Qty').val('');
+            $('#Amt').val('');
+            return false;
 
-    //function getFinalBillAmount()
-    //{
+        });
+        function GeneratedItemsTable() {
+            if (orderItems.length > 0) {
 
-    //    var sum = parseFloat($("#lblAmount").text());
-    //    $('.amt').each(function () {
-    //        sum += parseFloat($(this).text());
-    //    });
-    //    $('#lblBillAmount').text(sum)
+                var $table = $('<table id=tbl/>');
 
-    //}
+                $table.append('<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
+
+                var $tbody = $('<tbody/>');
+                $.each(orderItems, function (i, val) {
+
+                    var $row = $('<tr/>');
+
+                    $row.append($('<td/>').html(val.ManufacturerName));
+
+                    $row.append($('<td/>').html(val.SparePartName));
+
+                    $row.append($('<td/>').html(val.UnitPrice));
+
+                    $row.append($('<td/>').html(val.Quantity));
+                    $row.append($('<td class=amt/>').html(val.Amount));
+                    var $remove = $('<a href="#">Remove</a>');
+                    $remove.click(function (e) {
+                        e.preventDefault();
+                        orderItems.splice(i, 1);
+                        GeneratedItemsTable();
+                        getFinalBillAmount1();
+                    });
+                    $row.append($('<td/>').html($remove));
+                    $tbody.append($row);
+                });
+
+                $table.append($tbody);
+
+                $('#orderItems').html($table);
+
+            }
+            else {
+                $('#orderItems').html('');
+                $('#lblAmount').text('');
+                $('#txtQuantity').val('');
+            }
+        }
+        //$('#btn').click(function () {
+        //    var serviceURL = '/Inventory/SaveInventoryDetails';
+        //    var data = {
+        //        BillNo: $('#txtBillNumber').val(),
+        //        BillDate: $('#txtBillDate').val(),
+        //        VendorName: $('#Vendor option:selected').text(),
+        //        VendorId: $('#Vendor option:selected').val(),
+        //        BillAmount: $('#lblBillAmount').text(),
+        //        PoNumber: $('#txtPONumber').val(),
+        //        PoDate: $('#txtPODate').val(),
+        //        itemmodel: orderItems
+        //    };
+        //    $.ajax({
+        //        type: "POST",
+        //        url: serviceURL,
+        //        data: JSON.stringify(data),
+        //        contentType: "application/json; charset=utf-8",
+        //        dataType: "json",
+        //        success: function (response) {
+        //            if (response != 0) {
+        //                alert('Record Inserted');
+        //            }
+
+        //        },
+        //        failure: function (response) {
+        //            alert(response.responseText);
+        //        }
+        //    });
+        //});
+
+    });
+    function getFinalBillAmount()
+    {
+
+        var sum = parseFloat($("#lblAmount").text());
+        $('.amt').each(function () {
+            sum += parseFloat($(this).text());
+        });
+        $('#lblBillAmount').text(sum)
+
+    }
 
 
 
@@ -153,8 +304,90 @@
                         <div class="col-md-offset-2 col-md-10" style="margin-left:-180px">
                             <input type="submit" id="btnAdd" style="background-color:blue;color:white;width:70px" value="Add" class="btn btn-default" />
                         </div>
-                    </div>
+                        <div class="tablecontainer panel panel-primary" style="width: 150%;margin-left:-700px; height: 60%; margin-top:50px;"  >
+                            <div class="panel-heading">
+                                Added Items
+                            </div>
+                            <div class="panel-body" id="AddedItemsId">
+                                @*<div class="form-group" style="margin-left:-800px;margin-top:100px">*@
 
+                                    <table border="1">
+
+                                        <tr>
+
+                                            <th>Manufacturer Name</th>
+
+                                            <th>SparePart Name</th>
+
+                                            <th>Unit Price</th>
+                                            <th>Quantity</th>
+                                            <th>Amount</th>
+
+                                        </tr>
+
+                                        @if (ViewBag.CartItems != null)
+
+                                        {
+
+                                            foreach (System.Data.DataRow dr in (ViewBag.CartItems as System.Data.DataTable).Rows)
+
+                                            {
+
+                                                <tr>
+
+                                                    <td>
+
+                                                        @dr["ManufacturerName"]
+
+                                                    </td>
+
+                                                    <td align="left">
+
+                                                        @dr["PartName"]
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        @dr["UnitPrice"]
+
+                                                    </td>
+                                                    <td>
+
+                                                        @dr["Quantity"]
+
+                                                    </td>
+                                                    <td>
+
+                                                        @dr["Amount"]
+
+                                                    </td>
+                                                    <td>
+                                                        <a href="#">Remove</a>
+                                                    </td>
+                                                </tr>
+
+                                            }
+
+                                        }
+
+                                    </table>
+
+                               
+                            </div>
+
+                        </div>
+                        
+
+                    </div>
+                    <div class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 50px;" align="center">
+                        <div class="panel-heading">
+                            Order New Items
+                        </div>
+                        <div class="panel-body" id="orderItems">
+                        </div>
+
+                    </div>
                 </div>
             
                 <div class="form-group">
@@ -163,9 +396,9 @@
                     </div>
                 </div>
 
-
+           
             </div>
-
+           
     }
         </div>
     <div>

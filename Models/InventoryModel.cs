@@ -50,6 +50,7 @@ namespace Fleet_WorkShop.Models
         public string PoNumber { get; set; }
         public DateTime PoDate { get; set; }
         public List<InventoryDetails> itemmodel { get; set; }
+        public int ScrapBinId { get; set; }
     }
 
     public class InventoryDetails

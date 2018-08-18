@@ -1,9 +1,6 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.InventoryModel>
 
 
-@{
-    ViewBag.Title = "InventoryDetails";
-}
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
 <style>
  
@@ -130,6 +127,8 @@
             if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
                 $('#SparePart option:selected').text("");
                 $('#SparePart').prop("disabled", true);
+                $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
                 return false;
             }
             var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
@@ -147,7 +146,7 @@
                 success: function (Response) {
 
                     $('#SparePart').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < Response.length; i++) {
 
                         $('#SparePart').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
@@ -171,7 +170,11 @@
       
         $('#SparePart').change(function () {
             var SparePartId = $('#SparePart option:selected').val();
-      
+            if($('#SparePart option:selected').text()=='--Select--')
+            {
+                $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
+            }
             $.ajax({
                 type: "Post",
                 url: '/Inventory/GetCostDetails/' + SparePartId,
@@ -180,7 +183,8 @@
                 dataType: "json",
                 success: function (response) {
                     if (response != 0) {
-                        $('#txtunitprice').val(response);
+                        $('#txtunitprice').val(response.Cost);
+                        $('#lblpartnumber').text(response.PartNumber);
                     }
 
                 },
@@ -247,7 +251,6 @@
                 Amount: $('#lblAmount').text(),
             });
             GeneratedItemsTable();
-            $('#ManufacturerName option:selected').val(0);
             $('#SparePart option:selected').text('--Select--');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
@@ -334,7 +337,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
     <div class="panel-heading">
-        Inventory Information
+        SparePart Receipts
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -391,7 +394,7 @@
         <hr />
         <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
             <div class="panel-heading">
-                Orders
+                Receipt Items
             </div>
             <div class="panel-body">
                 <div class="col-lg-6">
@@ -442,14 +445,21 @@
                                 <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue; color: white">Add</button>
                             </div>
                         </div>
+                        @*<label id="lblpartnumber" style="margin-left:700px;"> 
+                               </label>*@
                     </form>
+                    <div class="form-group " style="margin-left:600px;margin-top:-60px;width:400px" >
+                        <div class="col-lg-6">
+                           PartNumber <label id="lblpartnumber" class="form-control" style="color:red"></label>
+                        </div>
+                    </div>
                 </div>
                
                   
                     
                         <div  class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 200px;" align="center">
                             <div class="panel-heading">
-                                Order Details
+                                Item Details
                             </div>
                             <div class="panel-body" id="orderItems">
                             </div>

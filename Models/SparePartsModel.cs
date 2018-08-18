@@ -16,6 +16,7 @@ namespace Fleet_WorkShop.Models
         public string PartName { get; set; }
         public string PartNumber { get; set; }
         public decimal Cost { get; set; }
+        public int ScrapBinId { get; set; }
     }
 
     public class LubesModel

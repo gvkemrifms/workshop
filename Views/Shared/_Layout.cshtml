@@ -105,6 +105,9 @@
                         <li>
                             <a href="/job/SubCategoryGroup">Sub Category</a>
                         </li>
+                        <li>
+                            <a href="/job/GetManufacturerAggregatesDetails">Labor Charges</a>
+                        </li>
                         @*<li>
         <a href="#">Tools</a>
     </li>
@@ -147,9 +150,9 @@
                         @*<li>
                             <a href="#">Repair & Maintenance Master</a>
                         </li>*@
-                        <li>
+                        @*<li>
                             <a href="~/job/SaveJobCardDetails">Repair & Maintenance</a>
-                        </li>
+                        </li>*@
                         @*<li>
                             <a href="~/Vehicle/GetPendingStatusDetails">Job Card</a>
                         </li>*@
@@ -164,6 +167,13 @@
                         </li>*@
                     </ul>
                     </li>
+                <li>
+                <li>
+                    <a href="~/job/SaveJobCardDetails">
+                        <i class="fa fa-wrench fa-fw"></i> Repair & Maintenance
+                        @*<span class="fa arrow"></span>*@
+                    </a>
+                </li>
                     <li>
                     <a href="~/Vehicle/GetPendingStatusDetails">
                         <i class="fa fa-wrench fa-fw"></i> Job Card
@@ -217,39 +227,51 @@
                 <li>
                     <a href="~/Reports/Reports">
                         <i class="fa fa-files-o fa-fw"></i> Reports
-                        @*<span class="fa arrow"></span>*@
-                    </a>
-                    @*<ul class="nav nav-second-level">
-                        <li>
-                            <a href="#"></a>
-                        </li>
-                        
-                    </ul>*@
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fa fa-files-o fa-fw"></i> Petty Expenses
                         <span class="fa arrow"></span>
                     </a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <span class="fa arrow"></span>
-                            <a href="#">Receipts</a>
+                            
+                            <a href="~/Reports/Reports">Reports</a>
                            
-                            <ul class="nav nav-third-level">
-                                @*<li>
+                            </li>
+                       
+                          
+                                <li>
+                            <a href="~/Reports/GetVehicleWiseStocksReport">Stocks Receipts</a>
+                        </li>
+                        @*<li>
+        <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
+    </li>*@
+                            </ul>
+                        </li>
+                    
+                        
+                        
+                            <li>
+                            @*<a href="#">
+                        <i class="fa fa-files-o fa-fw"></i> Reports
+                        <span class="fa arrow"></span>
+                    </a>*@
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <span class="fa arrow"></span>
+                                    <a href="#">Receipts</a>
+
+                                    <ul class="nav nav-third-level">
+                                        @*<li>
                                     <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
                                 </li>
                                 <li>
                                     <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
                                 </li>*@
-                            </ul>                
+                                    </ul>
+                                </li>
+
+                            </ul>
                         </li>
-                    
                     </ul>
-                </li>
-            </ul>
-        </div>
+</div>
         <!-- /.sidebar-collapse -->
     </div>
     <!-- /.navbar-static-side -->

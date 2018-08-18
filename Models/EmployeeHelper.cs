@@ -171,7 +171,7 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertSparePartsMasterDetails(string insertStmt, int manufacturerId, string partName, string partNumber, decimal cost)
+        internal int ExecuteInsertSparePartsMasterDetails(string insertStmt, int manufacturerId, string partName, string partNumber, decimal cost,int ScrapBinId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -185,7 +185,8 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@partname", partName);
                     comm.Parameters.AddWithValue("@partnumber", partNumber);
                     comm.Parameters.AddWithValue("@cost", cost);
-                 
+                    comm.Parameters.AddWithValue("@scrapbinid", ScrapBinId);
+
                     try
                     {
                         conn.Open();
@@ -1532,7 +1533,7 @@ namespace Fleet_WorkShop.Models
             }
 
         public DataSet FillDropDownHelperMethodWithSp(string commandText,int districtId=0)
-        {
+        {       
             var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
             var ds = new DataSet();
             conn.Open();
@@ -1563,6 +1564,7 @@ namespace Fleet_WorkShop.Models
         }
         public DataSet FillModelNumbers(string commandText, int vehicleId = 0)
         {
+            if (vehicleId == 0) return null;
             var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]);
             var ds = new DataSet();
             conn.Open();

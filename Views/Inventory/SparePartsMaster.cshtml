@@ -142,7 +142,8 @@
                 ManufacturerId: $('#Manufacturer').val(),
                 PartName: $('#txtpartName').val(),
                 PartNumber: $('#txtPartNumber').val(),
-                Cost: $('#txtCost').val()
+                Cost: $('#txtCost').val(),
+                ScrapBinId: $('#ScrapBin').val()
 
             };
             $.ajax({
@@ -209,7 +210,18 @@
 
             </form>
         </div>
-
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                  
+                        <label class="control-label col-lg-4">Scrap Bin</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("ScrapBin", ViewBag.ScrapBin as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @required = true })
+                        </div>
+                   
+                    </div>
+                </form>
+            </div>
         <div style="margin-bottom: 150px" class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">

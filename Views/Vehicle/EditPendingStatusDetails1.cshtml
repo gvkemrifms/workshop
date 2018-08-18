@@ -3,11 +3,12 @@
 @{
     WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
 }
+
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
 <style>
     #tblCosts {
         width: 70px;
-        margin-left:-300px;
+        margin-left:300px;
         position: absolute;
         color: red;
        
@@ -15,17 +16,21 @@
 
     #tblCost {
         width: 17%;
-        margin-left: 0px;
+        float:right;
         position: absolute;
-        overflow:no-display;
-        margin-top:450px
+        margin-top:450px;
+        margin-left:600px;
+        margin-top:100px;
+        
     }
        #tblCostStatus {
         width:17%;
-        margin-left: 0px;
-        margin-top:600px;
+         float:right;
+        margin-top:450px;
         position: absolute;
-        overflow:no-display;
+         margin-left:600px;
+        margin-top:330px;
+
     }
 
     #datess {
@@ -35,15 +40,28 @@
     {
         width:22%;
         margin-left: 0px;
-        margin-top:250px;
+        margin-top:300px;
         position: absolute;
       
+    }
+    #tbl{
+        margin-left:0px;
+        width:30%;
+        height:15%;
+         margin-top:120px
+    }
+    #tblLubes
+    {
+         margin-left:0px;
+         width:10%;
+         height:15%;
+          margin-top:15px
     }
 </style>
 
     
 <script type="text/javascript">
-    
+    var responseData = null;
   $(function(){
         $('#btnSubmit').filter(function () {
             $(this).hide();
@@ -68,9 +86,12 @@
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (response) {
+          
+               
                 $('#tblCost').empty();
                 CostDetails(response)
                 StatusDetails(response)
+               // GetCostDetails(response)
             },
             failure: function (response) {
                 alert(response.responseText);
@@ -97,6 +118,24 @@
         eTable += "</tbody></table>";
         $('#tblCost').html(eTable);
     }
+    //function getMachine(data) {
+    //    var retval;
+    //    for (var i = 0; i < data.length; i++) {
+    //        if (data[i]['LastEntryDate'] != null && data[i]['Quantity'] != 0) {
+    //            data[i]['LastEntryDate'];
+    //        }
+    //    }
+    
+           
+    //        if (thisArray[0] == color && qty >= parseInt(thisArray[1]) && qty <= parseInt(thisArray[2])) {
+    //            retval = thisArray[3];
+    //            return false;
+           
+    //    });
+    //    return retval;
+    //}
+
+    //var retval = getMachine(color, qty);
 
     function StatusDetails(data) {
         var eTable = "<table id=tblStatus  ><thead><tr><th>Quantity</th><th>Total Amount</th><th>Issued Date</th><th>Pending</th></tr></thead><tbody>"
@@ -138,6 +177,7 @@
                     $('#tblCost').empty();
                     CostDetails(response)
                     StatusDetails(response)
+                    
                 },
                 failure: function (response) {
                     alert(response.responseText);
@@ -182,11 +222,13 @@
         }
         return true
     }
-
+    
     $(function () {
         var orderItems = [];
         var LubesorderrItems = [];
+   
         $('#btnAdd').click(function () {
+            alert(responseData);
             if (Validate()) {
                 $('#btnSubmit').show();
                 orderItems.push({
@@ -196,7 +238,7 @@
                     Quantity: $('#txtQuantity').val().trim(),
                     HandOverToId: $('#HandOver').val(),
                     HandOverToName: $('#HandOver option:selected').text(),
-                    Status: $('input[type="radio"]').val(),
+                    Status: $('input[name="clkradio"]:checked').val(),
                     LubricantId: $('#Lubricant').val(),
                     LubricantName: $('#Lubricant option:selected').text(),
                     LubesQuantity: $('#txtLubesQuantity').val().trim(),
@@ -214,18 +256,19 @@
 
                 var $table = $('<table id=tbl/>');
 
-                $table.append('<thead><tr><th>Vehicle Number</th><th>SpareParts</th><th>Quantity</th><th>HandOverTo</th></tr></thead>');
+                $table.append('<thead><tr><th>SpareParts</th><th>Issued Date</th><th>Quantity</th><th>Unit Price</th><th>HandOverTo</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
                 $.each(orderItems, function (i, val) {
                     
                         var $row = $('<tr/>');
 
-                        $row.append($('<td/>').html(val.VehicleNumber));
+                        //$row.append($('<td/>').html(val.VehicleNumber));
 
                         $row.append($('<td/>').html(val.SparePartName));
-
+                        $row.append($('<td/>').html(val.IssuedDate));
                         $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td/>').html(val.UnitPrice));
                         $row.append($('<td class=amt/>').html(val.HandOverToName));
                         var $remove = $('<a href="#">Remove</a>');
                         $remove.click(function (e) {
@@ -258,7 +301,7 @@
                     Quantity: $('#txtLubesQuantity').val().trim(),
                     HandOverToId: $('#HandOverLubes').val(),
                     HandOverToName: $('#HandOverLubes option:selected').text(),
-                    Status: $('input[type="radio"]').val()
+                    Status: $('input[name="clkradio"]:checked').val()
                 });
                 LubesGeneratedItemsTable();
                 return false;
@@ -269,14 +312,14 @@
 
                 var $table = $('<table id=tblLubes/>');
 
-                $table.append('<thead><tr><th>Vehicle</th><th>Lubricant</th><th>Quantity</th><th>HandOverTo</th></tr></thead>');
+                $table.append('<thead><tr><th>Lubricant</th><th>Quantity</th><th>HandOverTo</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
                 $.each(LubesorderrItems, function (i, val) {
                     //if (val.Quantity > 0) {
                         var $row = $('<tr/>');
 
-                        $row.append($('<td/>').html(val.VehicleNumber));
+                        //$row.append($('<td/>').html(val.VehicleNumber));
 
                         $row.append($('<td/>').html(val.LubricantName));
 
@@ -307,6 +350,7 @@
             if (orderItems.length > 0) {
                 var serviceURL = '/Vehicle/SaveCalculateFIFO';
                 var data = {
+                    Status : $('input[name="clkradio"]:checked').val(),
                     //Status: $('input[type="radio"]').val(),
                     itemmodel: orderItems
                 };
@@ -332,7 +376,7 @@
             {
                 var serviceURL = '/Vehicle/SaveCalculateLubesFIFO';
                 var data = {
-                    //Status: $('input[type="radio"]').val(),
+                    Status: $('input[name="clkradio"]:checked').val(),
                     itemmodel: LubesorderrItems
                 };
 
@@ -460,7 +504,7 @@
         </tr>
 </table>
     <br />
-    <table class="table" style="margin-top:5px;width:1300px;">
+    <table class="table" style="margin-top:5px;width:100%;">
         <tr>
 
             @*<th>
@@ -480,19 +524,12 @@
                 @Html.DisplayNameFor(model => model.Cost)
             </th>
 
-            @*<th>
-                    @Html.DisplayNameFor(model => model.Status)
-                </th>*@
-
+           
         </tr>
 
         @foreach (var item in Model)
         {
-            <tr>
-
-                @*<td>
-                        @Html.DisplayFor(modelItem => item.VehicleNumberData)
-                    </td>*@
+            <tr>              
                 <td>
                     @Html.DisplayFor(modelItem => item.AggregateName)
                 </td>
@@ -509,8 +546,18 @@
             </tr>
         }
 
-    </table>
+       
+            
 
+</table>
+<div class="form-group" style="margin-left:730px">
+    <label class="control-label  col-lg-4" style="width:100px;color:red">Total Cost</label>
+    <div class="col-lg-8">
+        <input type="text" class="form-control" value="@ViewBag.TotalCost" id="txttotalCost" placeholder="Total Cost" onkeypress="return false;" style="margin-left:-30px;margin-top:-5px" readonly="readonly">
+    </div>
+</div>
+<br />
+<hr />
 @*<button type="submit" id="btnPreviousRepairs" class="btn btn-default" style="background-color: blue;margin-top:-630px;margin-left:870px; color: white;">Show Previous Repairs</button>*@
     <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
         <div class="panel-heading">
@@ -520,13 +567,17 @@
             <div class="col-lg-6">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <label class="control-label col-lg-3">Spare Part</label>
-                        <div class="col-lg-3">
+                        <label class="control-label col-lg-4">Spare Part</label>
+                        <div class="col-lg-8">
                             @Html.DropDownList("SpareParts", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
                         </div>
-                        <label class="control-label col-lg-3">Quantity</label>
-                        <div class="col-lg-3">
-                            <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity">
+                        <label class="control-label col-lg-4" style="margin-top:15px;">Quantity</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="margin-top:15px;">
+                        </div>
+                        <label class="control-label  col-lg-4" style="margin-top:15px;">HandOver To</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To",@style="margin-top:15px "})
                         </div>
                     </div>
 
@@ -535,12 +586,12 @@
             <div class="col-lg-6">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <label class="control-label  col-lg-3">HandOver To</label>
+                        @*<label class="control-label  col-lg-3">HandOver To</label>
                         <div class="col-lg-3">
                             @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To" })
-                        </div>
-                        <div class="col-sm-offset-2 col-sm-4">
-                            <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue;margin-left:-300px; color: white">Add</button>
+                        </div>*@
+                        <div class="col-sm-4" style="margin-top:100px">
+                            <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue;margin-left:-140px; color: white">Add</button>
                         </div>
                     </div>
 
@@ -548,16 +599,20 @@
                 </form>
             </div>
             
-            <div class="col-lg-6" style="margin-top:50px">
+            <div class="col-lg-offset-2 col-lg-6" style="margin-top:35px;" >
                 <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="control-label  col-lg-3">Lubricant</label>
-                        <div class="col-lg-3">
-                            @Html.DropDownList("Lubricant", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                    <div class="form-group" style="margin-left:-230px">
+                        <label class="control-label  col-lg-2">Lubricant</label>
+                        <div class="col-lg-4">
+                            @Html.DropDownList("Lubricant", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style = "margin-left:-50px" })
                         </div>
-                        <label class="control-label  col-lg-3">Quantity</label>
-                        <div class="col-lg-3">
-                            <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity">
+                        <label class="control-label  col-lg-2" style="margin-left:-80px">Quantity</label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity" style="margin-left:-50px">
+                        </div>
+                        <label class="control-label  col-lg-2" style="margin-left:-55px">HandOver To</label>
+                        <div class="col-lg-4">
+                            @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To",@style="margin-left:680px;margin-top:-33px" })
                         </div>
                     </div>
                     <div class="form-group">
@@ -565,16 +620,16 @@
                     </div>
                 </form>
             </div>
-            <div class="col-lg-6" style="margin-top:50px">
+            <div class="col-lg-6" >
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <label class="control-label  col-lg-3">HandOver To</label>
+                        @*<label class="control-label  col-lg-3">HandOver To</label>
                         <div class="col-lg-3">
                             @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To" })
-                        </div>
+                        </div>*@
                     </div>
                     <div class="col-sm-offset-2 col-sm-9">
-                        <button type="submit" id="btnAddLubes" class="btn btn-default" style="background-color: blue;margin-top:-80px; color: white">Add</button>
+                        <button type="submit" id="btnAddLubes" class="btn btn-default" style="background-color: blue;margin-top:-150px;margin-left:750px; color: white">Add</button>
                     </div>
                   
                 </form>
@@ -603,13 +658,13 @@
 
                 </div>
             </div>
-            <div class="col-lg-6" style="margin-top:2px;margin-bottom:350px;margin-left:500px">
+            <div class="col-lg-6" style="margin-top:10px;margin-bottom:350px;margin-left:500px">
                 <input name="clkradio" type="radio" value="Inprogress" />In progress
                 <input style="margin-left:30px" name="clkradio" type="radio" value="Completed" />Completed
                 <button type="submit" id="btnSubmit" class="btn btn-default" style="background-color: blue; color: white;" onclick="if (!Validations()) return false;">Submit</button>
             </div>
-            <table id="tblCost" align="center" style="width:30%"></table>
-            <table id="tblCostStatus" align="center" style="width:30%"></table>
+            <table id="tblCost"  style="width:30%;float:right"></table>
+            <table id="tblCostStatus" align="center" style="width:30%;float:right"></table>
 
         </div>
      

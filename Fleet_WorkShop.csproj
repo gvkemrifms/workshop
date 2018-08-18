@@ -368,11 +368,12 @@
     <Content Include="Views\Job\GetAggregateCostDetails.cshtml" />
     <Content Include="Views\Job\GetManufacturerAggregatesDetails.cshtml" />
     <Content Include="Views\Job\_getCategorySubCategoryCostDetails.cshtml" />
-    <Content Include="Views\Reports\GetVehicleWiseStockReport.cshtml" />
     <Content Include="Views\Inventory\_DisplaySparePartsDetails.cshtml" />
     <Content Include="Views\Vehicle\GetPreviousRepairs.cshtml" />
     <Content Include="Views\Vehicle\AddIssues.cshtml" />
     <Content Include="Views\Job\EditSubCategoryCostDetails.cshtml" />
+    <Content Include="Views\Reports\GetVehicleWiseStocksReport.cshtml" />
+    <Content Include="Views\Reports\_GetVehicleWiseStocksReportDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

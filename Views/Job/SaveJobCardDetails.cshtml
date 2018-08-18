@@ -132,12 +132,12 @@
     });
 
   
-    $(function () {
-        $("#District").change(function () {
-            //alert($(this).val());
-            $.post("/Vehicle/GetDistrictIds", { districtId: $(this).val() })
-        });
-    });
+    //$(function () {
+    //    $("#District").change(function () {
+    //        //alert($(this).val());
+    //        $.post("/Vehicle/GetDistrictIds", { districtId: $(this).val() })
+    //    });
+    //});
 
     $(function () {
         $('#txtOdo').blur(function () {
@@ -178,20 +178,26 @@
         })
         $("#Vehicle").blur(function () {
             var data = { vehicleid: $(this).val() };
-            $.ajax({
-                url: serviceURL,
-                type: "POST",
-                data: JSON.stringify(data),
-                datatype: "json",
-                contentType: 'application/json',
+            if (data != 0) {
+                $.ajax({
+                    url: serviceURL,
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: 'application/json',
 
-                success: function (Response) {
-                    $('#txtModel').val('')
-                    $('#txtModel').val(Response)
-                    
-                }
+                    success: function (Response) {
+                        $('#txtModel').val('')
+                        $('#txtModel').val(Response)
 
-            });
+                    }
+
+                });
+            }
+            else
+            {
+                return alert('Please select Vehicle')
+            }
         })
     })
 
@@ -226,7 +232,7 @@
                 {
                  
                     $('#Vehicle').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#Vehicle').append('<option value=0>--Select--</option>');
                     for (var i = 0; i < Response.length; i++)
                     {
                         
@@ -255,7 +261,12 @@
         $("#Manufacturer").change(function () {
             if ($('#Manufacturer option:selected').text().toLowerCase() == "--select--") {
                 $('#txtNatureOfComplaint option:selected').text("");
+                $('#SubCategory option:selected').text('');
+                $('#txtCategory option:selected').text('');
                 $('#txtNatureOfComplaint').prop("disabled", true);
+                $('#SubCategory').prop("disabled", true);
+                $('#txtCategory').prop('disabled', true);
+                $('#txtEstimatedCost').val('');
                 return false;
             }
             var serviceURL = '/Job/GetAggregatesBasedOnManufacturers';
@@ -274,7 +285,7 @@
                 success: function (Response) {
 
                     $('#txtNatureOfComplaint').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#txtNatureOfComplaint').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < Response.length; i++) {
 
                         $('#txtNatureOfComplaint').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
@@ -305,7 +316,10 @@
         $("#txtNatureOfComplaint").change(function () {
             if ($('#txtNatureOfComplaint option:selected').text().toLowerCase() == "--select--") {
                 $('#txtCategory option:selected').text("");
+                $('#SubCategory option:selected').text("");
                 $('#txtCategory').prop("disabled", true);
+                $('#SubCategory').prop("disabled", true);
+                $('#txtEstimatedCost').val('');
                 return false;
             }
             var serviceURL = '/Job/GetCategoryIds';
@@ -324,7 +338,7 @@
                 success: function (Response) {
 
                     $('#txtCategory').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#txtCategory').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < Response.length; i++) {
 
                         $('#txtCategory').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
@@ -353,6 +367,7 @@
             if ($('#txtCategory option:selected').text().toLowerCase() == "--select--") {
                 $('#SubCategory option:selected').text("");
                 $('#SubCategory').prop("disabled", true);
+                $('#txtEstimatedCost').val('');
                 return false;
             }
             var serviceURL = '/Job/GetSubCategoryIds';
@@ -371,7 +386,7 @@
                 success: function (Response) {
 
                     $('#SubCategory').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#SubCategory').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < Response.length; i++) {
 
                         $('#SubCategory').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
@@ -397,7 +412,7 @@
 
         $("#SubCategory").change(function () {
             if ($('#SubCategory option:selected').text().toLowerCase() == "--select--") {
-                
+                $('#txtEstimatedCost').val('');
                 return false;
             }
             var serviceURL = '/Job/GetEstimatedCostDetails';
@@ -481,7 +496,7 @@
         }
         var txtDOR = $('#txtDor').val();
         if (txtDOR === '') {
-            return alert("Please select Date Of Repair");
+            return alert("Please enter Vehicle Receipt Date");
         }
 
         var txtmodel = $('#txtModel').val();
@@ -547,7 +562,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-4">Date Of Repair</label>
+                    <label class="control-label col-lg-4">Received Date</label>
                     <div class="col-lg-8">
                         <input type="text" class="form-control" id="txtDor" placeholder="Date Of Repair" onkeypress="return false">
                     </div>

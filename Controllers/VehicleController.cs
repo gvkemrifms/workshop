@@ -184,7 +184,7 @@ namespace Fleet_WorkShop.Controllers
         {
             IEnumerable<JobCardPendingCases> pendingCases = new List<JobCardPendingCases>();
             DataTable dtPendingStatus= _helper.ExecuteSelectStmt("spGetVehiclesWithPendingStatus");
-            pendingCases = dtPendingStatus.AsEnumerable().Where(x=>x.Field<long>("num")==1).Select(x => new JobCardPendingCases { VehicleId= x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"),DistrictName= x.Field<string>("District"),DateOfRepair= x.Field<DateTime>("DateOfRepair"),Complaint= x.Field<string>("ServiceGroup_Name"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("Name"), Status = x.Field<string>("status"), });
+            pendingCases = dtPendingStatus.AsEnumerable().Where(x=>x.Field<long>("num")==1).Select(x => new JobCardPendingCases { VehicleId= x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"),DistrictName= x.Field<string>("District"),DateOfRepair= x.Field<DateTime>("DateOfRepair"),Complaint= x.Field<string>("ServiceGroup_Name"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("Name"), Status = x.Field<string>("status"),JobCardNumber=x.Field<int>("JobCardNumber") });
             Session["PendingStatus"] = dtPendingStatus;
             //DataTable dtSpareParts = _helper.ExecuteSelectStmtusingSP("spGetSpares");
             //Session["getSpares"] = dtSpareParts;
@@ -242,7 +242,15 @@ namespace Fleet_WorkShop.Controllers
            ViewBag.VehicleNumber= pendingCases.Select(x => x.VehicleNumber).FirstOrDefault();
             string vehicleNumber= pendingCases.Select(x => x.VehicleNumber).FirstOrDefault();
             DataTable dtgetComplaints = _helper.ExecuteSelectStmtusingSP("sp_getvehiclecomplaints", null, null, null,null, "@vehicleno", vehicleNumber);
-          pendingCases=  dtgetComplaints.AsEnumerable().Select(x => new JobCardPendingCases { VehicleIdData = x.Field<int>("VehicleId"), VehicleNumberData = x.Field<string>("VehicleNumber"), CategoryData = x.Field<string>("Categories"), CostApproximate = x.Field<int>("ApproxCost"),DateOfRepair= x.Field<DateTime>("Dor"),AggregateName= x.Field<string>("Aggregates"),SubCategoryName= x.Field<string>("Service_Name") });
+            //------------------------------
+            DataTable dtvehicleInfoOnVehicleNumber = _helper.ExecuteSelectStmtusingSP("getVehicleInfoOnVehicleNumber", null, null, null, null, "@vehiclenumber", vehicleNumber);
+            Session["VehicleInfoByNumber"] = dtvehicleInfoOnVehicleNumber;
+            int vehicleId = dtvehicleInfoOnVehicleNumber.AsEnumerable().Select(x => x.Field<int>("VehicleId")).FirstOrDefault();
+            DataTable dtTotalCost = _helper.ExecuteSelectStmtusingSP("getTotalCostForVehicleNumber", "@vehicleid", vehicleId.ToString());
+            int totalCost = dtTotalCost.AsEnumerable().Select(x => x.Field<int>("TotalCost")).FirstOrDefault();
+            ViewBag.TotalCost = totalCost;
+            //--------------------------------------------------------------------------------
+            pendingCases =  dtgetComplaints.AsEnumerable().Select(x => new JobCardPendingCases { VehicleIdData = x.Field<int>("VehicleId"), VehicleNumberData = x.Field<string>("VehicleNumber"), CategoryData = x.Field<string>("Categories"), CostApproximate = x.Field<int>("ApproxCost"),DateOfRepair= x.Field<DateTime>("Dor"),AggregateName= x.Field<string>("Aggregates"),SubCategoryName= x.Field<string>("Service_Name") });
            
             return View(pendingCases);
         }
@@ -255,6 +263,10 @@ namespace Fleet_WorkShop.Controllers
             }
            DataTable dtvehicleInfoOnVehicleNumber= _helper.ExecuteSelectStmtusingSP("getVehicleInfoOnVehicleNumber", null, null, null, null, "@vehiclenumber", vehicleNumber);
             Session["VehicleInfoByNumber"] = dtvehicleInfoOnVehicleNumber;
+            int vehicleId = dtvehicleInfoOnVehicleNumber.AsEnumerable().Select(x => x.Field<int>("VehicleId")).FirstOrDefault();
+            DataTable dtTotalCost = _helper.ExecuteSelectStmtusingSP("getTotalCostForVehicleNumber", "@vehicleid", vehicleId.ToString());
+            int totalCost = dtTotalCost.AsEnumerable().Select(x => x.Field<int>("TotalCost")).FirstOrDefault();
+           
             var manufacturerId = dtvehicleInfoOnVehicleNumber.AsEnumerable().Select(x => new { ManufacturerId = x.Field<int>("ManufacturerId") }).FirstOrDefault();
             DataSet dsFillAggregatesForManufacturer = _helper.FillDropDownHelperMethodWithSp("getAggeregatesByManufacturers", manufacturerId.ManufacturerId);
             ViewBag.Aggregates= new SelectList(dsFillAggregatesForManufacturer.Tables[0].AsDataView(), "ServiceGroup_Id", "ServiceGroup_Name");
@@ -263,8 +275,11 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult AddIssues(int Aggregates,int Categories,int SubCategories)
         {
-            int returnVal = 0;
             DataTable dtVehicleInfo = Session["VehicleInfoByNumber"] as DataTable;
+            string costQuery = "select [CostFor_A_Grade] as [EstimatedCost] from dbo.M_FMS_MaintenanceWorksMasterDetails where Service_id = "+ SubCategories+"";
+            DataTable dtCostQuery=_helper.ExecuteSelectStmt(costQuery);
+            int returnVal = 0;
+           
             VehicleModel _vehDetails = new VehicleModel()
             {
                 DistrictId=dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("DistrictId")).FirstOrDefault(),
@@ -275,7 +290,7 @@ namespace Fleet_WorkShop.Controllers
                 ReceivedLocation= dtVehicleInfo.AsEnumerable().Select(x => x.Field<string>("ReceivedLoc")).FirstOrDefault(),
                 PilotId= dtVehicleInfo.AsEnumerable().Select(x => x.Field<string>("PilotId")).FirstOrDefault(),
                 PilotName= dtVehicleInfo.AsEnumerable().Select(x => x.Field<string>("PilotName")).FirstOrDefault(),
-                ApproximateCost= dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("ApproxCost")).FirstOrDefault(),
+                ApproximateCost= dtCostQuery.AsEnumerable().Select(x => x.Field<int>("EstimatedCost")).FirstOrDefault(),
                 AllotedMechanic= dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("AllotedMechanic")).FirstOrDefault(),
                 WorkShopId= dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("WorkshopId")).FirstOrDefault(),
                 ServiceEngineer= dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("ServiceIncharge")).FirstOrDefault(),
@@ -288,7 +303,8 @@ namespace Fleet_WorkShop.Controllers
                 SubCategory= SubCategories
             };
             returnVal = _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", _vehDetails.DistrictId, _vehDetails.VehId, _vehDetails.DateOfRepair, _vehDetails.ModelNumber, _vehDetails.Odometer, _vehDetails.ReceivedLocation, _vehDetails.PilotId, _vehDetails.PilotName, _vehDetails.DateOfDelivery, _vehDetails.AggregateId, _vehDetails.ApproximateCost, _vehDetails.AllotedMechanic, _vehDetails.WorkShopId, _vehDetails.ServiceEngineer, _vehDetails.LaborCharges, _vehDetails.IdCategory,_vehDetails.SubCategory, _vehDetails.ManufacturerId);
-           return Json(returnVal, JsonRequestBehavior.AllowGet); ;
+            
+            return Json(returnVal, JsonRequestBehavior.AllowGet); ;
         }
         public ActionResult GetPreviousRepairs(string vehicleNumber)
         {
@@ -301,7 +317,7 @@ namespace Fleet_WorkShop.Controllers
             var list = dtGetVehiclePreviousRepairDetails.AsEnumerable().Select(x => new JobCardPendingCases { JobCardNumber = x.Field<int>("JobCardNumber"), DistrictName = x.Field<string>("District"), DateOfRepair = x.Field<DateTime>("DateOfRepair"), AggregateName = x.Field<string>("ServiceGroup_Name"), LaborCharges = x.Field<int>("laborcharges"),WorkShopName= x.Field<string>("workshop_name"),Status= x.Field<string>("Status"),VehicleNumber=vehicleNumber });
             return View(list);
         }
-        public ActionResult SaveCalculateFIFO(VehicleModel pendingCases)
+        public ActionResult SaveCalculateFIFO(VehicleModel pendingCases,string status)
         {
             int result = 0;
             string workshopName = Session["workshopName"].ToString();
@@ -325,7 +341,7 @@ namespace Fleet_WorkShop.Controllers
                             {
                                 decimal Cost = dtcostDetails.AsEnumerable().Select(x => x.Field<decimal>("Cost")).FirstOrDefault();
                                 decimal totalAmount = Cost * itemm.Quantity;
-                                int res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, itemm.Quantity, totalAmount, itemm.HandOverToId, pendingCases.JobCardId,itemm.Status);
+                                int res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, itemm.Quantity, totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status);
                                 if (res == 1)
                                 {
                                     int itemTotalQuantity = dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity")).FirstOrDefault();
@@ -358,7 +374,7 @@ namespace Fleet_WorkShop.Controllers
                                             Qty = Convert.ToInt32(row["Quantity"]);
                                         }
                                        
-                                        int res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, Qty, totalAmount, itemm.HandOverToId, pendingCases.JobCardId,itemm.Status);
+                                        int res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, Qty, totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status);
                                         if (res == 1)
                                         {
                                             int itemTotalQuantity = Convert.ToInt32(row["Quantity"]);
@@ -388,7 +404,7 @@ namespace Fleet_WorkShop.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult SaveCalculateLubesFIFO(VehicleModel pendingCases)
+        public ActionResult SaveCalculateLubesFIFO(VehicleModel pendingCases, string status=null)
         {
             int result = 0;
             string workshopName = Session["workshopName"].ToString();
@@ -412,7 +428,7 @@ namespace Fleet_WorkShop.Controllers
                             {
                                 decimal Cost = dtcostDetails.AsEnumerable().Select(x => x.Field<decimal>("CostPerLitre")).FirstOrDefault();
                                 decimal totalAmount = Cost * itemm.Quantity;
-                                int res = _helper.ExecuteInsertSparesIssueStatement("InsertLubeIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.LubricantId, itemm.Quantity, totalAmount, itemm.HandOverToId, pendingCases.JobCardId,itemm.Status);
+                                int res = _helper.ExecuteInsertSparesIssueStatement("InsertLubeIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.LubricantId, itemm.Quantity, totalAmount, itemm.HandOverToId, pendingCases.JobCardId,status);
                                 if (res == 1)
                                 {
                                     int itemTotalQuantity = dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity")).FirstOrDefault();
@@ -444,7 +460,7 @@ namespace Fleet_WorkShop.Controllers
                                             Qty = Convert.ToInt32(row["Quantity"]);
                                         }
 
-                                        int res = _helper.ExecuteInsertLubesIssueStatement("InsertLubesIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.LubricantId, Qty, totalAmount, itemm.HandOverToId, pendingCases.JobCardId,itemm.Status);
+                                        int res = _helper.ExecuteInsertLubesIssueStatement("InsertLubesIssueDetails", itemm.VehicleNumber, pendingCases.WorkShopId, itemm.LubricantId, Qty, totalAmount, itemm.HandOverToId, pendingCases.JobCardId,status);
                                         if (res == 1)
                                         {
                                             int itemTotalQuantity = Convert.ToInt32(row["Quantity"]);

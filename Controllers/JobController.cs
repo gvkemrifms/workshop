@@ -222,6 +222,8 @@ namespace Fleet_WorkShop.Controllers
             if (ModelState.IsValid)
             {
                 _vehModel.VehId = int.Parse(vehicleid);
+                if (_vehModel.VehId == 0) return null;
+             
                 DataSet dsFillVehiclesByDistrict = _helper.FillModelNumbers("spGetVehicleModelNumber", _vehModel.VehId);
                 list = dsFillVehiclesByDistrict.Tables[0].AsEnumerable().Select(x => x.Field<int>("model")).FirstOrDefault();
                 

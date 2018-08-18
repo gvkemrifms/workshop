@@ -24,7 +24,7 @@
                 success: function (Response) {
 
                     $('#Category').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#Category').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < Response.length; i++) {
 
                         $('#Category').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
@@ -70,7 +70,7 @@
                 success: function (Response) {
 
                     $('#SubCategory').empty();
-                    //$('#Vehicle').append('<option value=0 selected="selected">--Select--</option>').selectmenu('refresh');
+                    $('#SubCategory').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < Response.length; i++) {
 
                         $('#SubCategory').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
@@ -123,6 +123,7 @@
                 success: function (response) {
                     if (response != 0) {
                         alert('Record Inserted');
+                      
                     }
 
                 },
@@ -188,5 +189,5 @@
         </div>
     
                 </div>
-    @Html.ActionLink("Back", "GetPendingStatusDetails")
+    @Html.ActionLink("Back", "EditPendingStatusDetails1")
         </div>

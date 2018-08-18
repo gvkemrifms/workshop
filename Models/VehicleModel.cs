@@ -96,7 +96,7 @@ namespace Fleet_WorkShop.Models
         public int EstimatedCost { get; internal set; }
         public int ServiceEngineer { get; internal set; }
         public int LaborCharges { get; internal set; }
-        public string Status { get; internal set; }
+        public string Status { get;  set; }
     }
 }
 
@@ -196,17 +196,19 @@ public class JobCardPendingCases
     [DisplayName("Vehicle Number")]
     public string VehicleNumber { get; set; }
 public string DistrictName { get; set; }
-    [DisplayName("Date Of Repair")]
+    [DisplayName("Vehicle Received Date")]
 public DateTime DateOfRepair { get; set; }
     [DisplayName("Category")]
 public string Complaint { get; set; }
-    [DisplayName("WorkShop Name")]
+    [DisplayName("WorkShop")]
 public string WorkShopName { get; set; }
+    [DisplayName("Mechanic")]
     public string EmployeeName { get; set; }
     public string Status { get; set; }
     public int SparePartId { get; set; }
     public int Quantity { get; set; }
     public int HandOverToId { get; set; }
+    [DisplayName("JobCard")]
     public int JobCardNumber { get; set; }
     public SelectList Vehicle { get; set; }
     public string Manufacturer { get; set; }

@@ -39,6 +39,35 @@ namespace Fleet_WorkShop.WorkShpModels
                 connection.Close();
             }
         }
+             public DataTable ExecuteSelectStmtForDateTime(string insertStmt, string parameterName1 = null, string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null, string parameterName3 = null, string parameterValue3 = null)
+        {
+            var cs = ConfigurationManager.AppSettings["Str"];
+            var dtSyncData = new DataTable();
+            SqlConnection connection = null;
+            try
+            {
+                connection = new SqlConnection(cs);
+                connection.Open();
+                SqlCommand cmd = new SqlCommand(insertStmt, connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                if (parameterValue1 != null) cmd.Parameters.AddWithValue(parameterName1, DateTime.Parse(parameterValue1));
+                if (parameterValue2 != null) cmd.Parameters.AddWithValue(parameterName2, DateTime.Parse(parameterValue2));
+                if (parameterValue3 != null) cmd.Parameters.AddWithValue(parameterName3, parameterValue3);
+                var dataAdapter = new SqlDataAdapter { SelectCommand = cmd };
+                dataAdapter.Fill(dtSyncData);
+
+                return dtSyncData;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+    }
     }
    
-}

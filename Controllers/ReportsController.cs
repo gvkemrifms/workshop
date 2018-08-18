@@ -44,17 +44,24 @@ namespace Fleet_WorkShop.Controllers
             IEnumerable<ReportsModel> Lubesmodel = dtworkshopwiseLubes.AsEnumerable().Select(x => new ReportsModel { ID = x.Field<long>("ID"), WorkShopName = x.Field<string>("workshop_name"), Lubricant = x.Field<string>("OilName"), Quantity = x.Field<int>("Quantity"), Manufacturer = x.Field<string>("ManufacturerName") });
             return PartialView("WorkshopWiseLubesReport",Lubesmodel);
         }
+        
         [HttpGet]
-        public ActionResult GetVehicleWiseStockReport()
+        public ActionResult GetVehicleWiseStocksReport()
         {
-
+            if (Session["View"] != null)
+            {
+                var list = Session["View"] as IEnumerable<VehicleReport>;
+                return PartialView("_GetVehicleWiseStocksReportDetails",list);
+            }
             return View();
         }
         [HttpPost]
-        public ActionResult GetVehicleWiseStockReport(string startDate,string endDate)
+        public ActionResult GetVehicleWiseStocksReportDetails(DateTime startDate, DateTime endDate)
         {
-
-            return View();
+           DataTable dtgetStocksReport= _helper.ExecuteSelectStmtForDateTime("Vehicle_wise_Stockused", "@sdate", startDate.ToString(), "@edate", endDate.ToString());
+            var list = dtgetStocksReport.AsEnumerable().Select(x => new VehicleReport { Id = x.Field<long>("ID"), Workshop = x.Field<string>("workshop"), Vehicle = x.Field<string>("VehicleNumber"), Sparepart = x.Field<string>("SparePart"), Quantity = x.Field<int>("Quantity"), Amount = x.Field<decimal>("Amount"), JobcardId = x.Field<int>("Jobcard"), HandOverTo = x.Field<string>("HandOverto"), IssuedDate = x.Field<DateTime>("IssuedDate"), Status = x.Field<string>("status") });
+            Session["View"] = list;
+            return RedirectToAction("GetVehicleWiseStocksReport");
         }
     }
 }
