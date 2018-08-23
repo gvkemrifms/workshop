@@ -194,6 +194,89 @@
             });
         });
     });
+    $(function () {
+        
+        var serviceURL = '/Inventory/GetSparePODetails';
+        $('#txtPONumber').blur(function () {
+            var data = {
+
+               Ponumber : $(this).val()
+            }
+            $('#txtPODate').val('');
+            $.ajax({
+                type: "Post",
+                url: serviceURL,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response <= 0) {
+                        alert('Please enter valid P.O Number');
+                        $('#txtPONumber').val('');
+                    }
+                    else
+                    {
+             
+                        $('#txtPODate').val(response[0].PoDate);
+                        GeneratePODetailsList(response);
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            function GeneratePODetailsList(response) {
+                var res = JSON.stringify(response);
+  alert(res)
+                if (res.length > 0) {
+
+                    var $table = $('<table id=tbl/>');
+
+                    $table.append('<thead><tr><th>Spare Part</th><th>Part Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Receipt Date</th></tr></thead>');
+
+                    var $tbody = $('<tbody/>');
+                    for (i = 0; i < response.length; i++) {
+                  
+                        //$.each(res, function (i, val) {
+
+                        var $row = $('<tr/>');
+
+                        $row.append($('<td/>').html(response[i].PartName));
+
+                        $row.append($('<td/>').html(response[i].PartNumber));
+
+                        $row.append($('<td/>').html(response[i].PoQuantity));
+
+                        $row.append($('<td/>').html(response[i].ReceivedQuantity));
+                        $row.append($('<td />').html(response[i].PendingQuantity));
+                        $row.append($('<td />').html(response[i].LastReceivedDate));
+                        //var $remove = $('<a href="#">Remove</a>');
+                        //$remove.click(function (e) {
+                        //    e.preventDefault();
+                        //    orderItems.splice(i, 1);
+                        //    GeneratedItemsTable();
+                        //    getFinalBillAmount1();
+                        //});
+                        //$row.append($('<td/>').html($remove));
+                        $tbody.append($row);
+                    }
+                    //});
+
+                    $table.append($tbody);
+
+                    $('#poReceiptDetails').html($table);
+
+                }
+                else {
+                    $('#orderItems').html('');
+                    $('#lblAmount').text('');
+                    $('#txtQuantity').val('');
+                }
+            }
+        });
+    })
+   
     
     //function getValueOfSpares(dropDownValue) {
     //    window.location.href = '/Inventory/GetCostDetails/' + dropDownValue;
@@ -220,7 +303,7 @@
 <script type="text/javascript">
 
     $(function() {
-        $('#txtBillDate,#txtPODate').datepicker({
+        $('#txtBillDate,#txtPODate,#txtLastReceivedDate').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
@@ -370,20 +453,36 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Bill Amount</label>
                     <div class="col-lg-8">
-                        <label id="lblBillAmount" class="form-control" ></label>
+                        <label id="lblBillAmount" class="form-control"></label>
                         @*<input type="text" class="form-control" id="txtContactNumber" placeholder="Contact Number" maxlength="10">*@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label  col-lg-4">P.O Number</label>
+                    <label class="control-label  col-lg-4">P.O Date</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtPONumber" placeholder="P.O Number">
+                        <input type="text" class="form-control" id="txtPODate" onkeypress="return false" placeholder="P.O Date">
                     </div>
                 </div>
-                <div class="form-group" >
-                    <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">P.O Date</label>
+
+                <div class="form-group">
+                    <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">P.O Number</label>
                     <div class="col-lg-8">
-                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPODate" onkeypress="return false" placeholder="P.O Date">
+                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPONumber" placeholder="P.O Number">
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="control-label  col-lg-4"> Last Received Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtLastReceivedDate" onkeypress="return false" placeholder="Last Received Date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">Received Quantity</label>
+                    <div class="col-lg-8">
+                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtReceivedQuantity" placeholder="Received Quantity">
                     </div>
                 </div>
 
@@ -392,6 +491,17 @@
         </div>
 
         <hr />
+        <div class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+            <div class="panel-heading">
+                P.O Details
+            </div>
+            <div class="panel-body" id="poReceiptDetails" style="align-content:center">
+            </div>
+        </div>
+
+
+    </div>
+    <hr/>
         <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
             <div class="panel-heading">
                 Receipt Items

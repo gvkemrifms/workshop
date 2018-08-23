@@ -304,6 +304,75 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+        internal int ExecuteInsertPOManufacturerDetails(string insertStmt, string poNumber, int manufacturerId, int sparePartId, decimal unitPrice, int quantity, decimal amount)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@ponumber", poNumber);
+                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@sparepartid", sparePartId);
+                    comm.Parameters.AddWithValue("@unitprice", unitPrice);
+                    comm.Parameters.AddWithValue("@quantity", quantity);
+                    comm.Parameters.AddWithValue("@amount", amount);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int ExecutePODetails(string insertStmt, string poNumber, DateTime poDate, int employeeId)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;                   
+                    comm.Parameters.AddWithValue("@ponumber", poNumber);
+                    comm.Parameters.AddWithValue("@podate", poDate);
+                    comm.Parameters.AddWithValue("@employeeid", employeeId);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
+                        TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         internal int ExecuteInsertStockDetails(string insertStmt, int workShopId, int manufacturerId, int sparePartId, int unitPrice, int quantity, long receiptId,string billNumber,int vendorId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
@@ -429,6 +498,42 @@ namespace Fleet_WorkShop.Models
                         conn.Open();
                         i = comm.ExecuteNonQuery();
                         TraceService(insertStmt);
+                        return i;
+                    }
+                    catch (SqlException ex)
+                    {
+                        TraceService(" executeInsertStatement " + ex + insertStmt);
+                        return i;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal int ExecuteUpdateOutSourcingJobDetails(int vehicleId, string insertStmt, string vendor, string workOrder, string jobWork, DateTime completedDate, int outSourcingStatus,decimal amount)
+        {
+            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
+            {
+                using (var comm = new SqlCommand())
+                {
+                    var i = 0;
+                    comm.Connection = conn;
+                    comm.CommandText = insertStmt;
+                    comm.CommandType = CommandType.StoredProcedure;
+                    comm.Parameters.AddWithValue("@vehicleid", vehicleId);
+                    comm.Parameters.AddWithValue("@vendorname", vendor);
+                    comm.Parameters.AddWithValue("@jobwork", jobWork);
+                    comm.Parameters.AddWithValue("@workorder", workOrder);
+                    comm.Parameters.AddWithValue("@completeddate", completedDate);
+                    comm.Parameters.AddWithValue("@outsourcingstatus", outSourcingStatus);
+                    comm.Parameters.AddWithValue("@amount", amount);
+                    try
+                    {
+                        conn.Open();
+                        i = comm.ExecuteNonQuery();
                         return i;
                     }
                     catch (SqlException ex)

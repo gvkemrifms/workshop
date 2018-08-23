@@ -5,66 +5,25 @@
 }
 
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
-<style>
-    #tblCosts {
-        width: 70px;
-        margin-left:300px;
-        position: absolute;
-        color: red;
-       
-    }
-
-    #tblCost {
-        width: 17%;
-        float:right;
-        position: absolute;
-        margin-top:450px;
-        margin-left:600px;
-        margin-top:100px;
-        
-    }
-       #tblCostStatus {
-        width:17%;
-         float:right;
-        margin-top:450px;
-        position: absolute;
-         margin-left:600px;
-        margin-top:330px;
-
-    }
-
-    #datess {
-        width: 100px;
-    }
-    #LubesorderItems
-    {
-        width:22%;
-        margin-left: 0px;
-        margin-top:300px;
-        position: absolute;
-      
-    }
-    #tbl{
-        margin-left:0px;
-        width:30%;
-        height:15%;
-         margin-top:120px
-    }
-    #tblLubes
-    {
-         margin-left:0px;
-         width:10%;
-         height:15%;
-          margin-top:15px
-    }
-</style>
-
-    
+<link href="~/Content/css/outsourcing.css" rel="stylesheet" />
+<script>
+    $(function () {
+        $('#txtcompleteddate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0"
+        });
+    });
+</script>
+ 
 <script type="text/javascript">
+    var costDetailsData = [];
     var responseData = null;
   $(function(){
         $('#btnSubmit').filter(function () {
             $(this).hide();
+            $('#divradio').hide();
 
         })
     })
@@ -74,6 +33,12 @@
             if ($('#SpareParts option:selected').text() == '--Select--') {
                 $("#Lubricant").prop('selectedIndex', 0);
                 $('#tblCost').empty();
+                $('#divradio').hide();
+                $('#btnSubmit').hide();
+                $('#txtQuantity').val('');
+                $('#HandOver').val('');
+                $('#tblCostStatus').empty();
+
             }
         var data = {
             spareId: $('#SpareParts option:selected').val()
@@ -90,7 +55,7 @@
                
                 $('#tblCost').empty();
                 CostDetails(response)
-                StatusDetails(response)
+               // StatusDetails(response)
                // GetCostDetails(response)
             },
             failure: function (response) {
@@ -104,7 +69,8 @@
     })
 
     function CostDetails(data) {
-       
+        costDetailsData = JSON.stringify(data);
+        alert(costDetailsData)
         var eTable = "<table id=tblCosts  ><thead><tr><th id=datess >Last Entry Date</th><th>Quantity</th><th>Cost</th></tr></thead><tbody>"
         for (var i = 0; i < data.length; i++) {
             if (data[i]['LastEntryDate'] != null && data[i]['Quantity']!=0) {
@@ -138,7 +104,7 @@
     //var retval = getMachine(color, qty);
 
     function StatusDetails(data) {
-        var eTable = "<table id=tblStatus  ><thead><tr><th>Quantity</th><th>Total Amount</th><th>Issued Date</th><th>Pending</th></tr></thead><tbody>"
+        var eTable = "<table id=tblStatus  ><thead><tr><th>Quantity</th><th>Total Amount</th><th>Issued Date</th><th>Status</th></tr></thead><tbody>"
         for (var i = 0; i <data.length; i++) {
             if (data[i]['Quantity'] != 0 && data[i]['StatusType'] != null) {
                 eTable += "<tr>";
@@ -161,6 +127,7 @@
             if ($('#Lubricant option:selected').text() == '--Select--') {
                 $("#SpareParts").prop('selectedIndex', 0);
                 $('#tblCost').empty();
+                $('#tblCostStatus').empty();
                 return false;
             }
             var data = {
@@ -176,7 +143,7 @@
                 success: function (response) {
                     $('#tblCost').empty();
                     CostDetails(response)
-                    StatusDetails(response)
+                   // StatusDetails(response)
                     
                 },
                 failure: function (response) {
@@ -228,9 +195,9 @@
         var LubesorderrItems = [];
    
         $('#btnAdd').click(function () {
-            alert(responseData);
             if (Validate()) {
                 $('#btnSubmit').show();
+                $('#divradio').show();
                 orderItems.push({
                     VehicleNumber: '@ViewBag.VehicleNumber',
                     SparePartId: $('#SpareParts').val(),
@@ -252,15 +219,28 @@
             }
         });
         function GeneratedItemsTable() {
+           
             if (orderItems.length > 0) {
-
+                var duplicates = '';
                 var $table = $('<table id=tbl/>');
 
                 $table.append('<thead><tr><th>SpareParts</th><th>Issued Date</th><th>Quantity</th><th>Unit Price</th><th>HandOverTo</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
                 $.each(orderItems, function (i, val) {
-                    
+                    var id = val.SparePartName;
+                    if (i != 0) {
+                        $('#tbl tr td').each(function () {
+                            if (id == $(this).text()) {
+                                duplicates = id;
+                                $('#tbl tr').remove();
+                                alert(id + "  " + "Already exists");
+                                location.reload();
+                            }
+                        });
+                    }
+                    if (duplicates == '')
+                    {
                         var $row = $('<tr/>');
 
                         //$row.append($('<td/>').html(val.VehicleNumber));
@@ -270,6 +250,7 @@
                         $row.append($('<td/>').html(val.Quantity));
                         $row.append($('<td/>').html(val.UnitPrice));
                         $row.append($('<td class=amt/>').html(val.HandOverToName));
+
                         var $remove = $('<a href="#">Remove</a>');
                         $remove.click(function (e) {
                             e.preventDefault();
@@ -277,13 +258,12 @@
                             GeneratedItemsTable();
                         });
                         $row.append($('<td/>').html($remove));
-                        $tbody.append($row);
-                    
-                });
-
+                        $tbody.append($row);            
                 $table.append($tbody);
-
                 $('#orderItems').html($table);
+                    }
+                });
+                duplicates = '';
             }
             else {
                 $('#orderItems').html('');
@@ -337,7 +317,12 @@
                 });
 
                 $table.append($tbody);
-
+                //$('#tblLubes tbody tr').each(function () {
+                //    $projectName = $(this).find('td:eq(1)').text();
+                //    if ($projectName == $('#Lubricant option:seleceted').text()) {
+                //        return alert('ERROR')
+                //    }
+                //});
                 $('#LubesorderItems').html($table);
 
             }
@@ -352,7 +337,8 @@
                 var data = {
                     Status : $('input[name="clkradio"]:checked').val(),
                     //Status: $('input[type="radio"]').val(),
-                    itemmodel: orderItems
+                    itemmodel: orderItems,
+                    itemmodelPending: costDetailsData
                 };
 
                 $.ajax({
@@ -446,7 +432,7 @@
     })*@
     
 </script>
-<style>
+@*<style>
     .myclass{
         color:brown;
         margin-left:900px;
@@ -467,9 +453,9 @@
         font-size:15px;
         margin-top:10px
     }
-</style>
-@Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass" })
-@Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass1" })
+</style>*@
+@Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass"})
+@Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new { vehicleNumber = @ViewBag.VehicleNumber }, new { @class = "myclass" })
 <table class="table1" style="margin-top:5px;width:700px;margin-left:150px">
     <tr>
         <th>
@@ -551,11 +537,18 @@
 
 </table>
 <div class="form-group" style="margin-left:730px">
-    <label class="control-label  col-lg-4" style="width:100px;color:red">Total Cost</label>
+    <label class="control-label  col-lg-4" style="width:100px;color:red">Total Cost:</label>
     <div class="col-lg-8">
         <input type="text" class="form-control" value="@ViewBag.TotalCost" id="txttotalCost" placeholder="Total Cost" onkeypress="return false;" style="margin-left:-30px;margin-top:-5px" readonly="readonly">
     </div>
 </div>
+<div class="form-group" style="margin-left:680px;margin-top:40px">
+    <label class="control-label  col-lg-6" style="width:160px;color:red">OutSourcing Cost:</label>
+    <div class="col-lg-6">
+        <input type="text" class="form-control" value="@ViewBag.OutSourcingAmount" id="txttotalCost" placeholder="Total Cost" onkeypress="return false;" style="margin-left:-30px;margin-top:-5px" readonly="readonly">
+    </div>
+</div>
+
 <br />
 <hr />
 @*<button type="submit" id="btnPreviousRepairs" class="btn btn-default" style="background-color: blue;margin-top:-630px;margin-left:870px; color: white;">Show Previous Repairs</button>*@
@@ -563,6 +556,7 @@
         <div class="panel-heading">
             Vehicle Pending Status Details
         </div>
+     
         <div class="panel-body">
             <div class="col-lg-6">
                 <form class="form-horizontal">
@@ -573,7 +567,7 @@
                         </div>
                         <label class="control-label col-lg-4" style="margin-top:15px;">Quantity</label>
                         <div class="col-lg-8">
-                            <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="margin-top:15px;">
+                            <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="margin-top:15px;border:1px solid grey">
                         </div>
                         <label class="control-label  col-lg-4" style="margin-top:15px;">HandOver To</label>
                         <div class="col-lg-8">
@@ -598,10 +592,26 @@
 
                 </form>
             </div>
-            
-            <div class="col-lg-offset-2 col-lg-6" style="margin-top:35px;" >
-                <form class="form-horizontal">
-                    <div class="form-group" style="margin-left:-230px">
+            <hr />
+ 
+            <div class="col-lg-6" style="margin-top:35px;margin-left:-500px" >       
+               <form class="form-horizontal">    
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Lubricant</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Lubricant", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style="margin-left:-10px" })
+                        </div>
+                        <label class="control-label col-lg-4" style="margin-top:15px;">Quantity</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity" style="margin-top:15px;border:1px solid grey">
+                        </div>
+                        <label class="control-label  col-lg-4" style="margin-top:15px;">HandOver To</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To", @style = "margin-top:10px" })
+                        </div>
+                    </div>
+                    
+                     @*<div class="form-group" style="margin-left:-230px">
                         <label class="control-label  col-lg-2">Lubricant</label>
                         <div class="col-lg-4">
                             @Html.DropDownList("Lubricant", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style = "margin-left:-50px" })
@@ -614,39 +624,16 @@
                         <div class="col-lg-4">
                             @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To",@style="margin-left:680px;margin-top:-33px" })
                         </div>
-                    </div>
+                    </div>*@
                     <div class="form-group">
-                        
+                        <div class="col-sm-offset-2 col-sm-9">
+                            <button type="submit" id="btnAddLubes" class="btn btn-default" style="background-color: blue;margin-top:-90px;margin-left:390px; color: white">Add</button>
+                        </div>
                     </div>
                 </form>
             </div>
-            <div class="col-lg-6" >
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        @*<label class="control-label  col-lg-3">HandOver To</label>
-                        <div class="col-lg-3">
-                            @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @placeholder = "HandOver To" })
-                        </div>*@
-                    </div>
-                    <div class="col-sm-offset-2 col-sm-9">
-                        <button type="submit" id="btnAddLubes" class="btn btn-default" style="background-color: blue;margin-top:-150px;margin-left:750px; color: white">Add</button>
-                    </div>
-                  
-                </form>
-            </div>
-            <div class="col-lg-6">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        @*<div class="col-sm-offset-2 col-sm-4">
-                            <button type="submit" id="btnAddLubes" class="btn btn-default" style="background-color: blue;margin-left:-300px; color: white">Add</button>
-                        </div>*@
-
-                    </div>
-
-                </form>
-
-            </div>
-            <div class="form-group" style="margin-right:-200px;margin-bottom:-100px">
+ 
+            <div class="form-group" style="margin-bottom:-100px">
                 <div class="col-lg-4">
                     <div class="panel-body" id="orderItems"></div>
 
@@ -658,7 +645,7 @@
 
                 </div>
             </div>
-            <div class="col-lg-6" style="margin-top:10px;margin-bottom:350px;margin-left:500px">
+            <div class="col-lg-6" style="margin-top:10px;margin-bottom:350px;margin-left:500px" id="divradio">
                 <input name="clkradio" type="radio" value="Inprogress" />In progress
                 <input style="margin-left:30px" name="clkradio" type="radio" value="Completed" />Completed
                 <button type="submit" id="btnSubmit" class="btn btn-default" style="background-color: blue; color: white;" onclick="if (!Validations()) return false;">Submit</button>
@@ -666,11 +653,86 @@
             <table id="tblCost"  style="width:30%;float:right"></table>
             <table id="tblCostStatus" align="center" style="width:30%;float:right"></table>
 
+            <div class="container" style="width:500px ;margin-left:560px;margin-top:1px;position:absolute">
+                <div class="main">
+                    <div id="dialog" title="OutSourcing Job" style="margin-top:-300px" >
+                        <form action="" method="post">
+                            <label>Vendor:</label>
+                            <input type="text" id="txtvendor" name="Vendor" placeholder="Vendor" style="border:1px solid grey;" >
+                            <label>JobWork:</label>
+                            <textarea id="txtjobwork" rows="4" cols="50"></textarea>
+                            <label>Work Order:</label>
+                            <input id="txtworkorder" name="workorder" type="text" style="border:1px solid grey;">
+                            <label>Status:</label>
+                            <select class="form-control" id="txtstatus" name="Status" >
+                                <option value="0">--Select--</option>
+                                <option value="1">Pending</option>
+                                <option value="2">Close</option>
+                            </select>
+                            <label>Completed Date:</label>
+                            <input id="txtcompleteddate" name="Completed Date" type="text" onkeypress="return false;"  style="border:1px solid grey;">
+                            <label>Amount:</label>
+                            <input id="txtAmount" name="Amount" type="text" style="border:1px solid grey;">
+                            <input id="submit" type="submit" value="Submit">
+                        </form>
+                    </div>
+                    @*<h3>Out Sourcing Job Details</h3>*@
+                    <input id="button" type="button" value="Out Sourcing Job" style="margin-left:30px">
+                 
+                </div>
+            
+                
+            </div>
+          
         </div>
      
-            
+        <script>
+    $(document).ready(function() {
+        $(function() {
+            $("#dialog").dialog({
+                autoOpen: false
+            });
+            $("#button").on("click", function () {
+                $("#dialog.ui-dialog-titlebar-close").show();
+                $("#dialog").dialog("open");
+            });
+            $("#submit").on("click", function () {
+                var serviceURL = "/Vehicle/getOutSourcingJobDetails"
+                var newUrl = '@Url.Action("GetPendingStatusDetails","Vehicle")';
+                var data = {
+                    Vendor: $('#txtvendor').val(),
+                 JobWork : $('#txtjobwork').val(),
+                 workOrder : $('#txtworkorder').val(),
+                 OutSourcingStatus: $('#txtstatus').val(),
+                 CompletedDate : $('#txtcompleteddate').val(),
+                 Amount : $('#txtAmount').val()
+                }
+                alert(JSON.stringify(data))
+                $.ajax({
+                    type: "POST",
+                    url: serviceURL,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response != 0) {
+                            alert('Records Updated');
+                            window.location.href = newUrl;
+                        }
+
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+
+    });
+        </script>   
      
         <div class="panel-footer">
+
     
         </div>
     </div>

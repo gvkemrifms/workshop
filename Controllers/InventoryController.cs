@@ -218,6 +218,32 @@ namespace Fleet_WorkShop.Controllers
             return RedirectToAction("SaveInventoryDetails");
            
         }
+    
+        public ActionResult SavePODetails()
+        {
+            if (Session["WorkshopId"] == null)
+                return RedirectToAction("Login", "Account");
+            DataSet dsGetManufacturerVendor = _helper.FillDropDownHelperMethodWithSp("spGetManufacturerVendor");
+            ViewBag.VehicleManufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName");
+            ViewBag.Spares = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName");
+            return View();
+        }
+        [HttpPost]
+        public ActionResult SavePODetails(InventoryModel model)
+        {
+            string employee = Session["Employee_Id"].ToString();
+            InventoryModel billDetails = new InventoryModel { PoNumber = model.PoNumber, PoDate = model.PoDate, EmployeeId = Convert.ToInt32(employee) };
+          int result=  _helper.ExecutePODetails("spInsertPODetails", billDetails.PoNumber, billDetails.PoDate, billDetails.EmployeeId);
+            foreach (var items in model.itemmodel)
+            {
+
+                //var insertgridDetails = billDetails.itemmodel.Select((x) => new {ManufacturerId=x.ManufacturerId, ManufacturerName = x.ManufacturerName,SparePartId=x.SparePartId, SparePartName = x.SparePartName, Quantity = x.Quantity, Amount = x.Amount, UnitPrice = x.UnitPrice });
+                _helper.ExecuteInsertPOManufacturerDetails("spInsertSparePODetails", billDetails.PoNumber, Convert.ToInt32(items.ManufacturerId), Convert.ToInt32(items.SparePartId), Convert.ToDecimal(items.UnitPrice), Convert.ToInt32(items.Quantity),Convert.ToDecimal(items.Amount));
+
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult SaveInventoryDetails()
         {
             if (Session["WorkshopId"] == null)
@@ -520,6 +546,23 @@ namespace Fleet_WorkShop.Controllers
 
             }
             return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult GetSparePODetails(string Ponumber)
+        {
+            int response = 0;
+            IEnumerable<GetPODetailsSpareParts> podatailsSpares;
+            if (Ponumber == null) return null;
+           DataTable dtSparePartsPODatails= _helper.ExecuteSelectStmtusingSP("spSparePartsPODetails",null,null,null,null, "@ponumber", Ponumber);
+            if (dtSparePartsPODatails == null || dtSparePartsPODatails.Rows.Count <= 0)
+            {
+                return Json(response, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                podatailsSpares = dtSparePartsPODatails.AsEnumerable().Select(x => new GetPODetailsSpareParts {PoDate= x.Field<DateTime>("PoDate").ToShortDateString(),PartName= x.Field<string>("partname"),PartNumber= x.Field<string>("partnumber"),PoQuantity= x.Field<int>("poquantity"),ReceivedQuantity= x.Field<int>("ReceivedQuantity"),LastReceivedDate= x.Field<DateTime?>("lastreceiveddate"),PendingQuantity= x.Field<int>("poquantity") - x.Field<int>("ReceivedQuantity") });
+                return Json(podatailsSpares, JsonRequestBehavior.AllowGet);
+            }
+           
         }
     }
 }

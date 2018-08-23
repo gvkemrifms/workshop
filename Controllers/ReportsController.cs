@@ -63,5 +63,23 @@ namespace Fleet_WorkShop.Controllers
             Session["View"] = list;
             return RedirectToAction("GetVehicleWiseStocksReport");
         }
+        [HttpGet]
+        public ActionResult GetVehicleWiseLubesReport()
+        {
+            if (Session["ViewLubes"] != null)
+            {
+                var list = Session["ViewLubes"] as IEnumerable<VehicleReport>;
+                return PartialView("_GetVehicleWiseStocksReportDetails", list);
+            } 
+            return View();
+        }
+        [HttpPost]
+        public ActionResult GetVehicleWiseLubesDetails(DateTime startDate, DateTime endDate)
+        {
+            DataTable dtgetLubesReport = _helper.ExecuteSelectStmtForDateTime("vehicle_wise_lubesused", "@sdate", startDate.ToString(), "@edate", endDate.ToString());
+            var list = dtgetLubesReport.AsEnumerable().Select(x => new VehicleReport { Id = x.Field<long>("ID"), Workshop = x.Field<string>("workshop"), Vehicle = x.Field<string>("VehicleNumber"), Sparepart = x.Field<string>("Lube"), Quantity = x.Field<int>("Quantity"), Amount = x.Field<decimal>("Amount"), JobcardId = x.Field<int>("Jobcard"), HandOverTo = x.Field<string>("HandOverto"), IssuedDate = x.Field<DateTime>("IssuedDate"), Status = x.Field<string>("status") });
+            Session["ViewLubes"] = list;
+            return RedirectToAction("GetVehicleWiseLubesReport");
+        }
     }
 }

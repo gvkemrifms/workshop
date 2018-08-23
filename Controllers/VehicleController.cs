@@ -213,17 +213,23 @@ namespace Fleet_WorkShop.Controllers
 
         public ActionResult EditPendingStatusDetails1(Guid? id)
         {
+            decimal? OutSourcingAmount = 0;
             IEnumerable<JobCardPendingCases> pendingCases = new List<JobCardPendingCases>();
             if (id != null)
             {
                 DataTable dtPendingStatus = Session["PendingStatus"] as DataTable;
-                pendingCases = dtPendingStatus.AsEnumerable().Where(x => x.Field<Guid>("Id") == id).Select(x => new JobCardPendingCases { VehicleId = x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"), DistrictName = x.Field<string>("District"), DateOfRepair = x.Field<DateTime>("DateOfRepair").Date, Complaint = x.Field<string>("ServiceGroup_Name"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("Name"), Status = x.Field<string>("status"), JobCardNumber = x.Field<int>("JobCardNumber") });
+                pendingCases = dtPendingStatus.AsEnumerable().Where(x => x.Field<Guid>("Id") == id).Select(x => new JobCardPendingCases { VehicleId = x.Field<Guid>("Id"), VehicleNumber = x.Field<string>("VehicleNumber"), DistrictName = x.Field<string>("District"), DateOfRepair = x.Field<DateTime>("DateOfRepair").Date, Complaint = x.Field<string>("ServiceGroup_Name"), WorkShopName = x.Field<string>("workshop_name"), EmployeeName = x.Field<string>("Name"), Status = x.Field<string>("status"), JobCardNumber = x.Field<int>("JobCardNumber"), OutSourcingAmount= x.Field<decimal?>("Amount") });
                 Session["workshopName"] = pendingCases.Select(x => x.WorkShopName).FirstOrDefault();
-               ViewBag.VehicleNumber= dtPendingStatus.AsEnumerable().Select(x => x.Field<string>("VehicleNumber")).FirstOrDefault();
-                ViewBag.DateOfRepair= dtPendingStatus.AsEnumerable().Select(x => x.Field<DateTime>("DateOfRepair")).FirstOrDefault();
-                ViewBag.WorkShopName= dtPendingStatus.AsEnumerable().Select(x => x.Field<string>("workshop_name")).FirstOrDefault();
-                ViewBag.Mechanic= dtPendingStatus.AsEnumerable().Select(x => x.Field<string>("Name")).FirstOrDefault();
-     
+                //ViewBag.VehicleNumber= dtPendingStatus.AsEnumerable().Select(x => x.Field<string>("VehicleNumber")).FirstOrDefault();
+                ViewBag.VehicleNumber = pendingCases.Select(x => x.VehicleNumber).FirstOrDefault(); ;
+                //ViewBag.DateOfRepair= dtPendingStatus.AsEnumerable().Select(x => x.Field<DateTime>("DateOfRepair")).FirstOrDefault();
+                ViewBag.DateOfRepair = pendingCases.Select(x => x.DateOfRepair).FirstOrDefault(); ;
+                //ViewBag.WorkShopName= dtPendingStatus.AsEnumerable().Select(x => x.Field<string>("workshop_name")).FirstOrDefault();
+                ViewBag.WorkShopName = pendingCases.Select(x => x.WorkShopName).FirstOrDefault(); ;
+                //ViewBag.Mechanic= dtPendingStatus.AsEnumerable().Select(x => x.Field<string>("Name")).FirstOrDefault();
+                ViewBag.Mechanic = pendingCases.Select(x => x.EmployeeName).FirstOrDefault(); 
+                ViewBag.OutSourcingAmount = pendingCases.Select(x => x.OutSourcingAmount).FirstOrDefault(); 
+
             }
             else
             {
@@ -246,6 +252,7 @@ namespace Fleet_WorkShop.Controllers
             DataTable dtvehicleInfoOnVehicleNumber = _helper.ExecuteSelectStmtusingSP("getVehicleInfoOnVehicleNumber", null, null, null, null, "@vehiclenumber", vehicleNumber);
             Session["VehicleInfoByNumber"] = dtvehicleInfoOnVehicleNumber;
             int vehicleId = dtvehicleInfoOnVehicleNumber.AsEnumerable().Select(x => x.Field<int>("VehicleId")).FirstOrDefault();
+            Session["VehicleId"] = vehicleId;
             DataTable dtTotalCost = _helper.ExecuteSelectStmtusingSP("getTotalCostForVehicleNumber", "@vehicleid", vehicleId.ToString());
             int totalCost = dtTotalCost.AsEnumerable().Select(x => x.Field<int>("TotalCost")).FirstOrDefault();
             ViewBag.TotalCost = totalCost;
@@ -253,6 +260,16 @@ namespace Fleet_WorkShop.Controllers
             pendingCases =  dtgetComplaints.AsEnumerable().Select(x => new JobCardPendingCases { VehicleIdData = x.Field<int>("VehicleId"), VehicleNumberData = x.Field<string>("VehicleNumber"), CategoryData = x.Field<string>("Categories"), CostApproximate = x.Field<int>("ApproxCost"),DateOfRepair= x.Field<DateTime>("Dor"),AggregateName= x.Field<string>("Aggregates"),SubCategoryName= x.Field<string>("Service_Name") });
            
             return View(pendingCases);
+        }
+
+        public ActionResult GetOutSourcingJobDetails(OutSourcingJobDetails outsourcing)
+        {
+            int vehicleId = Convert.ToInt32(Session["VehicleId"]);
+            int jobCardNumber = Convert.ToInt32(Session["JobCardNumber"]);
+           int returnVal= _helper.ExecuteUpdateOutSourcingJobDetails(vehicleId, "UpdateOutSoiurcingVehicleDetails", outsourcing.Vendor, outsourcing.WorkOrder, outsourcing.JobWork, outsourcing.CompletedDate, outsourcing.OutSourcingStatus,outsourcing.Amount);
+
+
+            return Json(returnVal, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult AddIssues(string vehicleNumber)
@@ -319,6 +336,12 @@ namespace Fleet_WorkShop.Controllers
         }
         public ActionResult SaveCalculateFIFO(VehicleModel pendingCases,string status)
         {
+            var pendingStatusSpares = Session["pendingStatusSpareDetails"] as List<JobCardPendingCases>; 
+           
+           foreach(var i in pendingStatusSpares)
+            {
+                pendingCases.itemmodel.Add(i);
+            }
             int result = 0;
             string workshopName = Session["workshopName"].ToString();
             string query = "select workshop_id from m_workshop where workshop_name='" + workshopName + "'";
@@ -489,6 +512,7 @@ namespace Fleet_WorkShop.Controllers
         }
         public ActionResult GetSparePartCost(string spareId)
         {
+            List<JobCardPendingCases> getPendingSparesForCompletion = new List<JobCardPendingCases>();
             if (spareId == "") return Content("", "application/json");
             List<JobCardPendingCases> costDetails = new List<JobCardPendingCases>();
             DataTable VehicleSpareParts = Session["getVehicleSpares"] as DataTable;
@@ -512,13 +536,16 @@ namespace Fleet_WorkShop.Controllers
                 foreach (DataRow row in dtSpareIssueDetails.Rows)
                 {
                     JobCardPendingCases getSparesdetails = new JobCardPendingCases();
+                    getSparesdetails.SparePartId = Convert.ToInt32(spareId);
                     getSparesdetails.Quantity = Convert.ToInt32(row["Quantity"]);
                     getSparesdetails.TotalAmount = Convert.ToInt32(row["TotalAmount"]);
                     getSparesdetails.IssuedDate = Convert.ToDateTime(row["IssuedDate"]).ToShortDateString();
                     getSparesdetails.StatusType = row["Status"].ToString();
                     costDetails.Add(getSparesdetails);
+                    getPendingSparesForCompletion.Add(getSparesdetails);
                 }
             }
+            Session["pendingStatusSpareDetails"] = getPendingSparesForCompletion;
            string costDetails1 = JsonConvert.SerializeObject(costDetails, Formatting.None, new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

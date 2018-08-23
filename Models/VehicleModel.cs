@@ -82,7 +82,7 @@ namespace Fleet_WorkShop.Models
         public int HandOverTo { get; set; }
         public string WorkShopName { get; set; }
         public List<JobCardPendingCases> itemmodel { get; set; }
-
+        public List<JobCardPendingCases> itemmodelPending { get; set; }
         public List<VehicleJobCardModel> jobcarditems { get; set; }
         public int WorkShopId { get; set; }
         public int LubricantId { get; set; }
@@ -232,6 +232,12 @@ public string WorkShopName { get; set; }
     public string AggregateName { get; set; }
     [DisplayName("Asssigned Mechanic")]
     public string Mechanic { get; set; }
+    decimal? value = 0;
+    public decimal? OutSourcingAmount
+    {
+        get { return value; }
+        set { this.value = value; }
+    }
 
 }
 public class GetSparePartCostDetails
@@ -243,4 +249,30 @@ public class GetSparePartCostDetails
     public int LubricantId { get; set; }
     public string LubricantName { get; set; }
 
+}
+public class OutSourcingJobDetails
+{
+    public string Vendor { get; set; }
+    public string JobWork { get; set; }
+    public string WorkOrder { get; set; }
+    public DateTime CompletedDate { get; set; }
+    public decimal Amount { get; set; }
+    public int OutSourcingStatus { get; set; }
+}
+public class GetPODetailsSpareParts
+{
+    [DisplayName("SparePart")]
+    public string PartName { get; set; }
+    [DisplayName("Part Number")]
+    public string PartNumber { get; set; }
+    [DisplayName("P.O Quantity")]
+    public int PoQuantity { get; set; }
+    [DisplayName("Last Received Date")]
+    public DateTime? LastReceivedDate { get; set; }
+    [DisplayName("Received Quantity")]
+    public int ReceivedQuantity { get; set; }
+    [DisplayName("Pending Quantity")]
+    public int PendingQuantity { get; set; }
+    [DisplayName("P.O Date")]
+    public string PoDate { get; set; }
 }

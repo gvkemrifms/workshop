@@ -580,5 +580,6 @@ namespace Fleet_WorkShop.Controllers
             _helper.ExecuteJobSubCategoryUpdateCost("spEditJobSubCategoryCostDetails",aggregates.ApproxCost,aggregates.SubCategory );
             return RedirectToAction("SubCategoryGroup");
         }
+       
     }
 }

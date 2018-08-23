@@ -51,6 +51,7 @@ namespace Fleet_WorkShop.Models
         public DateTime PoDate { get; set; }
         public List<InventoryDetails> itemmodel { get; set; }
         public int ScrapBinId { get; set; }
+        public int EmployeeId { get; internal set; }
     }
 
     public class InventoryDetails

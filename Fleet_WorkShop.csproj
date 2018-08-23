@@ -228,6 +228,7 @@
     <Content Include="Content\css\jquery-ui.min.css" />
     <Content Include="Content\css\jquery-ui.min.js" />
     <Content Include="Content\css\metisMenu.min.css" />
+    <Content Include="Content\css\outsourcing.css" />
     <Content Include="Content\css\sb-admin-2.min.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\css\Site.css" />
@@ -374,6 +375,8 @@
     <Content Include="Views\Job\EditSubCategoryCostDetails.cshtml" />
     <Content Include="Views\Reports\GetVehicleWiseStocksReport.cshtml" />
     <Content Include="Views\Reports\_GetVehicleWiseStocksReportDetails.cshtml" />
+    <Content Include="Views\Reports\GetVehicleWiseLubesReport.cshtml" />
+    <Content Include="Views\Inventory\SavePODetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
