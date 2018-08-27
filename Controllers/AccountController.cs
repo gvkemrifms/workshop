@@ -1,15 +1,14 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Fleet_WorkShop.Models;
+using Fleet_WorkShop.WorkShpModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using Fleet_WorkShop.Models;
-using Fleet_WorkShop.WorkShpModels;
 using SignInStatus = Fleet_WorkShop.WorkShpModels.SignInStatus;
 
 namespace Fleet_WorkShop.Controllers
@@ -17,14 +16,15 @@ namespace Fleet_WorkShop.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        private readonly Helper _helper = new Helper();
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private readonly Helper _helper = new Helper();
+
         public AccountController()
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -32,26 +32,14 @@ namespace Fleet_WorkShop.Controllers
 
         public ApplicationSignInManager SignInManager
         {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set 
-            { 
-                _signInManager = value; 
-            }
+            get { return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>(); }
+            private set { _signInManager = value; }
         }
 
         public ApplicationUserManager UserManager
         {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
+            private set { _userManager = value; }
         }
 
         //
@@ -68,29 +56,35 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public  ActionResult Login(LoginViewModel model, string returnUrl)
+        public ActionResult Login(LoginViewModel model, string returnUrl)
         {
-       
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result =  PasswordSignInAsync(model.EmployeeName, model.Password);
+            var result = PasswordSignInAsync(model.EmployeeName, model.Password);
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Index","Home");
+                    return RedirectToAction("Index", "Home");
                 case SignInStatus.Failure:
                     return RedirectToAction("Login");
                 default:
-                   ModelState.AddModelError("", "Invalid login attempt.");
+                    ModelState.AddModelError("", "Invalid login attempt.");
                     return View(model);
             }
-        }      
-        public  SignInStatus PasswordSignInAsync(string employeeName, string password)
+        }
+
+        public SignInStatus PasswordSignInAsync(string employeeName, string password)
         {
-            string query = "select * from m_employees";
-            var dtUsers= _helper.ExecuteSelectStmt(query);
-            var employees= dtUsers.AsEnumerable().ToList().Select((name, pass) => new { Name = name.Field<string>("employeeName"), Password = name.Field<string>("password"),EmpId= name.Field<string>("employeeId"),WorkShopId=name.Field<int>("workshop_id") });
+            var query = "select * from m_employees";
+            var dtUsers = _helper.ExecuteSelectStmt(query);
+            var employees = dtUsers.AsEnumerable().ToList().Select((name, pass) => new
+            {
+                Name = name.Field<string>("employeeName"),
+                Password = name.Field<string>("password"),
+                EmpId = name.Field<string>("employeeId"),
+                WorkShopId = name.Field<int>("workshop_id")
+            });
             var enumerable = employees.ToList();
             foreach (var usercred in enumerable)
             {
@@ -99,7 +93,9 @@ namespace Fleet_WorkShop.Controllers
                 Session["Employee_Id"] = usercred.EmpId;
                 Session["WorkshopId"] = usercred.WorkShopId;
             }
-            return enumerable.Any(user => employeeName.ToUpper() == user.Name.ToUpper() && password == user.Password) ? SignInStatus.Success : SignInStatus.Failure;
+            return enumerable.Any(user => employeeName.ToUpper() == user.Name.ToUpper() && password == user.Password)
+                ? SignInStatus.Success
+                : SignInStatus.Failure;
         }
 
         //
@@ -109,12 +105,9 @@ namespace Fleet_WorkShop.Controllers
         {
             // Require that the user has already logged in via username/password or external login
             if (!await SignInManager.HasBeenVerifiedAsync())
-            {
                 return View("Error");
-            }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            return View(new VerifyCodeViewModel {Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe});
         }
-
 
 
         //
@@ -134,12 +127,12 @@ namespace Fleet_WorkShop.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser {UserName = model.Email, Email = model.Email};
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+                    await SignInManager.SignInAsync(user, false, false);
+
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
@@ -161,9 +154,7 @@ namespace Fleet_WorkShop.Controllers
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)
-            {
                 return View("Error");
-            }
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
@@ -186,11 +177,8 @@ namespace Fleet_WorkShop.Controllers
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
+                if (user == null || !await UserManager.IsEmailConfirmedAsync(user.Id))
                     return View("ForgotPasswordConfirmation");
-                }
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
@@ -228,20 +216,13 @@ namespace Fleet_WorkShop.Controllers
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
             var user = await UserManager.FindByNameAsync(model.Email);
             if (user == null)
-            {
-                // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
-            {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
             AddErrors(result);
             return View();
         }
@@ -262,7 +243,8 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult ExternalLogin(string provider, string returnUrl)
         {
             // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
+            return new ChallengeResult(provider,
+                Url.Action("ExternalLoginCallback", "Account", new {ReturnUrl = returnUrl}));
         }
 
         //
@@ -272,12 +254,16 @@ namespace Fleet_WorkShop.Controllers
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (userId == null)
-            {
                 return View("Error");
-            }
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            var factorOptions = userFactors.Select(purpose => new SelectListItem {Text = purpose, Value = purpose})
+                .ToList();
+            return View(new SendCodeViewModel
+            {
+                Providers = factorOptions,
+                ReturnUrl = returnUrl,
+                RememberMe = rememberMe
+            });
         }
 
         //
@@ -288,18 +274,14 @@ namespace Fleet_WorkShop.Controllers
         public async Task<ActionResult> SendCode(SendCodeViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View();
-            }
 
             // Generate the token and send it
             if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
-            {
                 return View("Error");
-            }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction("VerifyCode",
+                new {Provider = model.SelectedProvider, model.ReturnUrl, model.RememberMe});
         }
-
 
 
         //
@@ -307,29 +289,26 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
+        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model,
+            string returnUrl)
         {
             if (User.Identity.IsAuthenticated)
-            {
                 return RedirectToAction("Index", "Manage");
-            }
 
             if (ModelState.IsValid)
             {
                 // Get the information about the user from the external login provider
                 var info = await AuthenticationManager.GetExternalLoginInfoAsync();
                 if (info == null)
-                {
                     return View("ExternalLoginFailure");
-                }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser {UserName = model.Email, Email = model.Email};
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        await SignInManager.SignInAsync(user, false, false);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -339,15 +318,14 @@ namespace Fleet_WorkShop.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View(model);
         }
-       
+
         //
         // POST: /Account/LogOff
-       // [HttpPost]
-       // [ValidateAntiForgeryToken]
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
-        public  ActionResult LogOff()
+        public ActionResult LogOff()
         {
-           
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Cache.SetExpires(DateTime.Now.AddHours(-1));
             Response.Cache.SetNoStore();
@@ -389,31 +367,22 @@ namespace Fleet_WorkShop.Controllers
         }
 
         #region Helpers
+
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
+        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
 
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
-            {
                 ModelState.AddModelError("", error);
-            }
         }
 
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
-            {
                 return Redirect(returnUrl);
-            }
             return RedirectToAction("Index", "Home");
         }
 
@@ -437,14 +406,13 @@ namespace Fleet_WorkShop.Controllers
 
             public override void ExecuteResult(ControllerContext context)
             {
-                var properties = new AuthenticationProperties { RedirectUri = RedirectUri };
+                var properties = new AuthenticationProperties {RedirectUri = RedirectUri};
                 if (UserId != null)
-                {
                     properties.Dictionary[XsrfKey] = UserId;
-                }
                 context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
             }
         }
+
         #endregion
     }
 }

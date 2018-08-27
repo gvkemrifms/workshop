@@ -6,7 +6,7 @@
         <th>
             @Html.DisplayNameFor(model => model.ManufacturerName)
         </th>
-        
+
         <th>
             @Html.DisplayNameFor(model => model.PartName)
         </th>
@@ -16,24 +16,25 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.ManufacturerName)
-        </td>
-        
-        <td>
-            @Html.DisplayFor(modelItem => item.PartName)
-        </td>
-  
-        <td>
-            @Html.DisplayFor(modelItem => item.Cost)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "EditSpares", new { id = item.Id }) |
-            @Html.ActionLink("Delete", "DeleteSpares", new { id = item.Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ManufacturerName)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.PartName)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Cost)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditSpares", new {id = item.Id}) |
+                @Html.ActionLink("Delete", "DeleteSpares", new {id = item.Id})
+            </td>
+        </tr>
+    }
 
 </table>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel;
 using System.Web.Mvc;
 
 namespace Fleet_WorkShop.Models
@@ -24,12 +20,14 @@ namespace Fleet_WorkShop.Models
         public int Id { get; set; }
         public SelectList Manufacturer { get; set; }
         public int ManufacturerId { get; set; }
+
         [DisplayName("Lubricant")]
         public string OilName { get; set; }
+
         [DisplayName("Cost/Litre")]
         public decimal CostPerLitre { get; set; }
+
         [DisplayName("Lubricant Number")]
         public string LubricantNumber { get; set; }
-
     }
 }

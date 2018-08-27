@@ -42,7 +42,20 @@
     #lblAmount, #lblBillAmount { text-align: left; }
 </style>
 
+<script type="text/javascript">
+    $(function() {
+        $("#myInput").on("keyup",
+            function() {
+                var value = $(this).val().toLowerCase();
+                $("table tr").filter(function() {
 
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                    $(this).prevAll('thead').first().show();
+                });
+
+            });
+    });
+</script>
 <script type="text/javascript">
     $(function() {
         $("#txtQuantity").keyup(function() {
@@ -52,25 +65,27 @@
 
     function Validations() {
 
-        var poDate = $('#txtPODate').val();
-        if (poDate === "") {
+        var PoDate = $('#txtPODate').val();
+        if (PoDate === "") {
             return alert('P.O Date is Mandatory');
         }
-        if (poDate > window.currentDate) {
+        var currentDate = new Date();
+        if (PoDate > currentDate) {
             return alert("P.O Date should not be greater than current date");
         }
-        var poNumber = $('#txtPONumber').val();
-        if (poNumber === "") {
+        var PoNumber = $('#txtPONumber').val();
+        if (PoNumber === "") {
             return alert('P.O Number is Mandatory');
         }
+
 
         var ddlmanufacturer = $('#ManufacturerName option:selected').text().toLowerCase();
         if (ddlmanufacturer === '--select--' || ddlmanufacturer === '') {
             return alert("Please select Manufacturer");
         }
-        var ddlsparepart = $('#SparePart option:selected').text().toLowerCase();
-        if (ddlsparepart === '--select--' || ddlsparepart === '') {
-            return alert("Please select SparePart");
+        var ddllubes = $('#Lubes option:selected').text().toLowerCase();
+        if (ddllubes === '--select--' || ddllubes === '') {
+            return alert("Please select Lubricant");
         }
         var quantity = $('#txtQuantity').val();
         if (quantity === "") {
@@ -101,17 +116,16 @@
     });
     $(document).ready(function() {
 
-        $("#SparePart").prop("disabled", true);
+        $("#Lubes").prop("disabled", true);
 
         $("#ManufacturerName").change(function() {
             if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
-                $('#SparePart option:selected').text("");
-                $('#SparePart').prop("disabled", true);
+                $('#Lubes option:selected').text("");
+                $('#Lubes').prop("disabled", true);
                 $('#txtunitprice').val('');
-                $('#lblpartnumber').text('');
                 return false;
             }
-            var serviceUrl = '/Inventory/GetSparePartsDetailsForManufacturer';
+            var serviceUrl = '/Inventory/GetLubesDetailsForManufacturer';
 
             var data = {
                 ManufacturerId: $('#ManufacturerName option:selected').val()
@@ -125,11 +139,11 @@
 
                 success: function(response) {
 
-                    $('#SparePart').empty();
-                    $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
+                    $('#Lubes').empty();
+                    $('#Lubes').append('<option value=0 selected="selected">--Select--</option>');
                     for (var i = 0; i < response.length; i++) {
 
-                        $('#SparePart').append("<option value='" +
+                        $('#Lubes').append("<option value='" +
                             response[i].split('-')[1] +
                             "' >" +
                             response[i].split('-')[0] +
@@ -137,34 +151,30 @@
 
                     }
 
-                    $('#SparePart').prop("disabled", false);
+                    $('#Lubes').prop("disabled", false);
 
 
                 }
-
             });
-
-
+            return true;
         });
     });
     $(function() {
-
-        $('#SparePart').change(function() {
-            var sparePartId = $('#SparePart option:selected').val();
-            if ($('#SparePart option:selected').text() === '--Select--') {
+        $('#Lubes').change(function() {
+            var lubricantId = $('#Lubes option:selected').val();
+            if ($('#Lubes option:selected').text() == '--Select--') {
                 $('#txtunitprice').val('');
-                $('#lblpartnumber').text('');
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetCostDetails/' + sparePartId,
-                data: JSON.stringify(sparePartId),
+                url: '/Inventory/GetLubesCostDetails/' + lubricantId,
+                data: JSON.stringify(lubricantId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response !== 0) {
+                    if (response != 0) {
                         $('#txtunitprice').val(response.Cost);
-                        $('#lblpartnumber').text(response.PartNumber);
+                        $('#lblLubricantNumber').text(response.LubricantNumber);
                     }
 
                 },
@@ -175,23 +185,28 @@
         });
     });
 
+
+    //function getValueOfSpares(dropDownValue) {
+    //    window.location.href = '/Inventory/GetCostDetails/' + dropDownValue;
+    //}
     function getFinalBillAmount() {
+
         var sum = parseFloat($("#lblAmount").text());
         $('.amt').each(function() {
             sum += parseFloat($(this).text());
         });
         $('#lblBillAmount').text(sum);
-
     }
 
     function getFinalBillAmount1() {
+
         var sum = 0;
         $('.amt').each(function() {
             sum += parseFloat($(this).text());
         });
         $('#lblBillAmount').text(sum);
-
     }
+
 
 </script>
 <script type="text/javascript">
@@ -205,11 +220,10 @@
         });
     });
 
-
     $(function() {
         var orderItems = [];
         $('#btnAdd').click(function() {
-            if ($('#ManufacturerName option:selected').text() == "--Select--" ||
+            if ($('#ManufacturerName option:selected').text() === "--Select--" ||
                 $('#ManufacturerName option:selected').text() === "") {
                 return false;
             }
@@ -220,14 +234,15 @@
             orderItems.push({
                 ManufacturerName: $('#ManufacturerName option:selected').text(),
                 ManufacturerId: $('#ManufacturerName option:selected').val(),
-                SparePartId: $('#SparePart').val(),
-                SparePartName: $('#SparePart option:selected').text(),
+                LubricantId: $('#Lubes').val(),
+                LubricantName: $('#Lubes option:selected').text(),
                 UnitPrice: $('#txtunitprice').val().trim(),
                 Quantity: $('#txtQuantity').val().trim(),
-                Amount: $('#lblAmount').text()
+                Amount: $('#lblAmount').text(),
             });
             generatedItemsTable();
-            $('#SparePart option:selected').text('--Select--');
+            $('#ManufacturerName option:selected').val(0);
+            $('#Lubes option:selected').text('--Select--');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');
@@ -241,7 +256,7 @@
                 var $table = $('<table id=tbl/>');
 
                 $table.append(
-                    '<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
+                    '<thead><tr><th>Manufacturer Name</th><th>Lubricant Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
                 $.each(orderItems,
@@ -251,7 +266,7 @@
 
                         $row.append($('<td/>').html(val.ManufacturerName));
 
-                        $row.append($('<td/>').html(val.SparePartName));
+                        $row.append($('<td/>').html(val.LubricantName));
 
                         $row.append($('<td/>').html(val.UnitPrice));
 
@@ -280,7 +295,7 @@
         }
 
         $('#btn').click(function() {
-            var serviceUrl = '/Inventory/SavePODetails';
+            var serviceUrl = '/Inventory/SaveLubesInventoryPODetails';
             var data = {
                 PoNumber: $('#txtPONumber').val(),
                 PoDate: $('#txtPODate').val(),
@@ -311,37 +326,36 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-        P.O Details
+        Lubricant Information
     </div>
     <div class="panel-body">
-
         <div class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="control-label  col-lg-4">P.O Number</label>
+                    <label class="control-label col-lg-4">P.O Number</label>
                     <div class="col-lg-8">
                         <input type="text" class="form-control" id="txtPONumber" placeholder="P.O Number">
                     </div>
                 </div>
-
-
             </form>
-
         </div>
         <div class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="control-label col-lg-4">P.O Date</label>
+                    <label class="control-label  col-lg-4">P.O Date</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtPODate" onkeypress="return false" placeholder="P.O Date">
+                        <input type="text" class="form-control" id="txtPODate" placeholder="P.O Date">
                     </div>
                 </div>
+
+
             </form>
         </div>
+
         <hr/>
         <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
             <div class="panel-heading">
-                Receipt Items
+                Orders
             </div>
             <div class="panel-body">
                 <div class="col-lg-6">
@@ -353,11 +367,11 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-lg-4">Spare Parts</label>
+                            <label class="control-label col-lg-4">Lubricant</label>
                             <div class="col-lg-8">
-                                @Html.DropDownList("SparePart", ViewBag.Spares as IEnumerable<SelectListItem>, "--Select--", new
+                                @Html.DropDownList("Lubes", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new
                                 {
-                                    @class = "form-control" @*, @onchange = "getValueOfSpares(this.value)"*@
+                                    @class = "form-control"
                                 })
                             </div>
                         </div>
@@ -398,7 +412,7 @@
                     </form>
                     <div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
                         <div class="col-lg-6">
-                            PartNumber <label id="lblpartnumber" class="form-control" style="color: red"></label>
+                            LubricantNumber <label id="lblLubricantNumber" class="form-control" style="color: red"></label>
                         </div>
                     </div>
                 </div>
@@ -406,7 +420,7 @@
 
                 <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
                     <div class="panel-heading">
-                        Item Details
+                        Order Details
                     </div>
                     <div class="panel-body" id="orderItems">
                     </div>
@@ -428,19 +442,9 @@
                 </div>
             </form>
         </div>
-        <input type="text" id="myInput" class="form-control" placeholder="Search Bill Number.." style="float: left; width: 300px;">
+
     </div>
-    <script type="text/javascript">
-        $(function() {
-            $("#myInput").on("keyup",
-                function() {
-                    var value = $(this).val().toLowerCase();
-                    $("tr").filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                    });
-                });
-        });
-    </script>
+
     <div class="panel-footer">
 
     </div>

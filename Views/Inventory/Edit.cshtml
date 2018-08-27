@@ -1,76 +1,66 @@
-﻿@model Fleet_WorkShop.Models.InventoryModel
-    <style>
+﻿@using System.Data
+@model Fleet_WorkShop.Models.InventoryModel
+<style>
     hr {
-        display: block;
         border-style: solid;
         border-width: 1px;
+        display: block;
     }
 </style>
 <style>
     span.error {
-        display: block;
-        visibility: hidden;
         color: red;
+        display: block;
         font-size: 90%;
+        visibility: hidden;
     }
 
 
-    .container td {
-        vertical-align: top;
-    }
+    .container td { vertical-align: top; }
 
     .tablecontainer table {
+        border-collapse: collapse;
+        border-right: 1px solid #BFAEAE;
+        border-top: 1px solid #BFAEAE;
         display: block;
         width: 100%;
-        border-collapse: collapse;
-        border-top: 1px solid #BFAEAE;
-        border-right: 1px solid #BFAEAE;
     }
 
-    .tablecontainer th {
-        border-bottom: 2px solid #BFAEAE !important;
-    }
+    .tablecontainer th { border-bottom: 2px solid #BFAEAE !important; }
 
     .tablecontainer th, .tablecontainer td {
-        text-align: left;
+        border-bottom: 1px solid #BFAEAE;
         border-left: 1px solid #BFAEAE;
         padding: 5px;
-        border-bottom: 1px solid #BFAEAE;
-    }
-
-    .ui-widget {
-        font-size: 12px !important;
-    }
-
-    #lblAmount, #lblBillAmount {
         text-align: left;
     }
+
+    .ui-widget { font-size: 12px !important; }
+
+    #lblAmount, #lblBillAmount { text-align: left; }
 </style>
 
 <script type="text/javascript">
-    
-    $(function () {
-        var prevAmount = $("#Amt").val();
-        var $bill = 0;
 
-        $("#Qty,#Uprice").blur(function () {
+    $(function() {
+        $("#Qty,#Uprice").blur(function() {
             var unitPrice = $("#Uprice").val();
-                var quantity = $("#Qty").val();
-                var amount = parseInt(unitPrice) * parseInt(quantity);
-                $("#Amt").val('');
-                $("#Amt").val(amount);
-           
+            var quantity = $("#Qty").val();
+            var amount = parseInt(unitPrice) * parseInt(quantity);
+            $("#Amt").val('');
+            $("#Amt").val(amount);
+
             $("#Amt").focus();
         });
-        $('#SparePartId').change(function () {
-            var SparePartId = $('#SparePartId option:selected').val();
+        $('#SparePartId').change(function() {
+            var sparePartId = $('#SparePartId option:selected').val();
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetSpareCostDetails/' + SparePartId,
-                data: JSON.stringify(SparePartId),
+                url: '/Inventory/GetSpareCostDetails/' + sparePartId,
+                data: JSON.stringify(sparePartId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     if (response != 0) {
                         $('#Uprice').val(response);
                         $('#Qty').val('');
@@ -78,26 +68,17 @@
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
             });
         });
 
     });
-    
-    $(function () {
+
+    $(function() {
         var orderItems = [];
-        @*$('#orderItems').html(@ViewBag.CartItems);*@
-       
-        $('#btnAdd').click(function () {
-        //    if ($('#Manufacturer option:selected').text() == "--Select--" || $('#Manufacturer option:selected').text() == "") {
-        //        return false;
-        //    }
-        //    if ($('#Qty').val().trim() == "") {
-        //        return false;
-        //    }
-           // getFinalBillAmount();
+        $('#btnAdd').click(function() {
             orderItems.push({
                 ManufacturerName: $('#ManufacturerId option:selected').text(),
                 ManufacturerId: $('#ManufacturerId option:selected').val(),
@@ -105,10 +86,9 @@
                 SparePartName: $('#SparePartId option:selected').text(),
                 UnitPrice: $('#Uprice').val().trim(),
                 Quantity: $('#Qty').val().trim(),
-                Amount: $('#Amt').val(),
+                Amount: $('#Amt').val()
             });
-            GeneratedItemsTable();
-            //$('#ManufacturerId option:selected').val(0);
+            generatedItemsTable();
             $('#SparePartId option:selected').text('--Select--');
             $('#Uprice').val('');
             $('#Qty').val('');
@@ -116,291 +96,238 @@
             return false;
 
         });
-        function GeneratedItemsTable() {
+
+        function generatedItemsTable() {
             if (orderItems.length > 0) {
 
                 var $table = $('<table id=tbl/>');
 
-                $table.append('<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
+                $table.append(
+                    '<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
-                $.each(orderItems, function (i, val) {
+                $.each(orderItems,
+                    function(i, val) {
 
-                    var $row = $('<tr/>');
+                        var $row = $('<tr/>');
 
-                    $row.append($('<td/>').html(val.ManufacturerName));
+                        $row.append($('<td/>').html(val.ManufacturerName));
 
-                    $row.append($('<td/>').html(val.SparePartName));
+                        $row.append($('<td/>').html(val.SparePartName));
 
-                    $row.append($('<td/>').html(val.UnitPrice));
+                        $row.append($('<td/>').html(val.UnitPrice));
 
-                    $row.append($('<td/>').html(val.Quantity));
-                    $row.append($('<td class=amt/>').html(val.Amount));
-                    var $remove = $('<a href="#">Remove</a>');
-                    $remove.click(function (e) {
-                        e.preventDefault();
-                        orderItems.splice(i, 1);
-                        GeneratedItemsTable();
-                        getFinalBillAmount1();
+                        $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td class=amt/>').html(val.Amount));
+                        var $remove = $('<a href="#">Remove</a>');
+                        $remove.click(function(e) {
+                            e.preventDefault();
+                            orderItems.splice(i, 1);
+                            generatedItemsTable();
+                            getFinalBillAmount1();
+                        });
+                        $row.append($('<td/>').html($remove));
+                        $tbody.append($row);
                     });
-                    $row.append($('<td/>').html($remove));
-                    $tbody.append($row);
-                });
 
                 $table.append($tbody);
 
                 $('#orderItems').html($table);
 
-            }
-            else {
+            } else {
                 $('#orderItems').html('');
                 $('#lblAmount').text('');
                 $('#txtQuantity').val('');
             }
         }
-        //$('#btn').click(function () {
-        //    var serviceURL = '/Inventory/SaveInventoryDetails';
-        //    var data = {
-        //        BillNo: $('#txtBillNumber').val(),
-        //        BillDate: $('#txtBillDate').val(),
-        //        VendorName: $('#Vendor option:selected').text(),
-        //        VendorId: $('#Vendor option:selected').val(),
-        //        BillAmount: $('#lblBillAmount').text(),
-        //        PoNumber: $('#txtPONumber').val(),
-        //        PoDate: $('#txtPODate').val(),
-        //        itemmodel: orderItems
-        //    };
-        //    $.ajax({
-        //        type: "POST",
-        //        url: serviceURL,
-        //        data: JSON.stringify(data),
-        //        contentType: "application/json; charset=utf-8",
-        //        dataType: "json",
-        //        success: function (response) {
-        //            if (response != 0) {
-        //                alert('Record Inserted');
-        //            }
-
-        //        },
-        //        failure: function (response) {
-        //            alert(response.responseText);
-        //        }
-        //    });
-        //});
-
     });
-    function getFinalBillAmount()
-    {
+
+    function getFinalBillAmount() {
 
         var sum = parseFloat($("#lblAmount").text());
-        $('.amt').each(function () {
+        $('.amt').each(function() {
             sum += parseFloat($(this).text());
         });
-        $('#lblBillAmount').text(sum)
-
+        $('#lblBillAmount').text(sum);
     }
 
 
-
 </script>
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
         Billing Edit
     </div>
-
-
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
 
         <div class="form-horizontal">
-
-            <hr />
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <hr/>
+            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
             @Html.HiddenFor(model => model.Id)
             <div class="col-lg-6">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        @Html.LabelFor(model => model.BillNo, htmlAttributes: new { @class = "control-label col-md-4" })
+                        @Html.LabelFor(model => model.BillNo, new {@class = "control-label col-md-4"})
                         <div class="col-md-8">
-                            @Html.EditorFor(model => model.BillNo, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.BillNo, "", new { @class = "text-danger" })
+                            @Html.EditorFor(model => model.BillNo, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.BillNo, "", new {@class = "text-danger"})
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(model => model.Manufacturer, htmlAttributes: new { @class = "control-label col-md-4" })
+                        @Html.LabelFor(model => model.Manufacturer, new {@class = "control-label col-md-4"})
                         <div class="col-md-8">
-                            @*@foreach (var man in Model.Manufacturer)
-                {
-
-                    if (man.Text == Model.ManName)
-                    {*@
-                            @*@Model.ManufacturerId = Convert.ToInt32(man.Value);*@
-                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.Manufacturer, "", new { @class = "text-danger" })
-                            @*}
-                }*@
+                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.Manufacturer, "", new {@class = "text-danger"})
                         </div>
                     </div>
-                    
-                    </form>
-</div>
-                <div class="col-lg-6">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.BillDate, htmlAttributes: new { @class = "control-label col-md-4" })
-                            <div class="col-md-8">
-                                @Html.EditorFor(model => model.BillDate, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(model => model.BillDate, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SpareParts, htmlAttributes: new { @class = "control-label col-md-4" })
-                            <div class="col-md-8">
-                                @*@foreach (var spare in Model.SpareParts)
-                            {
 
-                                if (spare.Text == Model.PartName)
-                                {*@
-                                @*@Model.SparePartId = Convert.ToInt32(spare.Value);*@
-                                @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.SpareParts, "", new { @class = "text-danger" })
-                                @*}
-                            }*@
-                            </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BillDate, new {@class = "control-label col-md-4"})
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.BillDate, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.BillDate, "", new {@class = "text-danger"})
                         </div>
-                    </form>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SpareParts, new {@class = "control-label col-md-4"})
+                        <div class="col-md-8">
+
+                            @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.SpareParts, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Uprice, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Uprice, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
+                        @Html.ValidationMessageFor(model => model.Uprice, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Amt, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Amt, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
+                        @Html.ValidationMessageFor(model => model.Amt, "", new {@class = "text-danger"})
+                    </div>
                 </div>
 
 
-                <div class="col-lg-6">
-                    @*<form class="form-horizontal">*@
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Uprice, htmlAttributes: new { @class = "control-label col-md-4" })
-                        <div class="col-md-8">
-                            @Html.EditorFor(model => model.Uprice, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
-                            @Html.ValidationMessageFor(model => model.Uprice, "", new { @class = "text-danger" })
-                        </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Qty, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Qty, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})
                     </div>
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Amt, htmlAttributes: new { @class = "control-label col-md-4" })
-                        <div class="col-md-8">
-                            @Html.EditorFor(model => model.Amt, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
-                            @Html.ValidationMessageFor(model => model.Amt, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    
-                    @*</form>*@
                 </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Qty, htmlAttributes: new { @class = "control-label col-md-4" })
-                        <div class="col-md-8">
-                            @Html.EditorFor(model => model.Qty, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
-                        </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10" style="margin-left: -180px">
+                        <input type="submit" id="btnAdd" style="background-color: blue; color: white; width: 70px" value="Add" class="btn btn-default"/>
                     </div>
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10" style="margin-left:-180px">
-                            <input type="submit" id="btnAdd" style="background-color:blue;color:white;width:70px" value="Add" class="btn btn-default" />
+                    <div class="tablecontainer panel panel-primary" style="height: 60%; margin-left: -700px; margin-top: 50px; width: 150%;">
+                        <div class="panel-heading">
+                            Added Items
                         </div>
-                        <div class="tablecontainer panel panel-primary" style="width: 150%;margin-left:-700px; height: 60%; margin-top:50px;"  >
-                            <div class="panel-heading">
-                                Added Items
-                            </div>
-                            <div class="panel-body" id="AddedItemsId">
-                                @*<div class="form-group" style="margin-left:-800px;margin-top:100px">*@
+                        <div class="panel-body" id="AddedItemsId">
 
-                                    <table border="1">
 
+                            <table>
+
+                                <tr>
+
+                                    <th>Manufacturer Name</th>
+
+                                    <th>SparePart Name</th>
+
+                                    <th>Unit Price</th>
+                                    <th>Quantity</th>
+                                    <th>Amount</th>
+
+                                </tr>
+
+                                @if (ViewBag.CartItems != null)
+
+                                {
+                                    foreach (DataRow dr in (ViewBag.CartItems as DataTable).Rows)
+
+                                    {
                                         <tr>
 
-                                            <th>Manufacturer Name</th>
+                                            <td>
 
-                                            <th>SparePart Name</th>
+                                                @dr["ManufacturerName"]
 
-                                            <th>Unit Price</th>
-                                            <th>Quantity</th>
-                                            <th>Amount</th>
+                                            </td>
 
+                                            <td>
+
+                                                @dr["PartName"]
+
+                                            </td>
+
+                                            <td>
+
+                                                @dr["UnitPrice"]
+
+                                            </td>
+                                            <td>
+
+                                                @dr["Quantity"]
+
+                                            </td>
+                                            <td>
+
+                                                @dr["Amount"]
+
+                                            </td>
+                                            <td>
+                                                <a href="#">Remove</a>
+                                            </td>
                                         </tr>
+                                    }
+                                }
 
-                                        @if (ViewBag.CartItems != null)
+                            </table>
 
-                                        {
 
-                                            foreach (System.Data.DataRow dr in (ViewBag.CartItems as System.Data.DataTable).Rows)
-
-                                            {
-
-                                                <tr>
-
-                                                    <td>
-
-                                                        @dr["ManufacturerName"]
-
-                                                    </td>
-
-                                                    <td align="left">
-
-                                                        @dr["PartName"]
-
-                                                    </td>
-
-                                                    <td>
-
-                                                        @dr["UnitPrice"]
-
-                                                    </td>
-                                                    <td>
-
-                                                        @dr["Quantity"]
-
-                                                    </td>
-                                                    <td>
-
-                                                        @dr["Amount"]
-
-                                                    </td>
-                                                    <td>
-                                                        <a href="#">Remove</a>
-                                                    </td>
-                                                </tr>
-
-                                            }
-
-                                        }
-
-                                    </table>
-
-                               
-                            </div>
-
-                        </div>
-                        
-
-                    </div>
-                    <div class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 50px;" align="center">
-                        <div class="panel-heading">
-                            Order New Items
-                        </div>
-                        <div class="panel-body" id="orderItems">
                         </div>
 
                     </div>
+
+
                 </div>
-            
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10" style="margin-top:20px;margin-left:-60px">
-                        <input type="submit" id="btnEdit" style="background-color:blue;color:white;width:100px" value="Save" class="btn btn-default" />
+                <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 50px; width: 100%;" align="center">
+                    <div class="panel-heading">
+                        Order New Items
                     </div>
-                </div>
+                    <div class="panel-body" id="orderItems">
+                    </div>
 
-           
+                </div>
             </div>
-           
-    }
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10" style="margin-left: -60px; margin-top: 20px;">
+                    <input type="submit" id="btnEdit" style="background-color: blue; color: white; width: 100px" value="Save" class="btn btn-default"/>
+                </div>
+            </div>
+
+
         </div>
-    <div>
-        @Html.ActionLink("Back", "SaveInventoryDetails")
-    </div>
+    }
+</div>
+<div>
+    @Html.ActionLink("Back", "SaveInventoryDetails")
+</div>

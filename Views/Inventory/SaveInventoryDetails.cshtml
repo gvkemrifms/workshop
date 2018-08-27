@@ -125,47 +125,53 @@
 
         $("#ManufacturerName").change(function () {
             if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
-                $('#SparePart option:selected').text("");
+                $("#SparePart").val('0');
                 $('#SparePart').prop("disabled", true);
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
                 return false;
             }
-            var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
-           
-            var data = {
-                ManufacturerId: $('#ManufacturerName option:selected').val()
+            else
+            {
+                $('#SparePart').prop("disabled", false);
             }
-            $.ajax({
-                url: serviceURL,
-                type: "POST",
-                data: JSON.stringify(data),
-                datatype: "json",
-                contentType: 'application/json',
-
-                success: function (Response) {
-
-                    $('#SparePart').empty();
-                    $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
-                    for (var i = 0; i < Response.length; i++) {
-
-                        $('#SparePart').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
-
-                    }
-
-                    $('#SparePart').prop("disabled", false);
-
-
-                }
-                //error : function (err) {
-                //    alert("Error in Getting Vehicles!!");
-                //}
-
-            });
-
-
         });
     });
+    //        var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
+           
+    //        var data = {
+    //            ManufacturerId: $('#ManufacturerName option:selected').val()
+    //        }
+    //        $.ajax({
+    //            url: serviceURL,
+    //            type: "POST",
+    //            data: JSON.stringify(data),
+    //            datatype: "json",
+    //            contentType: 'application/json',
+
+    //            success: function (Response) {
+
+    //                $('#SparePart').empty();
+    //                $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
+    //                for (var i = 0; i < Response.length; i++) {
+
+    //                    $('#SparePart').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+    //                }
+
+    //                $('#SparePart').prop("disabled", false);
+
+
+    //            }
+    //            //error : function (err) {
+    //            //    alert("Error in Getting Vehicles!!");
+    //            //}
+
+    //        });
+
+
+    //    });
+    //});
     $(function () {
       
         $('#SparePart').change(function () {
@@ -195,7 +201,7 @@
         });
     });
     $(function () {
-        
+        $("#SparePart").prop("disabled", false);
         var serviceURL = '/Inventory/GetSparePODetails';
         $('#txtPONumber').blur(function () {
             var data = {
@@ -213,12 +219,26 @@
                     if (response <= 0) {
                         alert('Please enter valid P.O Number');
                         $('#txtPONumber').val('');
+                        $('#poReceiptDetails').empty();
                     }
                     else
                     {
-             
+                        
                         $('#txtPODate').val(response[0].PoDate);
+                        $('#ManufacturerName').empty();
+                        $('#ManufacturerName').append('<option value=0 selected="selected">--Select--</option>');
                         GeneratePODetailsList(response);
+                        var Id = response[0].ManufacturerId;
+                        var Name = response[0].ManufacturerName;
+                        $('#ManufacturerName').append("<option value='" + Id + "' >" + Name + "</option>");
+                        $('#SparePart').empty();
+                        $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
+                        for(i=0;i<=response.length;i++)
+                        {
+                            $('#SparePart').append("<option value='" + response[i].SparePartId + "' >" + response[i].PartName + "</option>");
+                        }
+                            //$('#ManufacturerName').append("<option value=1>Maruti</option>");
+                        $("#SparePart").prop("disabled", false);
                     }
 
                 },
@@ -227,8 +247,8 @@
                 }
             });
             function GeneratePODetailsList(response) {
+               
                 var res = JSON.stringify(response);
-  alert(res)
                 if (res.length > 0) {
 
                     var $table = $('<table id=tbl/>');
@@ -251,14 +271,6 @@
                         $row.append($('<td/>').html(response[i].ReceivedQuantity));
                         $row.append($('<td />').html(response[i].PendingQuantity));
                         $row.append($('<td />').html(response[i].LastReceivedDate));
-                        //var $remove = $('<a href="#">Remove</a>');
-                        //$remove.click(function (e) {
-                        //    e.preventDefault();
-                        //    orderItems.splice(i, 1);
-                        //    GeneratedItemsTable();
-                        //    getFinalBillAmount1();
-                        //});
-                        //$row.append($('<td/>').html($remove));
                         $tbody.append($row);
                     }
                     //});
@@ -317,6 +329,9 @@
         $('#btnAdd').click(function () {
             if ($('#ManufacturerName option:selected').text() == "--Select--" || $('#ManufacturerName option:selected').text() == "")
             {
+                $('#SparePart').val('');
+                $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
                 return false;
             }
             if ($('#txtQuantity').val().trim() == "")
@@ -334,10 +349,11 @@
                 Amount: $('#lblAmount').text(),
             });
             GeneratedItemsTable();
-            $('#SparePart option:selected').text('--Select--');
-            $('#txtunitprice').val('');
-            $('#txtQuantity').val('');
-            $('#lblAmount').text('');
+            
+                $('#txtunitprice').val('');
+                $('#txtQuantity').val('');
+                $('#lblAmount').text('');
+         
             return false;
 
         });
@@ -491,7 +507,7 @@
         </div>
 
         <hr />
-        <div class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+        <div class="tablecontainer panel panel-primary" style="width:100%; height: 100%; margin-top: 20px;" align="center">
             <div class="panel-heading">
                 P.O Details
             </div>
@@ -512,7 +528,8 @@
                         <div class="form-group">
                             <label class="control-label col-lg-4">Manufacturer</label>
                             <div class="col-lg-8">
-                                @Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                                @*@Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
+                                <select id="ManufacturerName" class="form-control" > </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -573,17 +590,13 @@
                             </div>
                             <div class="panel-body" id="orderItems">
                             </div>
+                            
                             </div>
-                       
-                   
-                    </div>
-
-                </div>
                 <div class="col-lg-6 col-lg-offset-6" style="margin-top:auto">
                     <form class="form-horizontal">
                         <div class="form-group">
                             <div class="col-sm-4">
-                                <button type="submit" id="btn" class="btn btn-default"  onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                                <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
                             </div>
                             <div class="col-sm-2">
                                 <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>
@@ -591,7 +604,7 @@
                         </div>
                     </form>
                 </div>
-        <input type="text" id="myInput" class="form-control"  placeholder="Search Bill Number.." style="width:300px;float:left" align="left">
+                <input type="text" id="myInput" class="form-control" placeholder="Search Bill Number.." style="width:300px;float:left" align="left">
                 <div class="col-lg-6" style="width:100%">
                     <form class="form-horizontal">
                         <div class="form-group">
@@ -603,6 +616,11 @@
                     </form>
 
                 </div>
+                    </div>
+           
+                </div>
+               
+       
             </div>
     <script type="text/javascript">
         $(function () {
@@ -617,7 +635,8 @@
             <div class="panel-footer">
 
             </div>
-        </div>
+       
+
 
 
 

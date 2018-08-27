@@ -1,7 +1,7 @@
 ﻿@model Aggregates
 
 
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
         Edit Categories
     </div>
@@ -11,34 +11,34 @@
 
         <div class="form-horizontal">
 
-            <hr />
+            <hr/>
             <div class="form-group">
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                @Html.LabelFor(model => model.AggregateList, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                @Html.LabelFor(model => model.AggregateList, new {@class = "control-label col-md-2"})
                 <div class="col-md-8">
-                    @Html.DropDownListFor(model => model.AggregateId, Model.AggregateList, "--Select--", new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.AggregateList, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor(model => model.AggregateId, Model.AggregateList, "--Select--", new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.AggregateList, "", new {@class = "text-danger"})
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.CategoryName, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.CategoryName, new {@class = "control-label col-md-2"})
                 <div class="col-md-8">
-                    @Html.EditorFor(model => model.CategoryName, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.CategoryName, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.CategoryName, "", new {@class = "text-danger"})
                 </div>
             </div>
 
 
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" value="Save" class="btn btn-default" />
+                    <input type="submit" value="Save" class="btn btn-default"/>
                 </div>
             </div>
         </div>
     }
 </div>
-  
-    <div>
-        @Html.ActionLink("Back", "CategoryGroup")
-    </div>
+
+<div>
+    @Html.ActionLink("Back", "CategoryGroup")
+</div>

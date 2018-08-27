@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.LubesModel>
 @{
-    WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
+    var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 
 <table class="table">
     <tr>
@@ -21,25 +21,26 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.ManufacturerId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.OilName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CostPerLitre)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LubricantNumber)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "LubesMasterEdit", new { id = item.Id }) |
-            @Html.ActionLink("Delete", "DeleteLubesMaster", new { id= item.Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ManufacturerId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OilName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CostPerLitre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LubricantNumber)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "LubesMasterEdit", new {id = item.Id}) |
+                @Html.ActionLink("Delete", "DeleteLubesMaster", new {id = item.Id})
+            </td>
+        </tr>
+    }
 
 </table>

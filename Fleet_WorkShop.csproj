@@ -377,6 +377,7 @@
     <Content Include="Views\Reports\_GetVehicleWiseStocksReportDetails.cshtml" />
     <Content Include="Views\Reports\GetVehicleWiseLubesReport.cshtml" />
     <Content Include="Views\Inventory\SavePODetails.cshtml" />
+    <Content Include="Views\Inventory\SaveLubesInventoryPODetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

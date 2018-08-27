@@ -1,9 +1,9 @@
 ﻿@model IEnumerable<Aggregates>
 
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <table class="table">
     <tr>
-     
+
         <th>
             @Html.DisplayNameFor(model => model.ServiceId)
         </th>
@@ -16,28 +16,29 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
+    @foreach (var item in Model)
+    {
+        <tr>
 
-        <td>
-            @Html.DisplayFor(modelItem => item.ServiceId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ServiceName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ManufacturerName)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "EditSubCategories", new {  id=item.ServiceId  }) |
-           @Ajax.ActionLink("Delete", "DeleteSubCategories", new { id = item.IdCategory }, new AjaxOptions()
-      {
-          HttpMethod = "Delete",
-          Confirm = "Are you sure you want to delete this Record?",
-          OnComplete = "function() { $(this).parent().parent().remove() }"
-      })
-        </td>
-    </tr>
-}
+            <td>
+                @Html.DisplayFor(modelItem => item.ServiceId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ServiceName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ManufacturerName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditSubCategories", new {id = item.ServiceId}) |
+                @Ajax.ActionLink("Delete", "DeleteSubCategories", new {id = item.IdCategory}, new AjaxOptions
+                {
+                    HttpMethod = "Delete",
+                    Confirm = "Are you sure you want to delete this Record?",
+                    OnComplete = "function() { $(this).parent().parent().remove() }"
+                })
+            </td>
+        </tr>
+    }
 
 </table>

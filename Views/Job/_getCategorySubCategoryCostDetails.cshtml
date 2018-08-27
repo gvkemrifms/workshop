@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Aggregates>
 
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <table class="table">
     <tr>
         <th>
@@ -32,9 +32,9 @@
                 @Html.DisplayFor(modelItem => item.ApproxCost)
             </td>
             <td>
-                @Html.ActionLink("Edit", "EditSubCategoryCostDetails", new {  id=item.ServiceId })
+                @Html.ActionLink("Edit", "EditSubCategoryCostDetails", new {id = item.ServiceId})
 
-                    @*@Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+                @*@Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
             </td>
         </tr>
     }

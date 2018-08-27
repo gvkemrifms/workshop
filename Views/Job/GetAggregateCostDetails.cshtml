@@ -1,9 +1,9 @@
 ﻿@model IEnumerable<Aggregates>
 
 
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-       Aggregates Cost
+        Aggregates Cost
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -11,17 +11,16 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">Vendor</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("Aggregates", ViewBag.Aggregates as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        @Html.DropDownList("Aggregates", ViewBag.Aggregates as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Bill Amount</label>
                     <div class="col-lg-8">
                         <label id="lblBillAmount" class="form-control"></label>
-                        @*<input type="text" class="form-control" id="txtContactNumber" placeholder="Contact Number" maxlength="10">*@
                     </div>
                 </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
+</div>

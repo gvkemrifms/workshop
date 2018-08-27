@@ -11,11 +11,11 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult Index()
         {
             if (Session["Employee_Id"] == null)
-               return RedirectToAction("Login","Account");
+                return RedirectToAction("Login", "Account");
             ViewBag.Email = UserName;
             return View();
         }
-       
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
@@ -29,9 +29,9 @@ namespace Fleet_WorkShop.Controllers
 
             return View();
         }
-        
+
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
-        public  ActionResult LogOff()
+        public ActionResult LogOff()
         {
             Session.RemoveAll();
             Session.Abandon();
@@ -39,7 +39,7 @@ namespace Fleet_WorkShop.Controllers
             Response.Cache.SetExpires(DateTime.Now.AddHours(-1));
             Response.Cache.SetNoStore();
             //AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-          return RedirectToAction("Login","Account");
+            return RedirectToAction("Login", "Account");
         }
     }
 }
