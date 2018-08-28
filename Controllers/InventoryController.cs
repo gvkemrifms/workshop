@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -299,6 +300,8 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SaveInventoryDetails(InventoryModel model)
         {
+            var poQuantitySpares = Session["PoQuantitySpares"] as IEnumerable<GetPODetailsSpareParts>;
+         
             if (model == null) throw new ArgumentNullException(nameof(model));
             var billDetails = new InventoryModel
             {
@@ -315,8 +318,18 @@ namespace Fleet_WorkShop.Controllers
                 billDetails.BillAmount, billDetails.VendorId, billDetails.PoNumber, billDetails.PoDate,
                 billDetails.WorkShopId);
             foreach (var items in model.itemmodel)
+            {
                 _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails", model.BillNo, items.ManufacturerId,
                     items.SparePartId, items.UnitPrice, items.Quantity, items.Amount, model.VendorId);
+                foreach (var poitem in poQuantitySpares)
+                {
+                    if (poitem.SparePartId == items.SparePartId)
+                    {
+                        _helper.UpdateSparePartsPoDetails("UpdateSparePartsPODetails", poitem.ReceivedQuantity+items.Quantity, model.BillDate, items.ManufacturerId, items.SparePartId, model.PoNumber);
+                    }
+                }
+               
+            }
             CommonMethod(model);
             return RedirectToAction("SaveInventoryDetails");
         }
@@ -653,6 +666,7 @@ namespace Fleet_WorkShop.Controllers
                     ManufacturerName = manufacturerName,
                     SparePartId = x.Field<int>("sparepartId")
                 });
+            Session["PoQuantitySpares"] = podatailsSpares;
             return Json(podatailsSpares, JsonRequestBehavior.AllowGet);
         }
 

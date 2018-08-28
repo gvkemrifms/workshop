@@ -1,68 +1,30 @@
 ﻿@model IEnumerable<JobCardPendingCases>
 
 @{
-    WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
+    var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <script type="text/javascript">
-    $(function(){
-        $('#btnSubmit').filter(function () {
+    $(function() {
+        $('#btnSubmit').filter(function() {
             $(this).hide();
-          
-        })
-    })
-    
-    var vehicleNumber=0;
-    $(function () {
-        $('#VehicleNumber').click(function ()
-        {      
-            vehicleNumber = $(this).text()
+
+        });
+    });
+
+    var vehicleNumber = 0;
+    $(function() {
+        $('#VehicleNumber').click(function() {
+            vehicleNumber = $(this).text();
             $('#tblCost').empty();
-            //$.ajax({
-            //    type: "Post",
-            //    url: '/Vehicle/GetPendingStatusDetails',
-            //    data: JSON.stringify(data),
-            //    contentType: "application/json; charset=utf-8",
-            //    dataType: "json",
-            //    success: function (response) {
-            //        if (response != null) {
-            //            alert(response);
-            //        }
 
-            //    },
-            //    failure: function (response) {
-            //        alert(response.responseText);
-            //    }
-            //});
-            $(window).scrollTop($('#pendingDivId').offset().top)           
-        })
-    })
+            $(window).scrollTop($('#pendingDivId').offset().top);
+        });
+    });
 
-    $(function () {
+    $(function() {
         var orderItems = [];
-        $('#btnAdd').click(function () {
-         
-           
-            //var data = {
-            //    SparePartId: $('#SpareParts').val()
-            //};
-                                          
-            //$.ajax({
-            //    type: "POST",
-            //    url: '/Vehicle/GetSparePartCost',
-            //    data: JSON.stringify(data),
-            //    contentType: "application/json; charset=utf-8",
-            //    dataType: "json",
-            //    success: function (response) {
-            //        if (response != null) {
-            //            alert(response);
-            //        }
-
-            //    },
-            //    failure: function (response) {
-            //        alert(response.responseText);
-            //    }
-            //});
+        $('#btnAdd').click(function() {
             $('#btnSubmit').show();
             orderItems.push({
                 VehicleNumber: vehicleNumber,
@@ -74,104 +36,84 @@
                 Status: $('input[type="radio"]').val(),
                 WorkShopName: $('#WorkShopName').text()
             });
-            GeneratedItemsTable();
+            generatedItemsTable();
             return false;
 
         });
-        function GeneratedItemsTable() {
+
+        function generatedItemsTable() {
             if (orderItems.length > 0) {
 
                 var $table = $('<table id=tbl/>');
 
-                $table.append('<thead><tr><th>Vehicle Number</th><th>SpareParts Name</th><th>Quantity</th><th>HandOver To</th></tr></thead>');
+                $table.append(
+                    '<thead><tr><th>Vehicle Number</th><th>SpareParts Name</th><th>Quantity</th><th>HandOver To</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
-                $.each(orderItems, function (i, val) {
+                $.each(orderItems,
+                    function(i, val) {
 
-                    var $row = $('<tr/>');
+                        var $row = $('<tr/>');
 
-                    $row.append($('<td/>').html(val.VehicleNumber));
+                        $row.append($('<td/>').html(val.VehicleNumber));
 
-                    $row.append($('<td/>').html(val.SparePartName));
+                        $row.append($('<td/>').html(val.SparePartName));
 
-                    $row.append($('<td/>').html(val.Quantity));
-                    $row.append($('<td class=amt/>').html(val.HandOverToName));
-                    var $remove = $('<a href="#">Remove</a>');
-                    $remove.click(function (e) {
-                        e.preventDefault();
-                        orderItems.splice(i, 1);
-                        GeneratedItemsTable();
+                        $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td class=amt/>').html(val.HandOverToName));
+                        var $remove = $('<a href="#">Remove</a>');
+                        $remove.click(function(e) {
+                            e.preventDefault();
+                            orderItems.splice(i, 1);
+                            generatedItemsTable();
+                        });
+                        $row.append($('<td/>').html($remove));
+                        $tbody.append($row);
                     });
-                    $row.append($('<td/>').html($remove));
-                    $tbody.append($row);
-                });
 
                 $table.append($tbody);
 
                 $('#orderItems').html($table);
 
-            }
-            else {
+            } else {
                 $('#orderItems').html('');
             }
         }
-      
-        $('#btnSubmit').click(function () {
+
+        $('#btnSubmit').click(function() {
             if (orderItems.length > 0) {
-                var serviceURL = '/Vehicle/SaveCalculateFIFO';
+                var serviceUrl = '/Vehicle/SaveCalculateFIFO';
             }
-           
-       
-            var data = {              
-                
+
+
+            var data = {
                 itemmodel: orderItems
             };
             $.ajax({
                 type: "POST",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
-                    if (response != 0) {
+                success: function(response) {
+                    if (response !== 0) {
                         alert('Record Inserted');
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
             });
         });
 
     });
-    //function PopupDialog() {
-    //    $("#pendingDivId").dialog({
-    //        buttons: [
-    //          {
-    //              text: "Ok",
-    //              icon: "ui-icon-heart",                
-    //              closeText: "hide",
-    //              click: function () {
-    //                  $(this).dialog("close");
-    //              }
-
-    //              // Uncommenting the following line would hide the text,
-    //              // resulting in the label being used as a tooltip
-    //              //showText: false
-    //          }
-    //        ],
-    //        height:200,
-    //        width:300,
-    //    });
-        
-    //}
 </script>
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-       Job Card
+        Job Card
     </div>
-    <table class="table" style="margin-top:40px;width:750px" align="center">
+    <table class="table" style="margin-top: 40px; width: 750px" align="center">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.VehicleNumber)
@@ -194,27 +136,20 @@
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
-       
+
             <th>
                 @Html.DisplayNameFor(model => model.JobCardNumber)
             </th>
-          
+
         </tr>
 
         @foreach (var item in Model)
         {
             <tr>
                 <td>
-                    @Html.ActionLink(item.VehicleNumber, "EditPendingStatusDetails1", new { id=item.VehicleId })
-                    @*@Ajax.ActionLink(item.VehicleNumber, "EditPendingStatusDetails", new { id = item.VehicleId }, new AjaxOptions()
-       {
-           HttpMethod = "Get",
-           UpdateTargetId = "pendingDivId",
-           InsertionMode = InsertionMode.Replace}, new { @class = "myclass" })*@
+                    @Html.ActionLink(item.VehicleNumber, "EditPendingStatusDetails1", new {id = item.VehicleId})
+
                 </td>
-                @*<td>
-                        @Html.DisplayFor(modelItem => item.VehicleNumber)block
-                    </td>*@
                 <td>
                     @Html.DisplayFor(modelItem => item.DistrictName)
                 </td>
@@ -236,73 +171,22 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.JobCardNumber)
                 </td>
-
-                @*<td>
-                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-                    </td>*@
             </tr>
         }
 
     </table>
-    <br />
+    <br/>
 
-    <div style="width:400px;margin-top:20px;margin-bottom:140px" id="pendingDivId" align="center">
-        
+    <div style="margin-bottom: 140px; margin-top: 20px; width: 400px;" id="pendingDivId" align="center">
+
     </div>
-    <div class="col-lg-6" style="margin-top:-70px;margin-left:100px;">
+    <div class="col-lg-6" style="margin-left: 100px; margin-top: -70px;">
         <form class="form-horizontal">
-
-            @*<div class="form-group">
-                <label class="control-label  col-lg-3">Spare Parts</label>
-                <div class="col-lg-4">
-                   
-                    @Html.DropDownList("SpareParts", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
-                </div>
-            </div>*@
-            @*<div class="form-group">
-                <label class="control-label col-lg-2" style="margin-left:280px;margin-top:-50px;">Quantity</label>
-                <div class="col-lg-4">
-                    <input type="text" class="form-control" style="margin-top:-50px;margin-left:350px" id="txtQuantity" placeholder="Quantity">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-lg-2">
-                    <label class="control-label  col-lg-2" style="margin-left:490px;margin-top:-68px;">HandOver</label>
-                </div>
-                <div class="col-lg-4">
-                    @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style = "margin-top:-67px;margin-left:500px", @placeholder = "HandOver To" })
-                    @*<input type="text" class="form-control" style="margin-top:-67px;margin-left:490px" id="txtSalary" placeholder="Quantity">*@
-                @*</div>
-
-            </div>
-            <div class="form-group">
-                <div class="col-lg-2">
-                    <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue;margin-left:760px;margin-top:-150px; color: white">Add</button>
-                </div>
-                <div class="col-lg-6">
-                    <table id="tblCost" align="center"></table>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-lg-4">
-                    <div class="panel-body" id="orderItems"></div>
-
-                </div>
-                </div>
-                <div class="col-lg-6">
-                    <input name="clkradio" type="radio" value="Inprogress" />In progress
-                    <input style="margin-left:30px" name="clkradio" type="radio" value="Completed" />Completed
-                </div>
-                <div>
-                    <button type="submit" id="btnSubmit" class="btn btn-default" style="background-color: blue; color: white;">Submit</button>
-                </div>*@
-</form>
+        </form>
     </div>
-            <div class="panel-body" id="orderItems" style="margin-top:50px;" align="center" ></div>
-    
-        <div class="panel-footer">
+    <div class="panel-body" id="orderItems" style="margin-top: 50px;" align="center"></div>
 
-        </div>
+    <div class="panel-footer">
+
     </div>
+</div>

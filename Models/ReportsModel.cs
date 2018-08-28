@@ -44,5 +44,15 @@ namespace Fleet_WorkShop.Models
         public string HandOverTo { get; set; }
         public DateTime IssuedDate { get; set; }
         public string Status { get; set; }
+        public string District { get; set; }
+        public DateTime DateOfRepair { get; set; }
+        public DateTime DateOfDelivery { get; set; }
+        public string Aggregate { get; set; }
+        public string Mechanic { get; set; }
+        public string Category { get; set; }
+        public string SubCategory { get; set; }
+        public int ManufacturerName { get; internal set; }
+        public string Lubricant { get; internal set; }
+        public string ServiceIncharge { get; internal set; }
     }
 }

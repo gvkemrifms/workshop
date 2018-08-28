@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
 
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <table class="table">
     <tr>
         <th>
@@ -33,37 +33,41 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Workshop)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Vehicle)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Sparepart)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Quantity)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Amount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.JobcardId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.HandOverTo)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IssuedDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Status)
-        </td>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Workshop)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vehicle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sparepart)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobcardId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HandOverTo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IssuedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
 
-    </tr>
-}
+        </tr>
+    }
 
 </table>
+<div>
+    @*@Html.ActionLink("Back", "GetJobCardDetails")*@
+</div>

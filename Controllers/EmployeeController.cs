@@ -241,5 +241,28 @@ namespace Fleet_WorkShop.Controllers
             var list = dtCheckIds.AsEnumerable().Select(x => x.Field<string>("empid")).FirstOrDefault();
             return list == null ? null : Json(list, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult PettyExpenses()
+        {
+            if (Session["Employee_Id"] == null)
+                return RedirectToAction("Login", "Account");
+            int workShopId = Convert.ToInt32(Session["WorkshopId"]);
+            string query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
+           DataTable dtworkshopName=_helper.ExecuteSelectStmt(query);
+            ViewBag.WorkShopName = dtworkshopName.AsEnumerable().Select(x => x.Field<string>("workshop_name"))
+                .FirstOrDefault();
+            string typeExpenseQuery = "select * from m_PettyExpenseTypeHeads";
+            DataTable dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
+            ViewBag.TypeOfExpense = new SelectList(dtTypeOfExpense.AsDataView(), "Id", "ExpenseType");
+            return View();
+        }
+        [HttpPost]
+        public ActionResult PettyExpenses(PettyExpenses expenses)
+        {
+            int workShopId = Convert.ToInt32(Session["WorkshopId"]);
+           int result= _helper.ExecuteInsertPettyDetails("spInsertPettyExpenses", Convert.ToInt32(workShopId), Convert.ToInt32(expenses.TypeOfExpense),
+                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
     }
 }

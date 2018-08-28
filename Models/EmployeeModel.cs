@@ -78,4 +78,13 @@ namespace Fleet_WorkShop.Models
         public IEnumerable<SelectListItem> DepartmentName { get; set; }
         public IEnumerable<SelectListItem> Designation { get; set; }
     }
+
+    public class PettyExpenses
+    {
+        //public int WorkShopId { get; set; }
+        public string WorkShopName { get; set; }
+        public int TypeOfExpense { get; set; }
+        public DateTime Date { get; set; }
+        public decimal Amount { get; set; }
+    }
 }

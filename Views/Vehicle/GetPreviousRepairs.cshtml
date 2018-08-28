@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<JobCardPendingCases>
 
 @{
-    WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
+    var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 
-<table class="table" style="margin-top:30px">
+<table class="table" style="margin-top: 30px">
     <tr>
-        
+
         <th>
             @Html.DisplayNameFor(model => model.WorkShopName)
         </th>
@@ -16,7 +16,7 @@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.JobCardNumber)
-        </th>  
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.DistrictName)
         </th>
@@ -26,61 +26,53 @@
         <th>
             @Html.DisplayNameFor(model => model.DateOfRepair)
         </th>
-        
-        
-       
+
+
         <th>
             @Html.DisplayNameFor(model => model.Status)
         </th>
-        
-                       
-       
+
+
         <th>
             @Html.DisplayNameFor(model => model.LaborCharges)
         </th>
-      
+
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-       
-        <td>
-            @Html.DisplayFor(modelItem => item.WorkShopName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.VehicleNumber)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.JobCardNumber)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DistrictName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AggregateName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateOfRepair)
-        </td>
- 
-        <td>
-            @Html.DisplayFor(modelItem => item.Status)
-        </td>
-        
-        
-       
-        <td>
-            @Html.DisplayFor(modelItem => item.LaborCharges)
-        </td>
-  
-        <td>
-            @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkShopName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VehicleNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobCardNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DistrictName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AggregateName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfRepair)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+
+
+            <td>
+                @Html.DisplayFor(modelItem => item.LaborCharges)
+            </td>
+        </tr>
+    }
 
 </table>
 

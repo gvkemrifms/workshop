@@ -1,66 +1,59 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.InventoryModel>
 
 
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <style>
  
     hr {
-        display: block;        
-        border-style:solid;
+        border-style: solid;
         border-width: 1px;
+        display: block;
     }
 </style>
 <style>
  
 
     span.error {
-        display: block;
-        visibility: hidden;
         color: red;
+        display: block;
         font-size: 90%;
+        visibility: hidden;
     }
 
 
-    .container td {
-        vertical-align: top;
-    }
+    .container td { vertical-align: top; }
 
     .tablecontainer table {
-        display:block;
-        width: 100%;
         border-collapse: collapse;
-        border-top: 1px solid #BFAEAE;
         border-right: 1px solid #BFAEAE;
+        border-top: 1px solid #BFAEAE;
+        display: block;
+        width: 100%;
     }
 
-    .tablecontainer th {
-        border-bottom: 2px solid #BFAEAE !important;
-    }
+    .tablecontainer th { border-bottom: 2px solid #BFAEAE !important; }
 
     .tablecontainer th, .tablecontainer td {
-        text-align: left;
+        border-bottom: 1px solid #BFAEAE;
         border-left: 1px solid #BFAEAE;
         padding: 5px;
-        border-bottom: 1px solid #BFAEAE;
+        text-align: left;
     }
 
-    .ui-widget {
-        font-size: 12px !important;
-    }
-    #lblAmount,#lblBillAmount
-    {
-        text-align:left;
-    }
+    .ui-widget { font-size: 12px !important; }
+
+    #lblAmount, #lblBillAmount { text-align: left; }
 </style>
 
 
 <script type="text/javascript">
-    $(function () {
-        $("#txtQuantity").keyup(function () {
+    $(function() {
+        $("#txtQuantity").keyup(function() {
             this.value = this.value.replace(/[^0-9\.]/g, '');
         });
     });
-    function Validations() {              
+
+    function Validations() {
         var billNumber = $('#txtBillNumber').val();
         if (billNumber === "") {
             return alert('BillNumber is Mandatory');
@@ -73,15 +66,15 @@
         if (billDate === "") {
             return alert('BillDate is Mandatory');
         }
-        var PoDate = $('#txtPODate').val();
-        if (PoDate === "") {
+        var poDate = $('#txtPODate').val();
+        if (poDate === "") {
             return alert('P.O Date is Mandatory');
         }
-        if (PoDate > currentDate) {
+        if (poDate > window.currentDate) {
             return alert("P.O Date should not be greater than current date");
         }
-        var PoNumber = $('#txtPONumber').val();
-        if (PoNumber === "") {
+        var poNumber = $('#txtPONumber').val();
+        if (poNumber === "") {
             return alert('P.O Number is Mandatory');
         }
 
@@ -93,52 +86,51 @@
         if (ddlsparepart === '--select--' || ddlsparepart === '') {
             return alert("Please select SparePart");
         }
-            var quantity = $('#txtQuantity').val();
-            if (quantity === "") {
-                return alert('Enter Quantity');
-            }
-            var tbody = $("#tbl tbody");
-
-            if (tbody.children().length == 0) {
-                return alert('Please add Items');
-            }
-            return true;
-      
+        var quantity = $('#txtQuantity').val();
+        if (quantity === "") {
+            return alert('Enter Quantity');
         }
-    $(function () {
+        var tbody = $("#tbl tbody");
+
+        if (tbody.children().length === 0) {
+            return alert('Please add Items');
+        }
+        return true;
+
+    }
+
+    $(function() {
 
         var $bill = 0;
 
-        $("#txtQuantity,#txtunitprice").blur(function () {
-            
-                var unitPrice = $("#txtunitprice").val();
-                var quantity = $("#txtQuantity").val();
-                var amount = parseInt(unitPrice) * parseInt(quantity);
-                $("#lblAmount").text(amount);
-               
+        $("#txtQuantity,#txtunitprice").blur(function() {
+
+            var unitPrice = $("#txtunitprice").val();
+            var quantity = $("#txtQuantity").val();
+            var amount = parseInt(unitPrice) * parseInt(quantity);
+            $("#lblAmount").text(amount);
+
         });
-       
+
     });
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         $("#SparePart").prop("disabled", true);
 
-        $("#ManufacturerName").change(function () {
-            if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
+        $("#ManufacturerName").change(function() {
+            if ($('#ManufacturerName option:selected').text().toLowerCase() === "--select--") {
                 $("#SparePart").val('0');
                 $('#SparePart').prop("disabled", true);
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
                 return false;
-            }
-            else
-            {
+            } else {
                 $('#SparePart').prop("disabled", false);
             }
         });
     });
     //        var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
-           
+
     //        var data = {
     //            ManufacturerId: $('#ManufacturerName option:selected').val()
     //        }
@@ -172,46 +164,44 @@
 
     //    });
     //});
-    $(function () {
-      
-        $('#SparePart').change(function () {
-            var SparePartId = $('#SparePart option:selected').val();
-            if($('#SparePart option:selected').text()=='--Select--')
-            {
+    $(function() {
+
+        $('#SparePart').change(function() {
+            var sparePartId = $('#SparePart option:selected').val();
+            if ($('#SparePart option:selected').text() === '--Select--') {
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetCostDetails/' + SparePartId,
-                data: JSON.stringify(SparePartId),
+                url: '/Inventory/GetCostDetails/' + sparePartId,
+                data: JSON.stringify(sparePartId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
-                    if (response != 0) {
+                success: function(response) {
+                    if (response !== 0) {
                         $('#txtunitprice').val(response.Cost);
                         $('#lblpartnumber').text(response.PartNumber);
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
             });
         });
     });
-    $(function () {
+    $(function() {
         $("#SparePart").prop("disabled", false);
-        var serviceURL = '/Inventory/GetSparePODetails';
-        $('#txtPONumber').blur(function () {
+        var serviceUrl = '/Inventory/GetSparePODetails';
+        $('#txtPONumber').blur(function() {
             var data = {
-
-               Ponumber : $(this).val()
-            }
+                Ponumber: $(this).val()
+            };
             $('#txtPODate').val('');
             $.ajax({
                 type: "Post",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -220,97 +210,85 @@
                         alert('Please enter valid P.O Number');
                         $('#txtPONumber').val('');
                         $('#poReceiptDetails').empty();
-                    }
-                    else
-                    {
-                        
+                    } else {
+
                         $('#txtPODate').val(response[0].PoDate);
                         $('#ManufacturerName').empty();
                         $('#ManufacturerName').append('<option value=0 selected="selected">--Select--</option>');
-                        GeneratePODetailsList(response);
-                        var Id = response[0].ManufacturerId;
-                        var Name = response[0].ManufacturerName;
-                        $('#ManufacturerName').append("<option value='" + Id + "' >" + Name + "</option>");
+                        generatePoDetailsList(response);
+                        var id = response[0].ManufacturerId;
+                        var name = response[0].ManufacturerName;
+                        $('#ManufacturerName').append("<option value='" + id + "' >" + name + "</option>");
                         $('#SparePart').empty();
                         $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
-                        for(i=0;i<=response.length;i++)
-                        {
-                            $('#SparePart').append("<option value='" + response[i].SparePartId + "' >" + response[i].PartName + "</option>");
+                        var i;
+                        for (i = 0; i <= response.length; i++) {
+                            $('#SparePart').append("<option value='" +
+                                response[i].SparePartId +
+                                "' >" +
+                                response[i].PartName +
+                                "</option>");
                         }
-                            //$('#ManufacturerName').append("<option value=1>Maruti</option>");
+
                         $("#SparePart").prop("disabled", false);
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
             });
-            function GeneratePODetailsList(response) {
-               
+
+            function generatePoDetailsList(response) {
+
                 var res = JSON.stringify(response);
                 if (res.length > 0) {
 
                     var $table = $('<table id=tbl/>');
 
-                    $table.append('<thead><tr><th>Spare Part</th><th>Part Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Receipt Date</th></tr></thead>');
+                    $table.append(
+                        '<thead><tr><th>Spare Part</th><th>Part Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Receipt Date</th></tr></thead>');
 
                     var $tbody = $('<tbody/>');
-                    for (i = 0; i < response.length; i++) {
-                  
-                        //$.each(res, function (i, val) {
-
+                    for (var i = 0; i < response.length; i++) {
                         var $row = $('<tr/>');
-
                         $row.append($('<td/>').html(response[i].PartName));
-
                         $row.append($('<td/>').html(response[i].PartNumber));
-
                         $row.append($('<td/>').html(response[i].PoQuantity));
-
                         $row.append($('<td/>').html(response[i].ReceivedQuantity));
                         $row.append($('<td />').html(response[i].PendingQuantity));
                         $row.append($('<td />').html(response[i].LastReceivedDate));
                         $tbody.append($row);
                     }
-                    //});
-
                     $table.append($tbody);
 
                     $('#poReceiptDetails').html($table);
 
-                }
-                else {
+                } else {
                     $('#orderItems').html('');
                     $('#lblAmount').text('');
                     $('#txtQuantity').val('');
                 }
             }
         });
-    })
-   
-    
-    //function getValueOfSpares(dropDownValue) {
-    //    window.location.href = '/Inventory/GetCostDetails/' + dropDownValue;
-    //}
+    });
+
     function getFinalBillAmount() {
         var sum = parseFloat($("#lblAmount").text());
-        $('.amt').each(function () {
+        $('.amt').each(function() {
             sum += parseFloat($(this).text());
         });
-        $('#lblBillAmount').text(sum)
-
+        $('#lblBillAmount').text(sum);
     }
 
     function getFinalBillAmount1() {
         var sum = 0;
-        $('.amt').each(function () {
+        $('.amt').each(function() {
             sum += parseFloat($(this).text());
         });
-        $('#lblBillAmount').text(sum)
-
+        $('#lblBillAmount').text(sum);
     }
- 
+
 </script>
 <script type="text/javascript">
 
@@ -322,23 +300,22 @@
             yearRange: "-60:+0"
         });
     });
-    
-  
-    $(function () {
+
+
+    $(function() {
         var orderItems = [];
-        $('#btnAdd').click(function () {
-            if ($('#ManufacturerName option:selected').text() == "--Select--" || $('#ManufacturerName option:selected').text() == "")
-            {
+        $('#btnAdd').click(function() {
+            if ($('#ManufacturerName option:selected').text() === "--Select--" ||
+                $('#ManufacturerName option:selected').text() === "") {
                 $('#SparePart').val('');
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
                 return false;
             }
-            if ($('#txtQuantity').val().trim() == "")
-            {
+            if ($('#txtQuantity').val().trim() === "") {
                 return false;
             }
-            getFinalBillAmount();            
+            getFinalBillAmount();
             orderItems.push({
                 ManufacturerName: $('#ManufacturerName option:selected').text(),
                 ManufacturerId: $('#ManufacturerName option:selected').val(),
@@ -346,61 +323,64 @@
                 SparePartName: $('#SparePart option:selected').text(),
                 UnitPrice: $('#txtunitprice').val().trim(),
                 Quantity: $('#txtQuantity').val().trim(),
-                Amount: $('#lblAmount').text(),
+                Amount: $('#lblAmount').text()
             });
-            GeneratedItemsTable();
-            
-                $('#txtunitprice').val('');
-                $('#txtQuantity').val('');
-                $('#lblAmount').text('');
-         
+            generatedItemsTable();
+
+            $('#txtunitprice').val('');
+            $('#txtQuantity').val('');
+            $('#lblAmount').text('');
+
             return false;
 
         });
-        function GeneratedItemsTable() {
+
+        function generatedItemsTable() {
             if (orderItems.length > 0) {
 
                 var $table = $('<table id=tbl/>');
 
-                $table.append('<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
+                $table.append(
+                    '<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
-                $.each(orderItems, function (i, val) {
+                $.each(orderItems,
+                    function(i, val) {
 
-                    var $row = $('<tr/>');
+                        var $row = $('<tr/>');
 
-                    $row.append($('<td/>').html(val.ManufacturerName));
+                        $row.append($('<td/>').html(val.ManufacturerName));
 
-                    $row.append($('<td/>').html(val.SparePartName));
+                        $row.append($('<td/>').html(val.SparePartName));
 
-                    $row.append($('<td/>').html(val.UnitPrice));
+                        $row.append($('<td/>').html(val.UnitPrice));
 
-                    $row.append($('<td/>').html(val.Quantity));
-                    $row.append($('<td class=amt/>').html(val.Amount));
-                    var $remove = $('<a href="#">Remove</a>');
-                    $remove.click(function (e) {
-                        e.preventDefault();
-                        orderItems.splice(i, 1);
-                        GeneratedItemsTable();                 
-                        getFinalBillAmount1();
+                        $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td class=amt/>').html(val.Amount));
+                        var $remove = $('<a href="#">Remove</a>');
+                        $remove.click(function(e) {
+                            e.preventDefault();
+                            orderItems.splice(i, 1);
+                            generatedItemsTable();
+                            getFinalBillAmount1();
+                        });
+                        $row.append($('<td/>').html($remove));
+                        $tbody.append($row);
                     });
-                    $row.append($('<td/>').html($remove));
-                    $tbody.append($row);                  
-                });
-                
+
                 $table.append($tbody);
 
                 $('#orderItems').html($table);
 
-            }
-            else {
+            } else {
                 $('#orderItems').html('');
                 $('#lblAmount').text('');
                 $('#txtQuantity').val('');
             }
         }
-        $('#btn').click(function () {
-            var serviceURL = '/Inventory/SaveInventoryDetails';
+
+        $('#btn').click(function() {
+            var serviceUrl = '/Inventory/SaveInventoryDetails';
             var data = {
                 BillNo: $('#txtBillNumber').val(),
                 BillDate: $('#txtBillDate').val(),
@@ -413,17 +393,17 @@
             };
             $.ajax({
                 type: "POST",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
-                    if (response != 0) {
+                success: function(response) {
+                    if (response !== 0) {
                         alert('Record Inserted');
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
             });
@@ -431,10 +411,10 @@
 
     });
 
-   
+
 </script>
 @{ ViewContext.FormContext = new FormContext(); }
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
         SparePart Receipts
     </div>
@@ -444,9 +424,9 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Bill Number</label>
                     <div class="col-lg-8">
-                        @*@Html.TextBoxFor(x => x.EmployeeName, new { @class = "form-control", placeholder = "Name",id="txtEmployeeName" })*@
+
                         <input type="text" class="form-control" id="txtBillNumber" placeholder="Name">
-                        @*@Html.ValidationMessageFor(m => m.EmployeeName, "", new { @class = "text-danger" })*@
+
                     </div>
                 </div>
                 <div class="form-group">
@@ -463,14 +443,14 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">Vendor</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("Vendor", ViewBag.Vendors as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        @Html.DropDownList("Vendor", ViewBag.Vendors as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Bill Amount</label>
                     <div class="col-lg-8">
                         <label id="lblBillAmount" class="form-control"></label>
-                        @*<input type="text" class="form-control" id="txtContactNumber" placeholder="Contact Number" maxlength="10">*@
+
                     </div>
                 </div>
                 <div class="form-group">
@@ -481,14 +461,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">P.O Number</label>
+                    <label class="control-label col-lg-4" style="margin-left: -500px; margin-top: -50px">P.O Number</label>
                     <div class="col-lg-8">
-                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPONumber" placeholder="P.O Number">
+                        <input type="text" style="margin-left: -670px; margin-top: -50px" class="form-control" id="txtPONumber" placeholder="P.O Number">
                     </div>
                 </div>
-
-
-                <div class="form-group">
+                @*<div class="form-group">
                     <label class="control-label  col-lg-4"> Last Received Date</label>
                     <div class="col-lg-8">
                         <input type="text" class="form-control" id="txtLastReceivedDate" onkeypress="return false" placeholder="Last Received Date">
@@ -496,149 +474,141 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">Received Quantity</label>
+                    <label class="control-label col-lg-4" style="margin-left: -500px; margin-top: -50px">Received Quantity</label>
                     <div class="col-lg-8">
-                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtReceivedQuantity" placeholder="Received Quantity">
+                        <input type="text" style="margin-left: -670px; margin-top: -50px" class="form-control" id="txtReceivedQuantity" placeholder="Received Quantity">
                     </div>
-                </div>
+                </div>*@
 
             </form>
 
         </div>
 
-        <hr />
-        <div class="tablecontainer panel panel-primary" style="width:100%; height: 100%; margin-top: 20px;" align="center">
+        <hr/>
+        <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
             <div class="panel-heading">
                 P.O Details
             </div>
-            <div class="panel-body" id="poReceiptDetails" style="align-content:center">
+            <div class="panel-body" id="poReceiptDetails" style="align-content: center">
             </div>
         </div>
 
 
     </div>
     <hr/>
-        <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
-            <div class="panel-heading">
-                Receipt Items
-            </div>
-            <div class="panel-body">
-                <div class="col-lg-6">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-lg-4">Manufacturer</label>
-                            <div class="col-lg-8">
-                                @*@Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
-                                <select id="ManufacturerName" class="form-control" > </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-lg-4">Spare Parts</label>
-                            <div class="col-lg-8">
-                                @Html.DropDownList("SparePart", ViewBag.Spares as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control"@*, @onchange = "getValueOfSpares(this.value)"*@ })
-                            </div>
-                        </div>
+    <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+        <div class="panel-heading">
+            Receipt Items
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Manufacturer</label>
+                        <div class="col-lg-8">
 
-                    </form>
-                </div>
-                <div class="col-lg-6">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-lg-4">Unit Price</label>
-                            <div class="col-lg-8">
-                                <input type="text" class="form-control" style="margin-top:10px;" id="txtunitprice" placeholder="Unit Price" maxlength="12" readonly="readonly">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-lg-4">Quantity</label>
-                            <div class="col-lg-8">
-                                <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity">
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="col-lg-6">
-                    <form class="form-horizontal">
-                        <div class="form-group ">
-
-                            <label class="control-label   col-lg-4">Amount</label>
-                            <div class="col-lg-8">
-                                <label id="lblAmount"   class="form-control" data-value="@Request.RequestContext.HttpContext.Session["Amount"]"></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-lg-6 col-lg-offset-10" style="margin-top:-50px">
-                                <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue; color: white">Add</button>
-                            </div>
-                        </div>
-                        @*<label id="lblpartnumber" style="margin-left:700px;"> 
-                               </label>*@
-                    </form>
-                    <div class="form-group " style="margin-left:600px;margin-top:-60px;width:400px" >
-                        <div class="col-lg-6">
-                           PartNumber <label id="lblpartnumber" class="form-control" style="color:red"></label>
+                            <select id="ManufacturerName" class="form-control"> </select>
                         </div>
                     </div>
-                </div>
-               
-                  
-                    
-                        <div  class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 200px;" align="center">
-                            <div class="panel-heading">
-                                Item Details
-                            </div>
-                            <div class="panel-body" id="orderItems">
-                            </div>
-                            
-                            </div>
-                <div class="col-lg-6 col-lg-offset-6" style="margin-top:auto">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>
-                            </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Spare Parts</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("SparePart", ViewBag.Spares as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control" @*, @onchange = "getValueOfSpares(this.value)"*@})
                         </div>
-                    </form>
-                </div>
-                <input type="text" id="myInput" class="form-control" placeholder="Search Bill Number.." style="width:300px;float:left" align="left">
-                <div class="col-lg-6" style="width:100%">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <div style="margin-top:30px">
-                                @Html.Partial("GetReceiptDetails");
-                            </div>
-
-                        </div>
-                    </form>
-
-                </div>
                     </div>
-           
-                </div>
-               
-       
+
+                </form>
             </div>
-    <script type="text/javascript">
-        $(function () {
-            $("#myInput").on("keyup", function () {
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Unit Price</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" style="margin-top: 10px;" id="txtunitprice" placeholder="Unit Price" maxlength="12" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Quantity</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group ">
+
+                        <label class="control-label   col-lg-4">Amount</label>
+                        <div class="col-lg-8">
+                            <label id="lblAmount" class="form-control" data-value="@Request.RequestContext.HttpContext.Session["Amount"]"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-6 col-lg-offset-10" style="margin-top: -50px">
+                            <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue; color: white">Add</button>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
+                    <div class="col-lg-6">
+                        PartNumber <label id="lblpartnumber" class="form-control" style="color: red"></label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
+                <div class="panel-heading">
+                    Item Details
+                </div>
+                <div class="panel-body" id="orderItems">
+                </div>
+
+            </div>
+            <div class="col-lg-6 col-lg-offset-6" style="margin-top: auto">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <button type="submit" id="btn" class="btn btn-default" onclick="if (!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <input type="text" id="myInput" class="form-control" placeholder="Search Bill Number.." style="float: left; width: 300px;" align="left">
+            <div class="col-lg-6" style="width: 100%">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div style="margin-top: 30px">
+                            @Html.Partial("GetReceiptDetails");
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+<script type="text/javascript">
+    $(function() {
+        $("#myInput").on("keyup",
+            function() {
                 var value = $(this).val().toLowerCase();
-                $("tr").filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                $("tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
-        });
-    </script>
-            <div class="panel-footer">
+    });
+</script>
+<div class="panel-footer">
 
-            </div>
-       
-
-
-
-
-
-
+</div>

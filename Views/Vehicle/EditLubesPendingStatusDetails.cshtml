@@ -1,62 +1,57 @@
 ﻿@model IEnumerable<JobCardPendingCases>
 
 @{
-    WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
+    var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <style>
     #tblCosts {
-        width: 200%;
         align: center;
         align-content: center;
-        position: absolute;
         color: red;
+        position: absolute;
+        width: 200%;
     }
 
     #tblCost {
-        width: 200%;
-        margin-left: 140px;
         align-content: center;
+        margin-left: 140px;
         position: relative;
+        width: 200%;
     }
 
-    #datess {
-        width: 100px;
-    }
+    #datess { width: 100px; }
 </style>
 <script type="text/javascript">
 
-    $(function () {
-        var serviceURL = '/Vehicle/GetLubesCost';
-        $('#Lubricant').change(function () {
+    $(function() {
+        var serviceUrl = '/Vehicle/GetLubesCost';
+        $('#Lubricant').change(function() {
             if ($('#Lubricant option:selected').text() == '--Select--')
                 $('#tblCost').empty();
-        var data = {
-            LubricantId: $('#Lubricant option:selected').val()
-        };
-            //alert(JSON.stringify(data));
-        $.ajax({
-            type: "POST",
-            url: serviceURL,
-            data: JSON.stringify(data),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                $('#tblCost').empty();
-                CostDetails(response)
-            },
-            failure: function (response) {
-                alert(response.responseText);
-            }
-            //error: function (response) {
-            //    alert(response.responseText);
-            //}
+            var data = {
+                LubricantId: $('#Lubricant option:selected').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    $('#tblCost').empty();
+                    CostDetails(response);
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
         });
-    })
-    })
+    });
 
     function CostDetails(data) {
-        var eTable = "<table id=tblCosts  ><thead><tr><th>Cost</th><th>Manufacturer</th><th>Lubricant</th><th id=datess >LastEntryDate</th><th>Quantity</th></tr></thead><tbody>"
+        var eTable =
+            "<table id=tblCosts  ><thead><tr><th>Cost</th><th>Manufacturer</th><th>Lubricant</th><th id=datess >LastEntryDate</th><th>Quantity</th></tr></thead><tbody>";
         for (var i = 0; i < data.length; i++) {
             eTable += "<tr>";
             eTable += "<td>" + data[i]['Cost'] + "</td>";
@@ -120,17 +115,8 @@
 </table>
 
 <div class="form-group" align="left">
-    <label class="control-label  col-lg-5" style="margin-left:-160px">Spare Parts</label>
+    <label class="control-label  col-lg-5" style="margin-left: -160px">Spare Parts</label>
     <div class="col-lg-5">
-        @Html.DropDownList("Lubricant", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", @style = "margin-left:-90px" })
+        @Html.DropDownList("Lubricant", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", style = "margin-left:-90px"})
     </div>
 </div>
-
-
-
-
-
-
-
-
-

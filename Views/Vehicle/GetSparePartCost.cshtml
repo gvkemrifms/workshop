@@ -17,23 +17,24 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Manufacturer)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.SparePart)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Cost)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ManufacturedDate)
-        </td>
-        <td>
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SparePart)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ManufacturedDate)
+            </td>
+            <td>
+            </td>
+        </tr>
+    }
 
 </table>

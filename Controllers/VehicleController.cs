@@ -697,5 +697,7 @@ namespace Fleet_WorkShop.Controllers
             });
             return Content(costDetails1, "application/json");
         }
+
+        
     }
 }

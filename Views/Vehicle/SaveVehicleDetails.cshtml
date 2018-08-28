@@ -3,35 +3,18 @@
 @{
     ViewBag.Title = "EmployeeDetails";
 }
-@*<style>
-    .ui-datepicker-month {
-        display: none;
-    }
-    .ui-datepicker-calendar {
-    display: none;
-    }
-</style>*@
+
 <script type="text/javascript">
-   
-    $(function () {
+
+    $(function() {
         $('#txtDoc').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
             yearRange: "-60:+0"
         });
-  
-        //$('#txtModel').datepicker({
-        //    dateFormat: "yy",
-        //    changeYear: true,
-        //    yearRange: "-60:+0",
-        //    onClose: function (dateText, inst) {
-        //        var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-        //        $('#txtModel').datepicker('setDate', new Date(year, 1));
-        //    }
-        //});
     });
-   
+
     function Validations() {
         var ddlDistrict = $('#District option:selected').text().toLowerCase();
         if (ddlDistrict === '--select--' || ddlDistrict === '') {
@@ -58,93 +41,43 @@
         if (txtloc === "") {
             return alert('Please enter Location Of Commission');
         }
-             
+
         return true;
     }
-    //$(function () {
-    //    $("#District").change(function () {
-    //        //alert($(this).val());
-    //        $.post("/Vehicle/GetDistrictIds", { districtId: $(this).val() })
-    //    });
-    //});
 
-    //$(document).ready(function() {  
-    //    $("#Vehicle").prop("disabled", true);
-    //    $("#District").change(function () {
-    //        if ($('#District option:selected').text().toLowerCase() == "--select--") {
-    //            $('#Vehicle option:selected').text("");
-    //            $('#Vehicle').prop("disabled", true);
-    //        }
-    //        var serviceURL = '/Vehicle/GetDistrictIds';
-    //        debugger;
-    //        var data = {
-    //            districtId: $('#District').val()
-    //            };
-    //        $.ajax({
-    //            url: serviceURL,
-    //            type : "POST",
-    //            data: JSON.stringify(data),
-    //            datatype : "json",
-    //            contentType : 'application/json',
-              
-    //            success: function (Response)
-    //            {
-                    
-    //                $('#Vehicle').empty();
-    //                for (var i = 0; i < Response.length; i++)
-    //                {
-    //                    $('#Vehicle').append("<option value='"+Response[i].split('-')[1]+"' >" + Response[i].split('-')[0] + "</option>");
-                       
-    //                }                                  
-    //                $('#Vehicle').prop("disabled", false);
-                   
-                   
-    //            } 
-    //                //error : function (err) {
-    //                //    alert("Error in Getting Vehicles!!");  
-    //                //}  
-                
-    //        });
-                
-           
-    //    });  
-    //}); 
-
-    $(function () {
-        $('#txtVehicleNumber').blur(function () {
-            var serviceURL = '/Vehicle/CheckVehicleNumber';
+    $(function() {
+        $('#txtVehicleNumber').blur(function() {
+            var serviceUrl = '/Vehicle/CheckVehicleNumber';
             var data = {
                 vehicleNumber: $('#txtVehicleNumber').val()
             };
             $.ajax({
                 type: "POST",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
-                    if (response != 0) {
+                success: function(response) {
+                    if (response !== 0) {
                         $('#txtVehicleNumber').val('');
                         alert('Vehicle Number already Exists');
                     }
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
             });
 
-        })
-    })
-    $(function () {
-        $('#btn').click(function () {
-            debugger;
-            var serviceURL = '/Vehicle/SaveVehicleDetails';
+        });
+    });
+    $(function() {
+        $('#btn').click(function() {
+            var serviceUrl = '/Vehicle/SaveVehicleDetails';
             var data = {
                 DistrictId: $('#District').val(),
                 ManufacturerId: $('#Manufacturer').val(),
-                //VehicleId: $('#Vehicle option:selected').val(),
                 VehicleNumber: $('#txtVehicleNumber').val(),
-                DateOfCommission:$('#txtDoc').val(),
+                DateOfCommission: $('#txtDoc').val(),
                 Model: $('#txtModel').val(),
                 EngineNumber: $('#txtEngineNumber').val(),
                 ChasisNumber: $('#txtChasis').val(),
@@ -152,32 +85,26 @@
             };
             $.ajax({
                 type: "POST",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     if (response != 0) {
                         alert('Record Inserted');
-                    } 
-                    //else {
-                    //    alert("Failed to Insert Please check ");
-                    //}
+                    }
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
-                //error: function (response) {
-                //    alert(response.responseText);
-                //}
             });
 
-        })
+        });
 
     });
 </script>
 
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
         Vehicle Information
     </div>
@@ -187,13 +114,13 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">District</label>
                     <div class="col-lg-8">
-                    @Html.DropDownList("District", ViewBag.Districts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        @Html.DropDownList("District", ViewBag.Districts as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Manufacturer</label>
                     <div class="col-lg-8">
-                      @Html.DropDownList("Manufacturer", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        @Html.DropDownList("Manufacturer", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
                     </div>
                 </div>
 
@@ -204,14 +131,13 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">Vehicle Number</label>
                     <div class="col-lg-8">
-                        @*<select id="Vehicle" class="form-control" > </select>*@
                         <input type="text" class="form-control" id="txtVehicleNumber" placeholder="Vehicle Number">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Model</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtModel" placeholder="Model Number" maxlength="10" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
+                        <input type="text" class="form-control" id="txtModel" placeholder="Model Number" maxlength="10" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                 </div>
 
@@ -232,57 +158,54 @@
                     </div>
                 </div>
             </form>
-            </div>
-            <div class="col-lg-6">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="control-label col-lg-4">Location</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control" id="txtLoc" placeholder="Location">
-                        </div>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Location</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtLoc" placeholder="Location">
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-lg-4">Date Of Commission</label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control" id="txtDoc" placeholder="Date Of Commission" onkeypress="return false;">
-                        </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Date Of Commission</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtDoc" placeholder="Date Of Commission" onkeypress="return false;">
                     </div>
-                </form>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 90px" class="col-lg-6">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                    <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;" onclick="if (!Validations()) return false;">Submit</button>
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;">Reset</button>
                 </div>
             </div>
-
-            <div style="margin-bottom: 90px" class="col-lg-6">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                            <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white" onclick="if (!Validations()) return false;">Submit</button>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
-
-            <div class="col-lg-6" style="width:100%">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <div style="margin-top:30px">
-                            @Html.Partial("GetVehicleDetails");
-                        </div>
-
-                    </div>
-                </form>
-
-            </div>
-
-        </div>
-
-
-    <div class="panel-footer">
+        </form>
 
     </div>
-  
+
+    <div class="col-lg-6" style="width: 100%">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div style="margin-top: 30px">
+                    @Html.Partial("GetVehicleDetails");
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+
+</div>
 
 
+<div class="panel-footer">
+
+</div>

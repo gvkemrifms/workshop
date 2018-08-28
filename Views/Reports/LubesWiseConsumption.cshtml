@@ -1,0 +1,109 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
+
+<script type="text/javascript">
+    $(function () {
+        $('#txtStartDate,#txtEndDate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0"
+        });
+    });
+    $(function () {
+        $('#btn').click(function() {
+            var serviceUrl = '/Reports/LubesConsumption';
+            var data = {
+                startDate: $('#txtStartDate').val(),
+                endDate: $('#txtEndDate').val(),
+                lubesId: $('#Lubes option:selected').val()
+
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Inserted');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+
+            });
+
+        });
+
+    });
+</script>
+<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+    <div class="panel-heading">
+        VehicleWise Repair's Report
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Start Date</label>
+                    <div class="col-lg-8">
+                        @*<select id="Vehicle" class="form-control" > </select>*@
+                        <input type="text" class="form-control" id="txtStartDate" placeholder="Start Date" onkeypress="return false;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">End Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtEndDate" placeholder="EndDate" maxlength="10" onkeypress="return false;">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Lubricant</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Lubes", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div style="margin-bottom: 90px" class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+    <div class="panel-footer">
+
+    </div>
+    <div class="col-lg-6" style="width:100%">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div style="margin-top:30px">
+                    @*@if (Model != null)
+                        {
+                            @Html.Partial("_GetVehicleWiseStocksReportDetails");
+                        }*@
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+

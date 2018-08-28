@@ -378,6 +378,15 @@
     <Content Include="Views\Reports\GetVehicleWiseLubesReport.cshtml" />
     <Content Include="Views\Inventory\SavePODetails.cshtml" />
     <Content Include="Views\Inventory\SaveLubesInventoryPODetails.cshtml" />
+    <Content Include="Views\Employee\PettyExpenses.cshtml" />
+    <Content Include="Views\Reports\VehicleWiseRepairReport.cshtml" />
+    <Content Include="Views\Reports\_GetVehicleWiseRepairsReportDetails.cshtml" />
+    <Content Include="Views\Reports\SparePartWiseConsumption.cshtml" />
+    <Content Include="Views\Reports\_GetSparePartWiseConsumption.cshtml" />
+    <Content Include="Views\Reports\LubesWiseConsumption.cshtml" />
+    <Content Include="Views\Reports\_GetLubesWiseConsumption.cshtml" />
+    <Content Include="Views\Reports\WorkShopMechanicReport.cshtml" />
+    <Content Include="Views\Reports\_getWorkShopMechanicReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
