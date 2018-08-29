@@ -98,12 +98,12 @@ namespace Fleet_WorkShop.Controllers
             var dtgetSPareConsumptionReport = _helper.ExecuteSelectStmtForDateTime("sparepartwise_consumption_report", "@sdate", startDate.ToString(CultureInfo.CurrentCulture), "@edate", endDate.ToString(CultureInfo.CurrentCulture),null,null, "@siid", sparePartId.ToString());
             var spareConsumption = dtgetSPareConsumptionReport.AsEnumerable().Select(x => new VehicleReport
             {
-                Id = x.Field<long>("ID"),
+                Id = x.Field<int>("ID"),
                 Workshop = x.Field<string>("WORKSHOP"),
                 Vehicle = x.Field<string>("VEHICLENUMBER"),
                 Sparepart = x.Field<string>("SPAREPART"),
                 Quantity = x.Field<int>("QUANTITY"),
-               ManufacturerName=x.Field<int>("MANUFACTURE")
+                Manufacturer = x.Field<string>("MANUFACTURE")
             });
             Session["Consumption"] = spareConsumption;
             return RedirectToAction("SparePartWiseConsumption");
@@ -130,12 +130,12 @@ namespace Fleet_WorkShop.Controllers
             var dtgetSPareConsumptionReport = _helper.ExecuteSelectStmtForDateTime("lubricantwise_consumption_report", "@sdate", startDate.ToString(CultureInfo.CurrentCulture), "@edate", endDate.ToString(CultureInfo.CurrentCulture), null, null, "@liid", lubesId.ToString());
             var lubesConsumption = dtgetSPareConsumptionReport.AsEnumerable().Select(x => new VehicleReport
             {
-                Id = x.Field<long>("ID"),
+                Id = x.Field<int>("ID"),
                 Workshop = x.Field<string>("WORKSHOP"),
                 Vehicle = x.Field<string>("VEHICLENUMBER"),
                 Lubricant = x.Field<string>("OILNAME"),
                 Quantity = x.Field<int>("QUANTITY"),
-                ManufacturerName = x.Field<int>("MANUFACTURER")
+                Manufacturer = x.Field<string>("MANUFACTURER")
             });
             Session["LubesConsumption"] = lubesConsumption;
             return RedirectToAction("LubesWiseConsumption");

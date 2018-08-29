@@ -18,9 +18,9 @@
             @Html.DisplayNameFor(model => model.Quantity)
         </th>     
         <th>
-            @Html.DisplayNameFor(model => model.ManufacturerName)
+            @Html.DisplayNameFor(model => model.Manufacturer)
         </th>
-        <th></th>
+     
     </tr>
 
 @foreach (var item in Model) {
@@ -37,12 +37,12 @@
         <td>
             @Html.DisplayFor(modelItem => item.Sparepart)
         </td>
-        <th>
+        <td>
             @Html.DisplayNameFor(model => model.Quantity)
-        </th>
+        </td>
        
         <td>
-            @Html.DisplayFor(modelItem => item.ManufacturerName)
+            @Html.DisplayFor(modelItem => item.Manufacturer)
         </td>
 
     </tr>

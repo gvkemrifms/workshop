@@ -435,8 +435,6 @@ namespace Fleet_WorkShop.Controllers
                             if (itemm.Quantity <= dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity"))
                                     .FirstOrDefault())
                             {
-                                    
-                                
                                     var cost = dtcostDetails.AsEnumerable().Select(x => x.Field<decimal>("Cost"))
                                     .FirstOrDefault();
                                 var totalAmount = cost * itemm.Quantity;
@@ -547,7 +545,19 @@ namespace Fleet_WorkShop.Controllers
             int remainingQuantity = response - quantity;
             return Json(remainingQuantity, JsonRequestBehavior.AllowGet);
         }
-
+        public ActionResult CheckLubesQuantity(int lubricantId, int quantity)
+        {
+  
+            string lubespartstotalQty = "select sum(quantity) as TotalQuantity from t_Lubes_Stock where LubricantId=" +
+                                        Convert.ToInt32(lubricantId) + "";
+            DataTable dtCheckStocks = _helper.ExecuteSelectStmt(lubespartstotalQty);
+            
+                int? response = dtCheckStocks.AsEnumerable().Select(x => x.Field<int?>("TotalQuantity")).FirstOrDefault();
+                int? remainingQuantity = response - quantity;
+            if (response == null)
+                remainingQuantity = -1;
+            return Json(remainingQuantity, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult SaveCalculateLubesFifo(VehicleModel pendingCases, string status = null)
         {
             var result = 0;
