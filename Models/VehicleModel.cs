@@ -338,4 +338,7 @@ public class GetPODetailsSpareParts
     public int ManufacturerId { get; internal set; }
     public string ManufacturerName { get; internal set; }
     public int SparePartId { get; internal set; }
+    public int LubricantId { get; set; }
+public string GetLastReceivedDate { get; set; }
+
 }

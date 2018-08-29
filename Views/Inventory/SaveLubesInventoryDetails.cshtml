@@ -59,7 +59,7 @@
                 var value = $(this).val().toLowerCase();
                 $("table tr").filter(function () {
                  
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                     $(this).prevAll('thead').first().show();
                 });
 
@@ -133,64 +133,72 @@
         });
 
     });
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         $("#Lubes").prop("disabled", true);
 
-        $("#ManufacturerName").change(function () {
-            if ($('#ManufacturerName option:selected').text().toLowerCase() == "--select--") {
-                $('#Lubes option:selected').text("");
+
+        $("#ManufacturerName").change(function() {
+            if ($('#ManufacturerName option:selected').text().toLowerCase() === "--select--") {
+                $("#Lubes").val('0');
                 $('#Lubes').prop("disabled", true);
                 $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
                 return false;
+            } else {
+                $('#Lubes').prop("disabled", false);
             }
-            var serviceURL = '/Inventory/GetLubesDetailsForManufacturer';
-
-            var data = {
-                ManufacturerId: $('#ManufacturerName option:selected').val()
-            }
-            $.ajax({
-                url: serviceURL,
-                type: "POST",
-                data: JSON.stringify(data),
-                datatype: "json",
-                contentType: 'application/json',
-
-                success: function (Response) {
-
-                    $('#Lubes').empty();
-                    $('#Lubes').append('<option value=0 selected="selected">--Select--</option>');
-                    for (var i = 0; i < Response.length; i++) {
-
-                        $('#Lubes').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
-
-                    }
-
-                    $('#Lubes').prop("disabled", false);
-
-
-                }
-                //error : function (err) {
-                //    alert("Error in Getting Vehicles!!");
-                //}
-
-            });
-
-
+            return true;
         });
     });
+    //        var serviceUrl = '/Inventory/GetLubesDetailsForManufacturer';
+
+    //        var data = {
+    //            ManufacturerId: $('#ManufacturerName option:selected').val()
+    //        };
+    //        $.ajax({
+    //            url: serviceUrl,
+    //            type: "POST",
+    //            data: JSON.stringify(data),
+    //            datatype: "json",
+    //            contentType: 'application/json',
+
+    //            success: function (response) {
+
+    //                $('#Lubes').empty();
+    //                $('#Lubes').append('<option value=0 selected="selected">--Select--</option>');
+    //                var i;
+    //                for (i = 0; i <= response.length; i++) {
+    //                    $('#Lubes').append("<option value='" +
+    //                        response[i].LubricantIdId +
+    //                        "' >" +
+    //                        response[i].OilName +
+    //                        "</option>");
+    //                }
+    //                $('#Lubes').prop("disabled", false);
+
+
+    //            }
+    //            //error : function (err) {
+    //            //    alert("Error in Getting Vehicles!!");
+    //            //}
+
+    //        });
+    //        return true;
+    //    });
+    //});
     $(function () {
-        debugger;
         $('#Lubes').change(function () {
-            var LubricantId = $('#Lubes option:selected').val();
-            if ($('#Lubes option:selected').text() == '--Select--')
+            var lubricantId = $('#Lubes option:selected').val();
+            if ($('#Lubes option:selected').text() === '--Select--')
             {
                 $('#txtunitprice').val('');
+                $('#lblLubricantNumber').val('');
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetLubesCostDetails/' + LubricantId,
-                data: JSON.stringify(LubricantId),
+                url: '/Inventory/GetLubesCostDetails/' + lubricantId,
+                data: JSON.stringify(lubricantId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
@@ -217,8 +225,7 @@
         $('.amt').each(function () {
             sum += parseFloat($(this).text());
         });
-        $('#lblBillAmount').text(sum)
-
+        $('#lblBillAmount').text(sum);
     }
     function getFinalBillAmount1() {
 
@@ -226,22 +233,21 @@
         $('.amt').each(function () {
             sum += parseFloat($(this).text());
         });
-        $('#lblBillAmount').text(sum)
-
+        $('#lblBillAmount').text(sum);
     }
 
     $(function () {
 
-        var serviceURL = '/Inventory/GetLubesPODetails';
+        var serviceUrl = '/Inventory/GetLubesPODetails';
         $('#txtPONumber').blur(function () {
             var data = {
 
                 Ponumber: $(this).val()
-            }
+            };
             $('#txtPODate').val('');
             $.ajax({
                 type: "Post",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -254,8 +260,24 @@
                     else {
 
                         $('#txtPODate').val(response[0].PoDate);
+                        $('#ManufacturerName').empty();
+                        $('#ManufacturerName').append('<option value=0 selected="selected">--Select--</option>');
+                        generatePoDetailsList(response);
+                        var id = response[0].ManufacturerId;
+                        var name = response[0].ManufacturerName;
+                        $('#ManufacturerName').append("<option value='" + id + "' >" + name + "</option>");
+                        $('#Lubes').empty();
+                        $('#Lubes').append('<option value=0 selected="selected">--Select--</option>');
+                        var i;
+                        for (i = 0; i <= response.length; i++) {
+                            $('#Lubes').append("<option value='" +
+                                response[i].SparePartId +
+                                "' >" +
+                                response[i].LubricantName +
+                                "</option>");
+                        }
 
-                        GeneratePODetailsList(response);
+                        $("#Lubes").prop("disabled", false);
                     }
 
                 },
@@ -263,18 +285,18 @@
                     alert(response.responseText);
                 }
             });
-            function GeneratePODetailsList(response) {
-
+            function generatePoDetailsList(response) {           
                 var res = JSON.stringify(response);
                 if (res.length > 0) {
 
                     var $table = $('<table id=tbl/>');
 
-                    $table.append('<thead><tr><th>Lubricant</th><th>Lubricant Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Receipt Date</th></tr></thead>');
+                    $table.append('<thead><tr><th>Lubricant</th><th>Lubricant Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Received Date</th></tr></thead>');
 
                     var $tbody = $('<tbody/>');
+                    var i;
                     for (i = 0; i < response.length; i++) {
-
+                      
                         //$.each(res, function (i, val) {
 
                         var $row = $('<tr/>');
@@ -287,7 +309,7 @@
 
                         $row.append($('<td/>').html(response[i].ReceivedQuantity));
                         $row.append($('<td />').html(response[i].PendingQuantity));
-                        $row.append($('<td />').html(response[i].LastReceivedDate));
+                        $row.append($('<td />').html(response[i].GetLastReceivedDate));
                         $tbody.append($row);
                     }
                     //});
@@ -304,7 +326,7 @@
                 }
             }
         });
-    })
+    });
 </script>
 <script type="text/javascript">
 
@@ -320,10 +342,14 @@
     $(function () {
         var orderItems = [];
         $('#btnAdd').click(function () {
-            if ($('#ManufacturerName option:selected').text() == "--Select--" || $('#ManufacturerName option:selected').text() == "") {
+            if ($('#ManufacturerName option:selected').text() === "--Select--" || $('#ManufacturerName option:selected').text() === "") {
+                $('#Lubes').val('');
+                $('#txtunitprice').val('');
+                $('#txtQuantity').val('');
+                $('#lblAmount').text('');
                 return false;
             }
-            if ($('#txtQuantity').val().trim() == "") {
+            if ($('#txtQuantity').val().trim() === "") {
                 return false;
             }
             getFinalBillAmount();
@@ -334,22 +360,20 @@
                 LubricantName: $('#Lubes option:selected').text(),
                 UnitPrice: $('#txtunitprice').val().trim(),
                 Quantity: $('#txtQuantity').val().trim(),
-                Amount: $('#lblAmount').text(),
+                Amount: $('#lblAmount').text()
             });
 
             //Clear fields
             //$('#txtunitprice').val('').focus();
             //$('#txtQuantity,#lblAmount').val('');
-            GeneratedItemsTable();
-            $('#ManufacturerName option:selected').val(0);
-            $('#Lubes option:selected').text('--Select--');
+            generatedItemsTable();
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');
             return false;
 
         });
-        function GeneratedItemsTable() {
+        function generatedItemsTable() {
             if (orderItems.length > 0) {
 
                 var $table = $('<table id=tbl/>');
@@ -373,7 +397,7 @@
                     $remove.click(function (e) {
                         e.preventDefault();
                         orderItems.splice(i, 1);
-                        GeneratedItemsTable();
+                        generatedItemsTable();
                         getFinalBillAmount1();
                     });
                     $row.append($('<td/>').html($remove));
@@ -392,7 +416,7 @@
             }
         }
         $('#btn').click(function () {
-            var serviceURL = '/Inventory/SaveLubesInventoryDetails';
+            var serviceUrl = '/Inventory/SaveLubesInventoryDetails';
             var data = {
                 BillNo: $('#txtBillNumber').val(),
                 BillDate: $('#txtBillDate').val(),
@@ -405,12 +429,12 @@
             };
             $.ajax({
                 type: "POST",
-                url: serviceURL,
+                url: serviceUrl,
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    if (response != 0) {
+                    if (response !== 0) {
                         alert('Record Inserted');
                     }
 
@@ -477,20 +501,7 @@
                     <div class="col-lg-8">
                         <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPONumber" placeholder="P.O Number">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label  col-lg-4"> Last Received Date</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtLastReceivedDate" onkeypress="return false" placeholder="Last Received Date">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">Received Quantity</label>
-                    <div class="col-lg-8">
-                        <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtReceivedQuantity" placeholder="Received Quantity">
-                    </div>
-                </div>
+                </div>         
             </form>
             <div class="tablecontainer panel panel-primary" style="width: 150%; height:100%; margin-top:20px;margin-left:-500px" align="center">
                 <div class="panel-heading">
@@ -512,7 +523,8 @@
                         <div class="form-group">
                             <label class="control-label col-lg-4">Manufacturer</label>
                             <div class="col-lg-8">
-                                @Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                                @*@Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
+                                <select id="ManufacturerName" class="form-control"> </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -521,6 +533,7 @@
                                 @Html.DropDownList("Lubes", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new
                            {
                                @class = "form-control"})
+                                
                             </div>
                         </div>
 

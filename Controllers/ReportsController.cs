@@ -292,10 +292,6 @@ namespace Fleet_WorkShop.Controllers
             Session["WSMCReports"] = workshopMechanicWiseRepairs;
             return RedirectToAction("WorkShopMechanicReport");
         }
-
-
-
-
-
+        //public ActionResult 
     }
 }

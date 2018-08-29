@@ -238,11 +238,9 @@
                 LubricantName: $('#Lubes option:selected').text(),
                 UnitPrice: $('#txtunitprice').val().trim(),
                 Quantity: $('#txtQuantity').val().trim(),
-                Amount: $('#lblAmount').text(),
+                Amount: $('#lblAmount').text()
             });
             generatedItemsTable();
-            $('#ManufacturerName option:selected').val(0);
-            $('#Lubes option:selected').text('--Select--');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');

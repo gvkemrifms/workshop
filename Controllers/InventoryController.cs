@@ -512,6 +512,7 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SaveLubesInventoryDetails(InventoryModel model)
         {
+            var poQuantityLubes= Session["PoQuantityLubes"] as IEnumerable<GetPODetailsSpareParts>;
             if (model == null) throw new ArgumentNullException(nameof(model));
             var billDetails = new InventoryModel
             {
@@ -528,10 +529,19 @@ namespace Fleet_WorkShop.Controllers
                 billDetails.BillAmount, billDetails.VendorId, billDetails.PoNumber, billDetails.PoDate,
                 billDetails.WorkShopId);
             foreach (var items in model.itemmodel)
+            {
                 _helper.ExecuteInsertLubesDetails("spInsertLubricantDetails", model.BillNo, items.ManufacturerId,
                     items.LubricantId, items.UnitPrice, items.Quantity, items.Amount, billDetails.VendorId);
+                foreach (var poitem in poQuantityLubes)
+                {
+                    if (poitem.SparePartId == items.LubricantId)
+                    {
+                        _helper.UpdateSparePartsPoDetails("UpdateLubesPODetails", poitem.ReceivedQuantity + items.Quantity, model.BillDate, items.ManufacturerId, items.LubricantId, model.PoNumber);
+                    }
+                }
+            }
             CommonMethodLubes(model);
-            return RedirectToAction("SaveInventoryDetails");
+            return RedirectToAction("SaveLubesInventoryDetails");
         }
 
         public ActionResult EditLubeDetails(int? id = null)
@@ -664,7 +674,8 @@ namespace Fleet_WorkShop.Controllers
                     PendingQuantity = x.Field<int>("poquantity") - x.Field<int>("ReceivedQuantity"),
                     ManufacturerId = id,
                     ManufacturerName = manufacturerName,
-                    SparePartId = x.Field<int>("sparepartId")
+                    SparePartId = x.Field<int>("sparepartId"),
+                    GetLastReceivedDate = x.Field<DateTime?>("lastreceiveddate").ToString()
                 });
             Session["PoQuantitySpares"] = podatailsSpares;
             return Json(podatailsSpares, JsonRequestBehavior.AllowGet);
@@ -678,6 +689,14 @@ namespace Fleet_WorkShop.Controllers
                 _helper.ExecuteSelectStmtusingSP("spLubesPODetails", null, null, null, null, "@ponumber", ponumber);
             if (dtLubesPoDatails == null || dtLubesPoDatails.Rows.Count <= 0)
                 return Json(response, JsonRequestBehavior.AllowGet);
+            var manufactureId = dtLubesPoDatails.AsEnumerable().Select(x => x.Field<int>("ManufacturerId"))
+
+                .FirstOrDefault();
+            var manufacturerQuery = "select * from [dbo].[m_LubesManufactures] where Id=" + manufactureId + "";
+            var dtManufacturerOnPo = _helper.ExecuteSelectStmt(manufacturerQuery);
+            var id = dtManufacturerOnPo.AsEnumerable().Select(x => x.Field<int>("Id")).FirstOrDefault();
+            var manufacturerName = dtManufacturerOnPo.AsEnumerable().Select(x => x.Field<string>("ManufacturerName"))
+                .FirstOrDefault();
             IEnumerable<GetPODetailsSpareParts> podatailsLubes = dtLubesPoDatails.AsEnumerable()
                 .Select(x => new GetPODetailsSpareParts
                 {
@@ -687,8 +706,13 @@ namespace Fleet_WorkShop.Controllers
                     PoQuantity = x.Field<int>("poquantity"),
                     ReceivedQuantity = x.Field<int>("ReceivedQuantity"),
                     LastReceivedDate = x.Field<DateTime?>("lastreceiveddate"),
-                    PendingQuantity = x.Field<int>("poquantity") - x.Field<int>("ReceivedQuantity")
+                    PendingQuantity = x.Field<int>("poquantity") - x.Field<int>("ReceivedQuantity"),
+                    ManufacturerId = id,
+                    ManufacturerName = manufacturerName,
+                    SparePartId = x.Field<int>("LubricantId"),
+                    GetLastReceivedDate= x.Field<DateTime?>("lastreceiveddate").ToString()
                 });
+            Session["PoQuantityLubes"] = podatailsLubes;
             return Json(podatailsLubes, JsonRequestBehavior.AllowGet);
         }
     }

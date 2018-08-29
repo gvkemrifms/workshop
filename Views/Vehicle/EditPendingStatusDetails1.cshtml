@@ -53,7 +53,7 @@
 
                     $('#tblCost').empty();
                     CostDetails(response);
-                    // StatusDetails(response)
+                    StatusDetails(response);
                     // GetCostDetails(response)
                 },
                 failure: function(response) {
@@ -88,7 +88,7 @@
         var eTable =
             "<table id=tblStatus  ><thead><tr><th>Quantity</th><th>Total Amount</th><th>Issued Date</th><th>Status</th></tr></thead><tbody>";
         for (var i = 0; i < data.length; i++) {
-            if (data[i]['Quantity'] != 0 && data[i]['StatusType'] != null) {
+            if (data[i]['Quantity'] !== 0 && data[i]['StatusType'] != null) {
                 eTable += "<tr>";
                 eTable += "<td>" + data[i]['Quantity'] + "</td>";
                 eTable += "<td>" + data[i]['TotalAmount'] + "</td>";
@@ -103,10 +103,39 @@
         $('#tblCostStatus').html(eTable);
     }
 
+    $(function () {
+        var serviceUrl = '/Vehicle/CheckSpareQuantity';
+        $('#txtQuantity').blur(function () {
+            var data= {
+                sparePartId: $("#SpareParts").val(),
+                quantity : $(this).val()
+            }
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response < 0) {
+                        alert("SpareParts Qty in Stock is less than Requested Quantity");
+                        $("#SpareParts").val('');
+                        $('#txtQuantity').val('');
+                        $('#tblCost').empty();
+                        $('#tblCostStatus').empty();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+
     $(function() {
         var serviceUrl = '/Vehicle/GetLubesCost';
         $('#Lubricant').change(function() {
-            if ($('#Lubricant option:selected').text() == '--Select--') {
+            if ($('#Lubricant option:selected').text() === '--Select--') {
                 $("#SpareParts").prop('selectedIndex', 0);
                 $('#tblCost').empty();
                 $('#tblCostStatus').empty();
@@ -308,7 +337,12 @@
                         if (response !== 0) {
                             alert('Record Inserted');
                         }
-
+                        else if (response === 0) {
+                            alert('Available SpareParts Quantity in Stock is less than Requested Quantity');
+                        }
+                        else {
+                            alert('Insertion Failed');
+                            }
                     },
                     failure: function(response) {
                         alert(response.responseText);
@@ -330,6 +364,8 @@
                     success: function(response) {
                         if (response !== 0) {
                             alert('Record Inserted');
+                        } else {
+                            alert('Insertion Failed');
                         }
 
                     },

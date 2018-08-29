@@ -127,6 +127,7 @@
             } else {
                 $('#SparePart').prop("disabled", false);
             }
+            return true;
         });
     });
     //        var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
@@ -247,7 +248,7 @@
                     var $table = $('<table id=tbl/>');
 
                     $table.append(
-                        '<thead><tr><th>Spare Part</th><th>Part Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Receipt Date</th></tr></thead>');
+                        '<thead><tr><th>Spare Part</th><th>Part Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Received Date</th></tr></thead>');
 
                     var $tbody = $('<tbody/>');
                     for (var i = 0; i < response.length; i++) {
@@ -257,7 +258,7 @@
                         $row.append($('<td/>').html(response[i].PoQuantity));
                         $row.append($('<td/>').html(response[i].ReceivedQuantity));
                         $row.append($('<td />').html(response[i].PendingQuantity));
-                        $row.append($('<td />').html(response[i].LastReceivedDate));
+                        $row.append($('<td />').html(response[i].GetLastReceivedDate));
                         $tbody.append($row);
                     }
                     $table.append($tbody);
