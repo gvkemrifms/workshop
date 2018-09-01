@@ -3,6 +3,7 @@
 @{
     var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
+@Html.Hidden("HiddenId");
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <link href="~/Content/css/outsourcing.css" rel="stylesheet"/>
 <script>
@@ -17,6 +18,7 @@
 </script>
 
 <script type="text/javascript">
+    var responseObj=0;
     var costDetailsData = [];
     var responseData = null;
     $(function() {
@@ -24,6 +26,34 @@
             $(this).hide();
             $('#divradio').hide();
 
+        });
+    });
+    $(function () {
+        var serviceUrl = '/Vehicle/GetCostForEachSpare';
+        $('#SpareParts').blur(function() {
+            var data = {
+                spareId: $('#SpareParts option:selected').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    responseObj = response;
+                    $('#txtCost1').val(response);
+
+                    //costItems[0].ResponseCostDetails;
+
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+
+                }
+
+            });
         });
     });
     $(function() {
@@ -48,16 +78,16 @@
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function(response) {
-
-
+                success: function (response) {
+                    responseObj = 0;
+                    responseObj = JSON.stringify(response[0]["Cost"]);
                     $('#tblCost').empty();
                     CostDetails(response);
                     StatusDetails(response);
                     // GetCostDetails(response)
                 },
                 failure: function(response) {
-                    alert(response.responseText);
+                    //alert(response.responseText);
                 }
                 //error: function (response) {
                 //    alert(response.responseText);
@@ -68,7 +98,7 @@
 
     function CostDetails(data) {
         costDetailsData = JSON.stringify(data);
-        alert(costDetailsData);
+       // alert(costDetailsData);
         var eTable =
             "<table id=tblCosts  ><thead><tr><th id=datess >Last Entry Date</th><th>Quantity</th><th>Cost</th></tr></thead><tbody>";
         for (var i = 0; i < data.length; i++) {
@@ -117,7 +147,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    if (response < 0) {
+                    if (response < 0 ) {
                         alert("SpareParts Qty in Stock is less than Requested Quantity");
                         $("#SpareParts").val('');
                         $('#txtQuantity').val('');
@@ -126,7 +156,7 @@
                     }
                 },
                 failure: function (response) {
-                    alert(response.responseText);
+                   // alert(response.responseText);
                 }
             });
         });
@@ -155,7 +185,7 @@
                     }
                 },
                 failure: function (response) {
-                    alert(response.responseText);
+                  //  alert(response.responseText);
                 }
             });
         });
@@ -182,11 +212,11 @@
                 success: function(response) {
                     $('#tblCost').empty();
                     CostDetails(response);
-                     StatusDetails(response)
+                    StatusDetails(response);
 
                 },
                 failure: function(response) {
-                    alert(response.responseText);
+                   // alert(response.responseText);
                 }
             });
             return true;
@@ -222,8 +252,34 @@
     $(function() {
         var orderItems = [];
         var lubesorderrItems = [];
+        var costItems = [];
+        var serviceUrl = '/Vehicle/GetCostForEachSpare';
 
-        $('#btnAdd').click(function() {
+        $('#btnAdd').click(function () {
+            $('#HiddenId').val('');
+            var data = {
+                SpareId: $('#SpareParts').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    responseObj = response;
+                   //$('#txtCost1').val(response);
+                    costItems.push({ ResponseCostDetails: response });
+                    //costItems[0].ResponseCostDetails;
+
+
+                },
+                failure: function (response) {
+                   // alert(response.responseText);
+
+                }
+
+            });
             if (Validate()) {
                 $('#btnSubmit').show();
                 $('#divradio').show();
@@ -240,25 +296,30 @@
                     LubesQuantity: $('#txtLubesQuantity').val().trim(),
                     LubesHandOverToId: $('#HandOverLubes').val(),
                     LubesHandOverToName: $('#HandOverLubes option:selected').text(),
+                    responseCost: $('#txtCost1').val()
                 });
-                generatedItemsTable();
+                //orderItems.concat(costItems);
+                //alert(orderItems);
+               generatedItemsTable();
 
                 return false;
             }
+          return true;
         });
 
         function generatedItemsTable() {
-
+            //var responseCost = $('#txtCost').val();
             if (orderItems.length > 0) {
                 var duplicates = '';
                 var $table = $('<table id=tbl/>');
 
                 $table.append(
-                    '<thead><tr><th>SpareParts</th><th>Issued Date</th><th>Quantity</th><th>Unit Price</th><th>HandOverTo</th></tr></thead>');
+                    '<thead><tr><th>SpareParts</th><th>Quantity</th><th>Unit Price</th><th>HandOverTo</th></tr></thead>');
 
                 var $tbody = $('<tbody/>');
                 $.each(orderItems,
-                    function(i, val) {
+                    function (i, val) {
+
                         var id = val.SparePartName;
                         if (i !== 0) {
                             $('#tbl tr td').each(function() {
@@ -273,9 +334,9 @@
                         if (duplicates === '') {
                             var $row = $('<tr/>');
                             $row.append($('<td/>').html(val.SparePartName));
-                            $row.append($('<td/>').html(val.IssuedDate));
+                            //$row.append($('<td/>').html(val.IssuedDate));
                             $row.append($('<td/>').html(val.Quantity));
-                            $row.append($('<td/>').html(val.UnitPrice));
+                            $row.append($('<td/>').html(val.responseCost));
                             $row.append($('<td class=amt/>').html(val.HandOverToName));
                             var $remove = $('<a href="#">Remove</a>');
                             $remove.click(function(e) {
@@ -363,18 +424,18 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function(response) {
-                        if (response !== 0) {
+                        if (response > 0) {
                             alert('Record Inserted');
+                            //location.reload();
+                            window.location.href = "/Vehicle/GetPendingStatusDetails";
                         }
-                        else if (response === 0) {
+                        else if (response < 0) {
                             alert('Available SpareParts Quantity in Stock is less than Requested Quantity');
                         }
-                        else {
-                            alert('Insertion Failed');
-                            }
+                       
                     },
                     failure: function(response) {
-                        alert(response.responseText);
+                        //alert(response.responseText);
                     }
                 });
             }
@@ -391,19 +452,16 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function(response) {
-                        if (response !== 0) {
+                        if (response > 0) {
                             alert('Record Inserted');
                         }
-                        else if (response === 0) {
+                        else if (response < 0) {
                             alert('Available  Quantity of Lubes is less than Requested Quantity');
                         }
-                        else {
-                            alert('Insertion Failed');
-                        }
-
+                        
                     },
                     failure: function(response) {
-                        alert(response.responseText);
+                        //alert(response.responseText);
                     }
                 });
             }
@@ -418,7 +476,7 @@
         var tbody = $("#tbl tbody");
         var tbodyLubes = $("#tblLubes tbody");
 
-        if (tbody.children().length == 0 && tbodyLubes.children().length == 0) {
+        if (tbody.children().length === 0 && tbodyLubes.children().length == 0) {
             return alert('Please add Items');
         }
         if ($('input[name=clkradio]:checked').length <= 0) {
@@ -511,6 +569,7 @@
 
 
 </table>
+<input type="text" id="txtCost1" placeholder="Total Cost" onkeypress="return false;" style="margin-top: -5px;visibility: hidden" readonly="readonly" >
 <div class="form-group" style="margin-left: 730px">
     <label class="control-label  col-lg-4" style="color: red; width: 100px;">Total Cost:</label>
     <div class="col-lg-8">
@@ -526,7 +585,6 @@
 
 <br/>
 <hr/>
-
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
         Vehicle Pending Status Details
@@ -679,7 +737,7 @@
 
                             },
                             failure: function(response) {
-                                alert(response.responseText);
+                               // alert(response.responseText);
                             }
                         });
                     });

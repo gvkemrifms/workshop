@@ -228,6 +228,7 @@ public class VehicleJobCardModel
 
 public class JobCardPendingCases
 {
+    public int HiddenId { get; set; }
     public int LaborCharges { get; set; }
 
     [DisplayName("Sub Category")]

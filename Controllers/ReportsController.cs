@@ -173,7 +173,7 @@ namespace Fleet_WorkShop.Controllers
                 Status = x.Field<string>("status")
             });
             Session["View"] = list;
-            return RedirectToAction("GetVehicleWiseStocksReport");
+            return RedirectToAction("GetVehicleWiseStocksReport","Reports");
         }
 
         [HttpGet]
@@ -284,7 +284,7 @@ namespace Fleet_WorkShop.Controllers
                 DateOfDelivery = x.Field<DateTime>("DATEOFDELIVERY"),
                 Aggregate = x.Field<string>("AGGRIGATENAME"),
                 Mechanic = x.Field<string>("MECHANIC"),
-                ServiceIncharge= x.Field<string>("SERVICEINCHARGE"),
+                ServiceInchargeId= x.Field<int>("SERVICEINCHARGE"),
                 Status = x.Field<string>("STATUS"),
                 Category = x.Field<string>("CATEGORIES"),
                 SubCategory = x.Field<string>("SUBCATEGORY")

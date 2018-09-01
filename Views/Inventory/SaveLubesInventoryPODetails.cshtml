@@ -65,16 +65,16 @@
 
     function Validations() {
 
-        var PoDate = $('#txtPODate').val();
-        if (PoDate === "") {
+        var poDate = $('#txtPODate').val();
+        if (poDate === "") {
             return alert('P.O Date is Mandatory');
         }
         var currentDate = new Date();
-        if (PoDate > currentDate) {
+        if (poDate > currentDate) {
             return alert("P.O Date should not be greater than current date");
         }
-        var PoNumber = $('#txtPONumber').val();
-        if (PoNumber === "") {
+        var poNumber = $('#txtPONumber').val();
+        if (poNumber === "") {
             return alert('P.O Number is Mandatory');
         }
 
@@ -93,7 +93,7 @@
         }
         var tbody = $("#tbl tbody");
 
-        if (tbody.children().length == 0) {
+        if (tbody.children().length === 0) {
             return alert('Please add Items');
         }
         return true;
@@ -308,6 +308,7 @@
                 success: function(response) {
                     if (response !== 0) {
                         alert('Record Inserted');
+                        location.reload();
                     }
 
                 },
@@ -319,7 +320,31 @@
 
     });
 
+    $(function () {
+        var serviceUrl = '/Inventory/CheckLubesPoNumber';
+        $('#txtPONumber').blur(function () {
+            var data = {
+                PoNumber: $(this).val()
 
+            }
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response > 0) {
+                        alert("P.O Number already exists");
+                        $('#txtPONumber').val('');
+                    }
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
 </script>
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
@@ -366,12 +391,14 @@
                         </div>
                         <div class="form-group">
                             <label class="control-label col-lg-4">Lubricant</label>
-                            <div class="col-lg-8">
+                            <div class="col-lg-4">
                                 @Html.DropDownList("Lubes", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new
-                                {
-                                    @class = "form-control"
-                                })
+                           {
+                               @class = "form-control",
+                               style = "width:175px;"
+                           })
                             </div>
+                            <label id="lblLubricantNumber" class="col-lg-4" style="color: red;"></label>
                         </div>
 
                     </form>
@@ -408,11 +435,11 @@
                             </div>
                         </div>
                     </form>
-                    <div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
+                    @*<div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
                         <div class="col-lg-6">
                             LubricantNumber <label id="lblLubricantNumber" class="form-control" style="color: red"></label>
                         </div>
-                    </div>
+                    </div>*@
                 </div>
 
 

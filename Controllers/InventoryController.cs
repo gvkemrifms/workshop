@@ -300,6 +300,7 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SaveInventoryDetails(InventoryModel model)
         {
+            var result = 0;
             var poQuantitySpares = Session["PoQuantitySpares"] as IEnumerable<GetPODetailsSpareParts>;
          
             if (model == null) throw new ArgumentNullException(nameof(model));
@@ -325,13 +326,13 @@ namespace Fleet_WorkShop.Controllers
                 {
                     if (poitem.SparePartId == items.SparePartId)
                     {
-                        _helper.UpdateSparePartsPoDetails("UpdateSparePartsPODetails", poitem.ReceivedQuantity+items.Quantity, model.BillDate, items.ManufacturerId, items.SparePartId, model.PoNumber);
+                        result= _helper.UpdateSparePartsPoDetails("UpdateSparePartsPODetails", poitem.ReceivedQuantity+items.Quantity, model.BillDate, items.ManufacturerId, items.SparePartId, model.PoNumber);
                     }
                 }
                
             }
             CommonMethod(model);
-            return RedirectToAction("SaveInventoryDetails");
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public void CommonMethod(InventoryModel model)
@@ -512,6 +513,7 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SaveLubesInventoryDetails(InventoryModel model)
         {
+            var result = 0;
             var poQuantityLubes= Session["PoQuantityLubes"] as IEnumerable<GetPODetailsSpareParts>;
             if (model == null) throw new ArgumentNullException(nameof(model));
             var billDetails = new InventoryModel
@@ -536,12 +538,12 @@ namespace Fleet_WorkShop.Controllers
                 {
                     if (poitem.SparePartId == items.LubricantId)
                     {
-                        _helper.UpdateSparePartsPoDetails("UpdateLubesPODetails", poitem.ReceivedQuantity + items.Quantity, model.BillDate, items.ManufacturerId, items.LubricantId, model.PoNumber);
+                        result= _helper.UpdateSparePartsPoDetails("UpdateLubesPODetails", poitem.ReceivedQuantity + items.Quantity, model.BillDate, items.ManufacturerId, items.LubricantId, model.PoNumber);
                     }
                 }
             }
             CommonMethodLubes(model);
-            return RedirectToAction("SaveLubesInventoryDetails");
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult EditLubeDetails(int? id = null)
@@ -646,6 +648,23 @@ namespace Fleet_WorkShop.Controllers
             return Json(list, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult CheckPoNumber(string poNumber)
+        {
+            string poSparesQuery = "select * from SparePartsPODetails where PoNumber='" + poNumber + "'";
+            DataTable dtPoDetails=_helper.ExecuteSelectStmt(poSparesQuery);
+            if (dtPoDetails == null) return null;
+            var po = dtPoDetails.AsEnumerable().Select(x => x.Field<int?>("Id")).FirstOrDefault();
+            return Json(po, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult CheckLubesPoNumber(string poNumber)
+        {
+            string poLubesQuery = "select * from LubesPO where PONumber='" + poNumber + "'";
+            DataTable dtPoDetails = _helper.ExecuteSelectStmt(poLubesQuery);
+            if (dtPoDetails == null) return null;
+            var po = dtPoDetails.AsEnumerable().Select(x => x.Field<int?>("Id")).FirstOrDefault();
+            return Json(po, JsonRequestBehavior.AllowGet);
+        }
+        
         public ActionResult GetSparePoDetails(string ponumber)
         {
             const int response = 0;

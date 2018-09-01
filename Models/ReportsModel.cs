@@ -55,5 +55,6 @@ namespace Fleet_WorkShop.Models
         public string Lubricant { get; internal set; }
         public string ServiceIncharge { get; internal set; }
         public string Manufacturer { get; set; }
+        public int ServiceInchargeId { get; internal set; }
     }
 }

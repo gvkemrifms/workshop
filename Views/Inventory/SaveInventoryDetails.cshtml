@@ -401,6 +401,7 @@
                 success: function(response) {
                     if (response !== 0) {
                         alert('Record Inserted');
+                       location.reload();
                     }
 
                 },
@@ -513,11 +514,12 @@
                     </div>
                     <div class="form-group">
                         <label class="control-label col-lg-4">Spare Parts</label>
-                        <div class="col-lg-8">
+                        <div class="col-lg-4">
                             @Html.DropDownList("SparePart", ViewBag.Spares as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control" @*, @onchange = "getValueOfSpares(this.value)"*@})
                         </div>
+                        <label id="lblpartnumber" class="col-lg-4" style="color: red;"></label>
                     </div>
-
+                    
                 </form>
             </div>
             <div class="col-lg-6">
@@ -553,11 +555,11 @@
                     </div>
 
                 </form>
-                <div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
+                @*<div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
                     <div class="col-lg-6">
                         PartNumber <label id="lblpartnumber" class="form-control" style="color: red"></label>
                     </div>
-                </div>
+                </div>*@
             </div>
 
 

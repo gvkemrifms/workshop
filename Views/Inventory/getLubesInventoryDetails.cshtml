@@ -16,7 +16,7 @@
             @Html.DisplayNameFor(model => model.LubricantName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.BillAmount)
+            @Html.DisplayNameFor(model => model.Uprice)
         </th>
 
         <th></th>
@@ -39,12 +39,12 @@
             </td>
 
             <td>
-                @Html.DisplayFor(modelItem => item.BillAmount)
+                @Html.DisplayFor(modelItem => item.Uprice)
             </td>
 
             <td>
-                @Html.ActionLink("Edit", "EditLubeDetails", new {id = item.Id}) |
-                @Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})
+                @Html.ActionLink("Edit", "EditLubeDetails", new {id = item.Id}) 
+                @*@Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})*@
             </td>
         </tr>
     }
