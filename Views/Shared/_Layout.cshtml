@@ -143,6 +143,10 @@
         <li>
             <a href="~/Inventory/SaveLubesInventoryPODetails">Purchase Order(Lubes)</a>
         </li>
+        <li>
+            <a href="~/inventory/getscrapdetails">Scrap Details</a>
+        </li>
+        
         
     </ul>
 </li>
@@ -185,6 +189,21 @@
 <li>
     <a href="~/Vehicle/GetPendingStatusDetails">
         <i class="fa fa-wrench fa-fw"></i> Job Card
+        @*<span class="fa arrow"></span>*@
+    </a>
+    @*<ul class="nav nav-second-level">
+                        <li>
+                            <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
+                        </li>
+                        <li>
+                            <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
+            </li>
+                        </ul>*@
+    <!-- /.nav-second-level -->
+</li>
+<li>
+    <a href="~/Vehicle/GetCompletedStatusDetails">
+        <i class="fa fa-wrench fa-fw"></i> Invoice
         @*<span class="fa arrow"></span>*@
     </a>
     @*<ul class="nav nav-second-level">
@@ -277,6 +296,9 @@
         </li>
         <li>
             <a href="~/Reports/WorkShopMechanicReport">WorkShop_MechanicWise Report</a>
+        </li>
+        <li>
+            <a href="~/Reports/RmeWisePerformanceReport">RME Wise Report</a>
         </li>
     @*<li>
         <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>

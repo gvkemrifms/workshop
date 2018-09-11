@@ -289,6 +289,10 @@ public class JobCardPendingCases
     public string Mechanic { get; set; }
 
     public decimal? OutSourcingAmount { get; set; } = 0;
+    public decimal SparePartsBill { get; internal set; }
+    public decimal LubesBill { get; internal set; }
+    public decimal FinalBillAmount { get; internal set; }
+    public object CompletedDate { get; internal set; }
 }
 
 public class GetSparePartCostDetails

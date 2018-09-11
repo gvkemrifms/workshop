@@ -143,7 +143,8 @@ namespace Fleet_WorkShop.Models
 
         public DataTable ExecuteSelectStmtusingSP(string insertStmt, string parameterName1 = null,
             string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null,
-            string parameterName3 = null, string parameterValue3 = null)
+            string parameterName3 = null, string parameterValue3 = null,string parameterName4 = null, string parameterValue4 = null,
+            string parameterName5 = null, string parameterValue5 = null, string parameterName6 = null, string parameterValue6 = null)
         {
             var cs = ConfigurationManager.AppSettings["Str"];
             var dtSyncData = new DataTable();
@@ -152,11 +153,13 @@ namespace Fleet_WorkShop.Models
             {
                 connection = new SqlConnection(cs);
                 connection.Open();
-                var cmd = new SqlCommand(insertStmt, connection);
-                cmd.CommandType = CommandType.StoredProcedure;
+                var cmd = new SqlCommand(insertStmt, connection) {CommandType = CommandType.StoredProcedure};
                 if (parameterValue1 != null) cmd.Parameters.AddWithValue(parameterName1, int.Parse(parameterValue1));
                 if (parameterValue2 != null) cmd.Parameters.AddWithValue(parameterName2, int.Parse(parameterValue2));
                 if (parameterValue3 != null) cmd.Parameters.AddWithValue(parameterName3, parameterValue3);
+                if (parameterValue4 != null) cmd.Parameters.AddWithValue(parameterName4, int.Parse(parameterValue4));
+                if (parameterValue5 != null) cmd.Parameters.AddWithValue(parameterName5, int.Parse(parameterValue5));
+                if (parameterValue6 != null) cmd.Parameters.AddWithValue(parameterName6, int.Parse(parameterValue6));
                 var dataAdapter = new SqlDataAdapter {SelectCommand = cmd};
                 dataAdapter.Fill(dtSyncData);
 
@@ -172,6 +175,42 @@ namespace Fleet_WorkShop.Models
             }
         }
 
+
+        public int ExecuteInsertStmtusingSp(string insertStmt, string parameterName1 = null,
+            string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null,
+            string parameterName3 = null, string parameterValue3 = null, string parameterName4 = null, string parameterValue4 = null,
+            string parameterName5 = null, string parameterValue5 = null, string parameterName6 = null, string parameterValue6 = null, string parameterName7 = null, string parameterValue7 = null)
+        {
+            var i = 0;
+            var cs = ConfigurationManager.AppSettings["Str"];
+            SqlConnection connection = null;
+            try
+            {
+                
+                connection = new SqlConnection(cs);
+                connection.Open();
+                var cmd = new SqlCommand(insertStmt, connection) { CommandType = CommandType.StoredProcedure };
+                if (parameterValue1 != null) cmd.Parameters.AddWithValue(parameterName1, int.Parse(parameterValue1));
+                if (parameterValue2 != null) cmd.Parameters.AddWithValue(parameterName2, int.Parse(parameterValue2));
+                if (parameterValue3 != null) cmd.Parameters.AddWithValue(parameterName3, parameterValue3);
+                if (parameterValue4 != null) cmd.Parameters.AddWithValue(parameterName4, int.Parse(parameterValue4));
+                if (parameterValue5 != null) cmd.Parameters.AddWithValue(parameterName5, int.Parse(parameterValue5));
+                if (parameterValue6 != null) cmd.Parameters.AddWithValue(parameterName6, int.Parse(parameterValue6));
+                if (parameterValue7 != null) cmd.Parameters.AddWithValue(parameterName7, int.Parse(parameterValue7));
+                i = cmd.ExecuteNonQuery();
+                TraceService(insertStmt);
+                return i;
+            }
+            catch (Exception ex)
+            {
+                TraceService(" executeInsertStatement " + ex + insertStmt);
+                return i;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
         internal int ExecuteInsertSparePartsMasterDetails(string insertStmt, int manufacturerId, string partName,
             string partNumber, decimal cost, int ScrapBinId)
         {
@@ -265,7 +304,7 @@ namespace Fleet_WorkShop.Models
         internal int ExecuteInsertJobCardDetails(string insertStmt, int districtId, int vehId, DateTime dateOfRepair,
             int modelNumber, int odometer, string receivedLocation, string pilotId, string pilotName,
             DateTime dateOfDelivery, int natureOfComplaint, int approximateCost, int allotedmechanic, int workshopid,
-            int serviceEngineer, int laborCharges, int categoryid, int subCategory, int manufacturerId)
+            int serviceEngineer, int laborCharges, int categoryid, int subCategory, int manufacturerId,int rmid,int pmid,int emeid)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -293,6 +332,9 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@categories", categoryid);
                     comm.Parameters.AddWithValue("@subcategory", subCategory);
                     comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
+                    comm.Parameters.AddWithValue("@rmid", rmid);
+                    comm.Parameters.AddWithValue("@pmid", pmid);
+                    comm.Parameters.AddWithValue("@emeid", emeid);
                     try
                     {
                         conn.Open();
@@ -706,8 +748,7 @@ namespace Fleet_WorkShop.Models
             }
         }
 
-        internal int ExecuteInsertSparesIssueStatement(string insertStmt, string vehicleNumber, int workShopId,
-            int sparePartId, int quantity, decimal total, int handOverToId, int JobcardId, string status)
+        internal int ExecuteInsertSparesIssueStatement(string insertStmt, string vehicleNumber, int workShopId,int sparePartId, int quantity, decimal total, int handOverToId, int jobcardId, string status,string billNumber=null)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -723,8 +764,10 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@Quantity", quantity);
                     comm.Parameters.AddWithValue("@TotalAmount", total);
                     comm.Parameters.AddWithValue("@HandOverTo", handOverToId);
-                    comm.Parameters.AddWithValue("@jobcardid", JobcardId);
+                    comm.Parameters.AddWithValue("@jobcardid", jobcardId);
                     comm.Parameters.AddWithValue("@status", status);
+                    if (billNumber != null)
+                        comm.Parameters.AddWithValue("@billnumber", billNumber);
                     try
                     {
                         conn.Open();

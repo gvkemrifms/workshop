@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.ReportsModel>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.WorkShopName)
+        </th>       
+        <th>
+            @Html.DisplayNameFor(model => model.JobCardNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.VehicleNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DOR)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Aggregate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Category)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SubCategory)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Mechanic)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ServiceIncharge)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        
+       
+       
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+         
+        <td>
+            @Html.DisplayFor(modelItem => item.WorkShopName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.JobCardNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.VehicleNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DOR)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Aggregate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Category)
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.SubCategory)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Mechanic)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ServiceIncharge)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Status)
+        </td>
+        
+       
+
+    </tr>
+}
+
+</table>

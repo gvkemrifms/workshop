@@ -41,6 +41,7 @@
 </style>
 
 <script type="text/javascript">
+    var finalAmount1 = $('#BillAmount').val();
 
     $(function() {
         $("#Qty,#Uprice").blur(function() {
@@ -61,7 +62,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response != 0) {
+                    if (response !== 0) {
                         $('#Uprice').val(response);
                         $('#Qty').val('');
                         $('#Amt').val('');
@@ -89,10 +90,11 @@
                 Amount: $('#Amt').val()
             });
             generatedItemsTable();
-            $('#SparePartId option:selected').text('--Select--');
-            $('#Uprice').val('');
-            $('#Qty').val('');
-            $('#Amt').val('');
+            getFinalBillAmount();
+            //$("#SparePartId").prop('selectedIndex', 0);
+            //$('#Uprice').val('');
+            //$('#Qty').val('');
+            //$('#Amt').val('');
             return false;
 
         });
@@ -140,17 +142,56 @@
                 $('#txtQuantity').val('');
             }
         }
-    });
 
-    function getFinalBillAmount() {
+        function getFinalBillAmount() {
+            var finalAmount = $('#BillAmount').val();
+            var sum = 0;
+            $('.amt').each(function () {
+                sum += parseFloat($(this).text());
+            });
+            finalAmount = parseFloat(finalAmount) + sum;
+            $('#BillAmount').val(finalAmount);
+        }
 
-        var sum = parseFloat($("#lblAmount").text());
-        $('.amt').each(function() {
-            sum += parseFloat($(this).text());
+        function getFinalBillAmount1() {
+            var sum1 = 0;
+            $('.amt').each(function () {
+                sum1 += parseFloat($(this).text());
+            });
+            alert(sum1);
+            finalAmount1 = parseFloat(finalAmount1) + $('#BillAmount').val(parseFloat(sum1));
+            alert(@ViewBag.BillAmount);
+            if (finalAmount1 === 0) {
+                alert(@ViewBag.BillAmount);
+                finalAmount1 = parseFloat( @ViewBag.BillAmountss);
+            }
+
+            alert(finalAmount1);
+        }
+        $('#btnEdit').click(function() {
+            var serviceUrl = '/Inventory/EditOrderItemsInventoryDetails';
+            var data = {
+                itemmodel: orderItems
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response !== 0) {
+                        alert('Record Inserted');
+                        location.reload();
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
         });
-        $('#lblBillAmount').text(sum);
-    }
-
+    });
 
 </script>
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
@@ -171,14 +212,15 @@
                         @Html.LabelFor(model => model.BillNo, new {@class = "control-label col-md-4"})
                         <div class="col-md-8">
                             @Html.EditorFor(model => model.BillNo, new {htmlAttributes = new {@class = "form-control"}})
-                            @Html.ValidationMessageFor(model => model.BillNo, "", new {@class = "text-danger"})
+                            @*@Html.ValidationMessageFor(model => model.BillNo, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
+                    <hr/>
                     <div class="form-group">
                         @Html.LabelFor(model => model.Manufacturer, new {@class = "control-label col-md-4"})
                         <div class="col-md-8">
                             @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new {@class = "form-control"})
-                            @Html.ValidationMessageFor(model => model.Manufacturer, "", new {@class = "text-danger"})
+                            @*@Html.ValidationMessageFor(model => model.Manufacturer, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
 
@@ -190,15 +232,16 @@
                         @Html.LabelFor(model => model.BillDate, new {@class = "control-label col-md-4"})
                         <div class="col-md-8">
                             @Html.EditorFor(model => model.BillDate, new {htmlAttributes = new {@class = "form-control"}})
-                            @Html.ValidationMessageFor(model => model.BillDate, "", new {@class = "text-danger"})
+                            @*@Html.ValidationMessageFor(model => model.BillDate, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
+                    <hr/>
                     <div class="form-group">
                         @Html.LabelFor(model => model.SpareParts, new {@class = "control-label col-md-4"})
                         <div class="col-md-8">
 
                             @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new {@class = "form-control"})
-                            @Html.ValidationMessageFor(model => model.SpareParts, "", new {@class = "text-danger"})
+                            @*@Html.ValidationMessageFor(model => model.SpareParts, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
                 </form>
@@ -211,14 +254,14 @@
                     @Html.LabelFor(model => model.Uprice, new {@class = "control-label col-md-4"})
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.Uprice, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
-                        @Html.ValidationMessageFor(model => model.Uprice, "", new {@class = "text-danger"})
+                        @*@Html.ValidationMessageFor(model => model.Uprice, "", new {@class = "text-danger"})*@
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(model => model.Amt, new {@class = "control-label col-md-4"})
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.Amt, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
-                        @Html.ValidationMessageFor(model => model.Amt, "", new {@class = "text-danger"})
+                        @*@Html.ValidationMessageFor(model => model.Amt, "", new {@class = "text-danger"})*@
                     </div>
                 </div>
 
@@ -229,14 +272,81 @@
                     @Html.LabelFor(model => model.Qty, new {@class = "control-label col-md-4"})
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.Qty, new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})
+                        @*@Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})*@
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.BillAmount, new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.BillAmount, new { htmlAttributes = new { @class = "form-control" } })
+                        @*@Html.ValidationMessageFor(model => model.BillAmount, "", new { @class = "text-danger" })*@
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10" style="margin-left: -180px">
-                        <input type="submit" id="btnAdd" style="background-color: blue; color: white; width: 70px" value="Add" class="btn btn-default"/>
+                        <input type="submit" id="btnAdd" style="background-color: blue; margin-top: -80px; margin-left: -25px; color: white; width: 70px" value="Add" class="btn btn-default"/>
                     </div>
-                    <div class="tablecontainer panel panel-primary" style="height: 60%; margin-left: -700px; margin-top: 50px; width: 150%;">
+                    <div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:10px; margin-top: 50px; width: 70%; ">
+                        <div class="panel-heading">
+                           Available Spares Quantity 
+                        </div>
+                        <div class="panel-body" id="AddedItemsId">
+
+
+                            <table>
+
+                                <tr>
+
+                                    <th>SparePartId </th>
+
+                                    <th>Name</th>
+
+                                    <th>Avaialble Quantity</th>
+
+                                </tr>
+
+                                @if (ViewBag.SparesQty != null)
+
+                                {
+                                    var dataTable = ViewBag.SparesQty as DataTable;
+                                    if (dataTable != null)
+                                    {
+                                        foreach (DataRow dr in dataTable.Rows)
+
+                                        {
+                                            <tr>
+
+                                                <td>
+
+                                                    @dr["sparepartId"]
+
+                                                </td>
+
+                                                <td>
+
+                                                    @dr["partname"]
+
+                                                </td>
+
+                                                <td>
+
+                                                    @dr["AvailableQuantity"]
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+
+                            </table>
+
+
+                        </div>
+
+                    </div>
+                    
+
+                    <div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:-950px; margin-top:-245px; width: 110%;">
                         <div class="panel-heading">
                             Added Items
                         </div>

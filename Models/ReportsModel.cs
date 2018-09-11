@@ -5,6 +5,8 @@ namespace Fleet_WorkShop.Models
 {
     public class ReportsModel
     {
+        internal DateTime DOD;
+
         [DisplayName("Employee Name")]
         public string EmployeeName { get; set; }
 
@@ -30,6 +32,15 @@ namespace Fleet_WorkShop.Models
 
         [DisplayName("Employee Id")]
         public string EmployeeId { get; set; }
+        public int JobCardNumber { get; internal set; }
+        public object District { get; internal set; }
+        public string VehicleNumber { get; internal set; }
+        public DateTime DOR { get; internal set; }
+        public string Aggregate { get; internal set; }
+        public string ServiceIncharge { get; internal set; }
+        public string Status { get; internal set; }
+        public string Mechanic { get; internal set; }
+        public string SubCategory { get; internal set; }
     }
 
     public class VehicleReport

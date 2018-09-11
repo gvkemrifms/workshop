@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -302,7 +301,7 @@ namespace Fleet_WorkShop.Controllers
         {
             var result = 0;
             var poQuantitySpares = Session["PoQuantitySpares"] as IEnumerable<GetPODetailsSpareParts>;
-         
+
             if (model == null) throw new ArgumentNullException(nameof(model));
             var billDetails = new InventoryModel
             {
@@ -323,13 +322,10 @@ namespace Fleet_WorkShop.Controllers
                 _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails", model.BillNo, items.ManufacturerId,
                     items.SparePartId, items.UnitPrice, items.Quantity, items.Amount, model.VendorId);
                 foreach (var poitem in poQuantitySpares)
-                {
                     if (poitem.SparePartId == items.SparePartId)
-                    {
-                        result= _helper.UpdateSparePartsPoDetails("UpdateSparePartsPODetails", poitem.ReceivedQuantity+items.Quantity, model.BillDate, items.ManufacturerId, items.SparePartId, model.PoNumber);
-                    }
-                }
-               
+                        result = _helper.UpdateSparePartsPoDetails("UpdateSparePartsPODetails",
+                            poitem.ReceivedQuantity + items.Quantity, model.BillDate, items.ManufacturerId,
+                            items.SparePartId, model.PoNumber);
             }
             CommonMethod(model);
             return Json(result, JsonRequestBehavior.AllowGet);
@@ -365,9 +361,17 @@ namespace Fleet_WorkShop.Controllers
         {
             if (id == null)
                 return RedirectToAction("SaveInventoryDetails");
-            var dsGetManufacturerVendor = _helper.FillDropDownHelperMethodWithSp("spGetManufacturerVendor");
+            //var dsGetManufacturerVendor = _helper.FillDropDownHelperMethodWithSp("spGetManufacturerVendor");
             var dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetReceiptDetails");
             var row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
+            var manufacturerId = Convert.ToInt32(row["ManufacturerId"]);
+            var manufacturerQuery = "select * from m_VehicleManufacturer where Id=" + manufacturerId + " ";
+            var dtManufacturers = _helper.ExecuteSelectStmt(manufacturerQuery);
+            //spGetReceiptDetailsonBillNumber
+            var dtGetReceiptsDetailsonSpares = _helper.ExecuteSelectStmtusingSP("spGetReceiptDetailsonBillNumber", null,
+                null, null, null, "@billnumber", row["BillNumber"].ToString());
+            //var sparesList= dsGetReceiptsDetailsonSpares.AsEnumerable().Select(x=>x).Where(x => x.Field<string>("BillNumber") == row["BillNumber"].ToString());
+            //var sparePartId= dsGetReceiptsDetailsonSpares.Tables[0].AsEnumerable().Where(x => x.Field<string>("BillNumber") == row["BillNumber"].ToString()).Select(x => x.Field<int>("SparePartId")).FirstOrDefault();
             var model = new InventoryModel
             {
                 BillNo = row["BillNumber"].ToString(),
@@ -379,14 +383,24 @@ namespace Fleet_WorkShop.Controllers
                 BillAmount = Convert.ToDecimal(row["BillAmount"]),
                 BillDate = DateTime.Parse(row["BillDate"].ToString()),
                 ManufacturerId = Convert.ToInt32(row["ManufacturerId"]),
-                Manufacturer = new SelectList(dsGetManufacturerVendor.Tables[0].AsDataView(), "Id", "ManufacturerName"),
-                SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName"),
+                Manufacturer = new SelectList(dtManufacturers.AsDataView(), "Id", "ManufacturerName"),
+                //SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName"),
+                SpareParts = new SelectList(dtGetReceiptsDetailsonSpares.AsDataView(), "SparePartId", "PartName"),
                 VendorId = Convert.ToInt32(row["vendorid"]),
                 SparePartId = Convert.ToInt32(row["SparePartId"])
             };
             var dtgetAllSpares = _helper.ExecuteSelectStmtusingSP("getSparesForBillNumberAndVendors", "@vendorid",
                 model.VendorId.ToString(), null, null, "@billnumber", model.BillNo);
             ViewBag.CartItems = dtgetAllSpares;
+            var getPo =
+                "select top 1 r.PoNumber,billamount from t_receipts r join t_receiptData rd on r.BillNumber=rd.BillNumber where r.BillNumber='" +
+                model.BillNo + "'";
+            var dtGetPoNum = _helper.ExecuteSelectStmt(getPo);
+            var getPoNumber = dtGetPoNum.AsEnumerable().Select(x => x.Field<string>("PoNumber")).FirstOrDefault();
+            ViewBag.BillAmountss = model.BillAmount;
+            var dtGetPoNumber = _helper.ExecuteSelectStmtusingSP("spSparePartsEditPODetails", null, null, null, null,
+                "@ponumber", getPoNumber);
+            ViewBag.SparesQty = dtGetPoNumber;
             Session["BillAmount"] = model.BillAmount;
             Session["Amt"] = model.Amt;
             Session["Bill"] = model.BillNo;
@@ -426,6 +440,11 @@ namespace Fleet_WorkShop.Controllers
             }
             CommonEditSparesMethod(postInventory);
             return RedirectToAction("SaveInventoryDetails");
+        }
+
+        public ActionResult EditOrderItemsInventoryDetails(InventoryModel postInventory)
+        {
+            return View();
         }
 
         private void CommonEditSparesMethod(InventoryModel model)
@@ -514,7 +533,7 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult SaveLubesInventoryDetails(InventoryModel model)
         {
             var result = 0;
-            var poQuantityLubes= Session["PoQuantityLubes"] as IEnumerable<GetPODetailsSpareParts>;
+            var poQuantityLubes = Session["PoQuantityLubes"] as IEnumerable<GetPODetailsSpareParts>;
             if (model == null) throw new ArgumentNullException(nameof(model));
             var billDetails = new InventoryModel
             {
@@ -535,12 +554,10 @@ namespace Fleet_WorkShop.Controllers
                 _helper.ExecuteInsertLubesDetails("spInsertLubricantDetails", model.BillNo, items.ManufacturerId,
                     items.LubricantId, items.UnitPrice, items.Quantity, items.Amount, billDetails.VendorId);
                 foreach (var poitem in poQuantityLubes)
-                {
                     if (poitem.SparePartId == items.LubricantId)
-                    {
-                        result= _helper.UpdateSparePartsPoDetails("UpdateLubesPODetails", poitem.ReceivedQuantity + items.Quantity, model.BillDate, items.ManufacturerId, items.LubricantId, model.PoNumber);
-                    }
-                }
+                        result = _helper.UpdateSparePartsPoDetails("UpdateLubesPODetails",
+                            poitem.ReceivedQuantity + items.Quantity, model.BillDate, items.ManufacturerId,
+                            items.LubricantId, model.PoNumber);
             }
             CommonMethodLubes(model);
             return Json(result, JsonRequestBehavior.AllowGet);
@@ -650,21 +667,22 @@ namespace Fleet_WorkShop.Controllers
 
         public ActionResult CheckPoNumber(string poNumber)
         {
-            string poSparesQuery = "select * from SparePartsPODetails where PoNumber='" + poNumber + "'";
-            DataTable dtPoDetails=_helper.ExecuteSelectStmt(poSparesQuery);
+            var poSparesQuery = "select * from SparePartsPODetails where PoNumber='" + poNumber + "'";
+            var dtPoDetails = _helper.ExecuteSelectStmt(poSparesQuery);
             if (dtPoDetails == null) return null;
             var po = dtPoDetails.AsEnumerable().Select(x => x.Field<int?>("Id")).FirstOrDefault();
             return Json(po, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult CheckLubesPoNumber(string poNumber)
         {
-            string poLubesQuery = "select * from LubesPO where PONumber='" + poNumber + "'";
-            DataTable dtPoDetails = _helper.ExecuteSelectStmt(poLubesQuery);
+            var poLubesQuery = "select * from LubesPO where PONumber='" + poNumber + "'";
+            var dtPoDetails = _helper.ExecuteSelectStmt(poLubesQuery);
             if (dtPoDetails == null) return null;
             var po = dtPoDetails.AsEnumerable().Select(x => x.Field<int?>("Id")).FirstOrDefault();
             return Json(po, JsonRequestBehavior.AllowGet);
         }
-        
+
         public ActionResult GetSparePoDetails(string ponumber)
         {
             const int response = 0;
@@ -709,7 +727,6 @@ namespace Fleet_WorkShop.Controllers
             if (dtLubesPoDatails == null || dtLubesPoDatails.Rows.Count <= 0)
                 return Json(response, JsonRequestBehavior.AllowGet);
             var manufactureId = dtLubesPoDatails.AsEnumerable().Select(x => x.Field<int>("ManufacturerId"))
-
                 .FirstOrDefault();
             var manufacturerQuery = "select * from [dbo].[m_LubesManufactures] where Id=" + manufactureId + "";
             var dtManufacturerOnPo = _helper.ExecuteSelectStmt(manufacturerQuery);
@@ -729,10 +746,65 @@ namespace Fleet_WorkShop.Controllers
                     ManufacturerId = id,
                     ManufacturerName = manufacturerName,
                     SparePartId = x.Field<int>("LubricantId"),
-                    GetLastReceivedDate= x.Field<DateTime?>("lastreceiveddate").ToString()
+                    GetLastReceivedDate = x.Field<DateTime?>("lastreceiveddate").ToString()
                 });
             Session["PoQuantityLubes"] = podatailsLubes;
             return Json(podatailsLubes, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetScrapDetails(int? scrapId)
+        {
+            if (Session["Employee_Id"] == null) return RedirectToAction("Login", "Account");
+            var scrapList = new List<ScrapBinModel>();
+            const string queryScrap = "select * from m_ScrapBin";
+            var dtScrap = _helper.ExecuteSelectStmt(queryScrap);
+            ViewBag.ScrapBin = new SelectList(dtScrap.AsDataView(), "ScrapBinId", "ScrapBinName");
+            if (scrapId != null)
+            {
+                var dtGetScrapDetails =
+                    _helper.ExecuteSelectStmtusingSP("ScrapDetails", "@scrapbinid", scrapId.ToString());
+
+                Session["Scraps"] = dtGetScrapDetails;
+                foreach (DataRow row in dtGetScrapDetails.Rows)
+                {
+                    var scrapBin = new ScrapBinModel
+                    {
+                        ScrapBinId = Convert.ToInt32(row["ScrapBinId"]),
+                        PartName = row["PartName"].ToString(),
+                        PartNumber = row["PartNumber"].ToString(),
+                        Quantity = Convert.ToInt32(row["Quantity"])
+                    };
+                    scrapList.Add(scrapBin);
+                }
+                return Json(scrapList, JsonRequestBehavior.AllowGet);
+            }
+
+            return View();
+        }
+
+        public ActionResult InsertScrapDetails(int? netWeight, int? actualCount)
+        {
+            var result = 0;
+            var employee = Session["Employee_Id"].ToString();
+            var dtGetScrapDetails = Session["Scraps"] as DataTable;
+            if (dtGetScrapDetails != null)
+            {
+                var count = dtGetScrapDetails.AsEnumerable().Sum(x => x.Field<long>("rownumber"));
+                foreach (DataRow row in dtGetScrapDetails.Rows)
+                {
+                    result = _helper.ExecuteInsertStmtusingSp("SpinsertScrapDetails", "@scrapid",
+                        row["ScrapBinId"].ToString(),
+                        "@sparecount", count.ToString(), null, null, "@sparequantity", row["Quantity"].ToString(),
+                        "@netweight", netWeight.ToString(), "@actualquantity", actualCount.ToString(), "@enterdby",
+                        employee);
+                    if (result > 0)
+                        break;
+                }
+                foreach (DataRow row in dtGetScrapDetails.Rows)
+                    _helper.ExecuteInsertStmtusingSp("SpUpdateScrapDetails", "@scrapid", row["ScrapBinId"].ToString(),
+                        "@sparepartid", row["Id"].ToString());
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }

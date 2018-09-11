@@ -79,4 +79,5 @@ E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\bin\Microsoft.Owin.Security.Twitter.xm
 E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\obj\Debug\Fleet_WorkShop.dll
 E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\obj\Debug\Fleet_WorkShop.pdb
-E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\obj\Debug\Fleet_WorkShop.csprojResolveAssemblyReference.cache
+E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\bin\Rotativa.Core.dll
+E:\Angular2\Fleet_WorkShop\Fleet_WorkShop\bin\Rotativa.MVC.dll

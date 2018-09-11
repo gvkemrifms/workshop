@@ -77,6 +77,14 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Rotativa.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rotativa.Core.2.0.0\lib\net45\Rotativa.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Rotativa.MVC, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rotativa.MVC.2.0.3\lib\net45\Rotativa.MVC.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -214,6 +222,7 @@
     <Compile Include="Models\InventoryModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ReportsModel.cs" />
+    <Compile Include="Models\ScrapBinModel.cs" />
     <Compile Include="Models\SparePartsModel.cs" />
     <Compile Include="Models\VehicleModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -239,6 +248,13 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\GVK_Group.png" />
+    <Content Include="Images\print.png" />
+    <Content Include="Images\Prints.jpg" />
+    <Content Include="Rotativa\help-wkhtmltoimage.txt" />
+    <Content Include="Rotativa\help-wkhtmltopdf.txt" />
+    <Content Include="Rotativa\wkhtmltoimage.exe" />
+    <Content Include="Rotativa\wkhtmltopdf.exe" />
     <Content Include="ScriptsCss\Bindings.css" />
     <Content Include="ScriptsCss\bootstrap.min.css" />
     <Content Include="ScriptsCss\bootstrap.min.js" />
@@ -264,6 +280,7 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="App_Browsers\qt.browser" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -387,6 +404,14 @@
     <Content Include="Views\Reports\_GetLubesWiseConsumption.cshtml" />
     <Content Include="Views\Reports\WorkShopMechanicReport.cshtml" />
     <Content Include="Views\Reports\_getWorkShopMechanicReport.cshtml" />
+    <Content Include="Views\Vehicle\GetCompletedStatusDetails.cshtml" />
+    <Content Include="Views\Vehicle\GetVehicleCompletedStatusDetails.cshtml" />
+    <Content Include="Views\Vehicle\_GetVehicleCompletedStatusDetails.cshtml" />
+    <Content Include="Views\Reports\RMEWisePerformanceReport.cshtml" />
+    <Content Include="Views\Reports\RmeWisePerformanceReports.cshtml" />
+    <Content Include="Views\Inventory\GetScrapDetails.cshtml" />
+    <Content Include="Views\Inventory\_GetScrapDetails.cshtml" />
+    <Content Include="Views\Inventory\_GetScrapDetails1.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

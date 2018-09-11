@@ -83,10 +83,11 @@
         }
 
         $('#btn').click(function() {
-
+            var vehicleNumber = $('#Vehicle option:selected').text();
             var serviceUrl = '/Job/SaveJobCardDetails';
             var data = {
-                jobcarditems: orderItems
+                jobcarditems: orderItems,
+                vehicleNumber: vehicleNumber
             };
 
             $.ajax({

@@ -41,7 +41,7 @@ namespace Fleet_WorkShop.WorkShpModels
 
         public DataTable ExecuteSelectStmtForDateTime(string insertStmt, string parameterName1 = null,
             string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null,
-            string parameterName3 = null, string parameterValue3 = null,string parameterName4=null, string parameterValue4 = null, string parameterName5 = null, string parameterValue5 = null)
+            string parameterName3 = null, string parameterValue3 = null,string parameterName4=null, string parameterValue4 = null, string parameterName5 = null, string parameterValue5 = null,string parameterName6=null, string parameterValue6 = null)
         {
             var cs = ConfigurationManager.AppSettings["Str"];
             var dtSyncData = new DataTable();
@@ -58,6 +58,7 @@ namespace Fleet_WorkShop.WorkShpModels
                 if (parameterValue3 != null) cmd.Parameters.AddWithValue(parameterName3, parameterValue3);
                 if (parameterValue4 != null) cmd.Parameters.AddWithValue(parameterName4, Convert.ToInt32(parameterValue4));
                 if (parameterValue5 != null) cmd.Parameters.AddWithValue(parameterName5, Convert.ToInt32(parameterValue5));
+                if (parameterValue6 != null) cmd.Parameters.AddWithValue(parameterName6, Convert.ToInt32(parameterValue6));
                 var dataAdapter = new SqlDataAdapter {SelectCommand = cmd};
                 dataAdapter.Fill(dtSyncData);
 

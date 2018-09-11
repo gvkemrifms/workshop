@@ -143,6 +143,7 @@ namespace Fleet_WorkShop.Controllers
 
 
         public object ManufacturerName { get; set; }
+        public object DOR { get; private set; }
 
         [HttpGet]
         public ActionResult GetVehicleWiseStocksReport()
@@ -292,6 +293,60 @@ namespace Fleet_WorkShop.Controllers
             Session["WSMCReports"] = workshopMechanicWiseRepairs;
             return RedirectToAction("WorkShopMechanicReport");
         }
-        //public ActionResult 
+
+        public ActionResult RmeWisePerformanceReport()
+        {
+            string rm = "select name,empid from emp_Details where desgid=8";
+            string pm = "select name,empid from emp_Details where desgid=9";
+            string eme= "select name,empid from emp_Details where desgid=10";
+            DataTable dtRm = _helper.ExecuteSelectStmt(rm);
+            DataTable dtPm = _helper.ExecuteSelectStmt(pm);
+            DataTable dteme = _helper.ExecuteSelectStmt(eme);
+            ViewBag.RM = new SelectList(dtRm.AsDataView(),"empid","name");
+            ViewBag.PM = new SelectList(dtPm.AsDataView(), "empid", "name");
+            ViewBag.EME= new SelectList(dteme.AsDataView(), "empid", "name");
+            if (Session["PerformanceReports"] != null)
+            {
+                var list = Session["PerformanceReports"] as IEnumerable<ReportsModel>;
+                return PartialView("RmeWisePerformanceReports", list);
+            }
+            return View();
+        }
+        [HttpPost]
+        public ActionResult RmeWisePerformanceReports(int rm,int pm,int eme,DateTime fromDate,DateTime toDate)
+        {
+            List<ReportsModel> repmodels=new List<ReportsModel>();
+           
+            DataTable dtgetEMEDetails = _helper.ExecuteSelectStmtForDateTime("rmpmeme_wise_performance_report",
+                "@sdate", fromDate.ToShortDateString(), "@edate", toDate.ToShortDateString(), null, null, "@emeid",
+                rm.ToString(), "@pmid", pm.ToString(), "@rmid", eme.ToString());
+            foreach (DataRow row in dtgetEMEDetails.Rows)
+            {
+                if (row != null)
+                {
+                    ReportsModel reports = new ReportsModel();
+                    reports.JobCardNumber = Convert.ToInt32(row["JOBCARDNO"]);
+                    reports.WorkShopName = row["WORKSHOP"].ToString();
+                    reports.District= row["DISTRICT"].ToString();
+                    reports.VehicleNumber = row["VEHICLENUMBER"].ToString();
+                    reports.DOR = Convert.ToDateTime(row["DATEOFREPAIR"]);
+                    reports.DOD = Convert.ToDateTime(row["DATEOFDELIVERY"]);
+                    reports.Aggregate =row["AGGRIGATENAME"].ToString();
+                    reports.ServiceIncharge = row["SERVICEINCHARGE"].ToString();
+                    reports.Status = row["STATUS"].ToString();
+                    reports.Mechanic = row["MECHANIC"].ToString();
+                    reports.Category = row["CATEGORIES"].ToString();
+                    reports.SubCategory = row["SUBCATEGORY"].ToString();
+                    repmodels.Add(reports);
+                }
+               
+            }
+            Session["PerformanceReports"] = repmodels;
+            return RedirectToAction("RmeWisePerformanceReport");
+        }
+            
+           
+          
+        }
+
     }
-}

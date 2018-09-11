@@ -357,7 +357,9 @@
             }
         }
 
-        $('#btnAddLubes').click(function() {
+        $('#btnAddLubes').click(function () {
+            $('#btnSubmit').show();
+            $('#divradio').show();
             if (ValidateLubes()) {
                 $('#btnSubmit').show();
                 lubesorderrItems.push({
@@ -454,6 +456,7 @@
                     success: function(response) {
                         if (response > 0) {
                             alert('Record Inserted');
+                            window.location.href = "/Vehicle/GetPendingStatusDetails";
                         }
                         else if (response < 0) {
                             alert('Available  Quantity of Lubes is less than Requested Quantity');
