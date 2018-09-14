@@ -60,7 +60,7 @@ namespace Fleet_WorkShop.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveJobCardDetails(VehicleModel model,string vehicleNumber)
+        public ActionResult SaveJobCardDetails(VehicleModel model, string vehicleNumber)
         {
             foreach (var item in model.jobcarditems)
             {
@@ -85,12 +85,14 @@ namespace Fleet_WorkShop.Controllers
                     SubCat = item.SubCat,
                     ManufacturerId = item.ManufacturerId
                 };
-                DataTable dtGetEmpmre =
-                    _helper.ExecuteSelectStmtusingSP("spGetEMEPMRM",null,null,null,null, "@vehiclenumber", vehicleNumber);
-                int emt = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "EMT").Select(x => x.Field<int>("empid")).FirstOrDefault();
-                int pm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "PM")
+                var dtGetEmpmre =
+                    _helper.ExecuteSelectStmtusingSP("spGetEMEPMRM", null, null, null, null, "@vehiclenumber",
+                        vehicleNumber);
+                var emt = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "EMT")
                     .Select(x => x.Field<int>("empid")).FirstOrDefault();
-                int rm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "RM")
+                var pm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "PM")
+                    .Select(x => x.Field<int>("empid")).FirstOrDefault();
+                var rm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "RM")
                     .Select(x => x.Field<int>("empid")).FirstOrDefault();
                 _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", vehDetails.DistrictId, vehDetails.VehId,
                     vehDetails.DateOfRepair, vehDetails.ModelNumber, vehDetails.Odometer, vehDetails.ReceivedLocation,
@@ -98,7 +100,8 @@ namespace Fleet_WorkShop.Controllers
                     vehDetails.ApproximateCost, Convert.ToInt32(vehDetails.AllotedMechanic), vehDetails.WorkShopId,
                     Convert.ToInt32(vehDetails.ServiceEngineer), Convert.ToInt32(vehDetails.LaborCharges),
                     Convert.ToInt32(vehDetails.CategoryIdd), Convert.ToInt32(item.SubCat),
-                    Convert.ToInt32(item.ManufacturerId),Convert.ToInt32(rm), Convert.ToInt32(pm), Convert.ToInt32(emt));
+                    Convert.ToInt32(item.ManufacturerId), Convert.ToInt32(rm), Convert.ToInt32(pm),
+                    Convert.ToInt32(emt));
             }
 
             return RedirectToAction("SaveJobCardDetails");

@@ -37,44 +37,46 @@
        
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
+    @foreach (var item in Model) {
+        <tr>
          
-        <td>
-            @Html.DisplayFor(modelItem => item.WorkShopName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.JobCardNumber)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.VehicleNumber)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DOR)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Aggregate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Category)
-        </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkShopName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobCardNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VehicleNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DOR)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Aggregate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
 
-        <td>
-            @Html.DisplayFor(modelItem => item.SubCategory)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Mechanic)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ServiceIncharge)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Status)
-        </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mechanic)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ServiceIncharge)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
         
        
 
-    </tr>
-}
+        </tr>
+    }
 
 </table>
+<br/>
+@Html.ActionLink("Back", "RmeWisePerformanceReport",new {id=1})

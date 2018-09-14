@@ -9,6 +9,15 @@
     });
 </script>
 <script>
+    $(document).ready(function () {
+        var uri = window.location.toString();
+        if (uri.indexOf("1") > 0) {
+            var cleanUri = uri.substring(0, uri.indexOf("1"));
+            window.history.replaceState({}, document.title, cleanUri);
+        }
+    });
+</script>
+<script>
     $(function() {
         $('#btnShow').click(function() {
             var serviceUrl = '/Reports/RmeWisePerformanceReports';

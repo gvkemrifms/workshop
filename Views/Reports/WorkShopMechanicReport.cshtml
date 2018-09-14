@@ -1,5 +1,13 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
-
+<script>
+    $(document).ready(function () {
+        var uri = window.location.toString();
+        if (uri.indexOf("1") > 0) {
+            var cleanUri = uri.substring(0, uri.indexOf("1"));
+            window.history.replaceState({}, document.title, cleanUri);
+        }
+    });
+</script>
 <script type="text/javascript">
     $(function () {
         $('#txtStartDate,#txtEndDate').datepicker({

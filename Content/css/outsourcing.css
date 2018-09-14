@@ -104,7 +104,7 @@ text-align:center
         width: 17%;
         float:right;
         position: absolute;
-        margin-top:220px;
+        margin-top:300px;
         margin-left:600px;
      margin-bottom:200px;
         
@@ -133,14 +133,14 @@ text-align:center
         margin-left:-150px;
         width:50%;
         height:15%;
-       margin-top:220px;
+       margin-top:240px;
     }
     #tblLubes
     {
          margin-left:0px;
-         width:10%;
+         width:50%;
          height:15%;
-        margin-top:75px;
+        margin-top:160px;
        position:absolute;
        overflow:hidden;
     }

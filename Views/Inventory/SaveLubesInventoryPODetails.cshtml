@@ -43,6 +43,7 @@
 </style>
 
 <script type="text/javascript">
+  
     $(function() {
         $("#myInput").on("keyup",
             function() {
@@ -57,11 +58,11 @@
     });
 </script>
 <script type="text/javascript">
-    $(function() {
-        $("#txtQuantity").keyup(function() {
-            this.value = this.value.replace(/[^0-9\.]/g, '');
-        });
-    });
+    //$(function() {
+    //    $("#txtQuantity").keyup(function() {
+    //        this.value = this.value.replace(/[^0-9\.]/g, '');
+    //    });
+    //});
 
     function Validations() {
 
@@ -208,6 +209,40 @@
     }
 
 
+</script>
+<script>
+    $(function () {
+        $('#txtQuantity').blur(function () {
+            alert('hello');
+            if ($('#Lubes option:selected').text() === "--Select--") {
+                $('#txtQuantity').val('');
+                return alert('Please select Lubricant');
+
+            }
+            var data = {
+                qty: $('#txtQuantity').val(),
+                lubesid: $('#Lubes').val()
+            }
+
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/CheckLubesQuantity/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response === 0) {
+                        alert("Quantity entered is more than P.O Quantity");
+                        $('#txtQuantity').val('');
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
 </script>
 <script type="text/javascript">
 
@@ -367,7 +402,7 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">P.O Date</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtPODate" placeholder="P.O Date">
+                        <input type="text" class="form-control" id="txtPODate" placeholder="P.O Date" onkeypress="return false;">
                     </div>
                 </div>
 

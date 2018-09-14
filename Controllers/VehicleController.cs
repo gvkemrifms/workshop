@@ -4,10 +4,9 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
-using System.Web.SessionState;
 using Fleet_WorkShop.Models;
 using Newtonsoft.Json;
-using Rotativa;
+using Rotativa.Core.Options;
 using Rotativa.MVC;
 
 namespace Fleet_WorkShop.Controllers
@@ -22,7 +21,6 @@ namespace Fleet_WorkShop.Controllers
         // GET: Vehicle
         public ActionResult GetVehicleDetails()
         {
-         
             return Session["Employee_Id"] == null
                 ? RedirectToAction("Login", "Account")
                 : RedirectToAction("SaveVehicleDetails");
@@ -217,7 +215,7 @@ namespace Fleet_WorkShop.Controllers
                         EmployeeName = x.Field<string>("Name"),
                         Status = x.Field<string>("status"),
                         JobCardNumber = x.Field<int>("JobCardNumber"),
-                        CompletedDate=x.Field<DateTime>("CompletedDate")
+                        CompletedDate = x.Field<DateTime?>("CompletedDate")
                     });
             Session["CompletedStatus"] = dtCompletedStatus;
             var dtHandOver = _helper.ExecuteSelectStmtusingSP("spGetDesidnationDetails");
@@ -227,8 +225,7 @@ namespace Fleet_WorkShop.Controllers
 
         public PartialViewResult EditPendingStatusDetails(Guid? id)
         {
-           
-                  IEnumerable<JobCardPendingCases> pendingCases = new List<JobCardPendingCases>();
+            IEnumerable<JobCardPendingCases> pendingCases = new List<JobCardPendingCases>();
             if (id != null)
             {
                 var dtPendingStatus = Session["PendingStatus"] as DataTable;
@@ -255,10 +252,11 @@ namespace Fleet_WorkShop.Controllers
             Session["JobCardNumber"] = pendingCases.Select(x => x.JobCardNumber).FirstOrDefault();
             return PartialView("_EditPendingStatusDetails", pendingCases);
         }
-     
+
         public ActionResult GetVehicleCompletedStatusDetails(Guid? id)
         {
-            JobCardPendingCases completedCasesModel = new JobCardPendingCases();
+            if (id == null) return RedirectToAction("GetCompletedStatusDetails");
+            var completedCasesModel = new JobCardPendingCases();
             IEnumerable<JobCardPendingCases> completedCases = new List<JobCardPendingCases>();
             if (id != null)
             {
@@ -271,7 +269,7 @@ namespace Fleet_WorkShop.Controllers
                             VehicleNumber = x.Field<string>("VehicleNumber"),
                             DistrictName = x.Field<string>("District"),
                             DateOfRepair = x.Field<DateTime>("DateOfRepair").Date,
-                            CompletedDate = x.Field<DateTime>("CompletedDate").Date,
+                            CompletedDate = x.Field<DateTime?>("CompletedDate"),
                             Complaint = x.Field<string>("ServiceGroup_Name"),
                             WorkShopName = x.Field<string>("workshop_name"),
                             EmployeeName = x.Field<string>("Name"),
@@ -280,23 +278,25 @@ namespace Fleet_WorkShop.Controllers
                             OutSourcingAmount = x.Field<decimal?>("Amount")
                         });
                 ViewBag.WorkShopName = completedCases.Select(x => x.WorkShopName).FirstOrDefault();
-                completedCasesModel.WorkShopName= completedCases.Select(x => x.WorkShopName).FirstOrDefault();
+                completedCasesModel.WorkShopName = completedCases.Select(x => x.WorkShopName).FirstOrDefault();
                 completedCasesModel.VehicleNumber = completedCases.Select(x => x.VehicleNumber).FirstOrDefault();
-                completedCasesModel.CompletedDate= completedCases.Select(x => x.CompletedDate).FirstOrDefault();
-                completedCasesModel.DateOfRepair= completedCases.Select(x => x.DateOfRepair).FirstOrDefault();
+                completedCasesModel.CompletedDate = completedCases.Select(x => x.CompletedDate).FirstOrDefault();
+                completedCasesModel.DateOfRepair = completedCases.Select(x => x.DateOfRepair).FirstOrDefault();
                 ViewBag.VehicleNumber = completedCasesModel.VehicleNumber;
-                string getVehIdQuery = "select Id from m_GetVehicleDetails where VehicleNumber='"+ completedCasesModel.VehicleNumber + "'";
-                DataTable dtVeh = _helper.ExecuteSelectStmt(getVehIdQuery);
-                int vehId = dtVeh.AsEnumerable().Select(x => x.Field<int>("Id")).FirstOrDefault();
+                var getVehIdQuery = "select Id from m_GetVehicleDetails where VehicleNumber='" +
+                                    completedCasesModel.VehicleNumber + "'";
+                var dtVeh = _helper.ExecuteSelectStmt(getVehIdQuery);
+                var vehId = dtVeh.AsEnumerable().Select(x => x.Field<int>("Id")).FirstOrDefault();
                 completedCasesModel.VehicleIdData = vehId;
-                string getAddressDetails =
+                var getAddressDetails =
                     "select top 1 d.District,jc.ReceivedLoc as Location,jc.Odometer from [t_VehicleJobCardDetails] jc join m_districts d on d.Id=jc.DistrictId where jc.VehicleId=" +
                     vehId + "";
-                DataTable dtVehicleRepairInfo = _helper.ExecuteSelectStmt(getAddressDetails);
+                var dtVehicleRepairInfo = _helper.ExecuteSelectStmt(getAddressDetails);
                 ViewBag.AddressDetails = dtVehicleRepairInfo;
                 Session["AddressDetails"] = dtVehicleRepairInfo;
-                DataTable showSparePartGrid = _helper.ExecuteSelectStmtusingSP("spGetSparePartGrid",null,null,null,null,"@vehiclenumber", completedCasesModel.VehicleNumber);
-               decimal sParesSum= showSparePartGrid.AsEnumerable().Sum(x => x.Field<decimal>("totalamount"));
+                var showSparePartGrid = _helper.ExecuteSelectStmtusingSP("spGetSparePartGrid", null, null, null, null,
+                    "@vehiclenumber", completedCasesModel.VehicleNumber);
+                var sParesSum = showSparePartGrid.AsEnumerable().Sum(x => x.Field<decimal>("totalamount"));
                 ViewBag.SparePartsBill = sParesSum;
                 completedCasesModel.SparePartsBill = sParesSum;
                 ViewBag.ShowSparesGrid = showSparePartGrid;
@@ -305,25 +305,26 @@ namespace Fleet_WorkShop.Controllers
                     _helper.ExecuteSelectStmtusingSP("GetLaborChargesReport", "@vehicleid", vehId.ToString());
                 ViewBag.GetLaborChargesReport = dtGetLaborChargesReport;
                 Session["LabourChargesGrid"] = dtGetLaborChargesReport;
-           int labourSum = dtGetLaborChargesReport.AsEnumerable().Sum(x => x.Field<int>("LaborCharges"));
-           
-               ViewBag.LaborBill = labourSum;
+                var labourSum = dtGetLaborChargesReport.AsEnumerable().Sum(x => x.Field<int>("LaborCharges"));
+
+                ViewBag.LaborBill = labourSum;
                 completedCasesModel.LaborCharges = labourSum;
-                DataTable showLubesGrid = _helper.ExecuteSelectStmtusingSP("spGetLubesGrid", null, null, null, null, "@vehiclenumber", completedCasesModel.VehicleNumber);
+                var showLubesGrid = _helper.ExecuteSelectStmtusingSP("spGetLubesGrid", null, null, null, null,
+                    "@vehiclenumber", completedCasesModel.VehicleNumber);
                 ViewBag.ShowLubesGrid = showLubesGrid;
                 Session["LubesGrid"] = showLubesGrid;
-                decimal lubesSum = showLubesGrid.AsEnumerable().Sum(x => x.Field<decimal>("totalamount"));
+                var lubesSum = showLubesGrid.AsEnumerable().Sum(x => x.Field<decimal>("totalamount"));
                 ViewBag.LubesBill = lubesSum;
                 completedCasesModel.LubesBill = lubesSum;
-                decimal finalBillAmount = sParesSum + labourSum + lubesSum;
+                var finalBillAmount = sParesSum + labourSum + lubesSum;
                 ViewBag.FinalBillAmount = finalBillAmount;
                 completedCasesModel.FinalBillAmount = finalBillAmount;
                 Session["completedCasesModel"] = completedCasesModel;
-
             }
-            var dtVehicleSpareParts = _helper.ExecuteSelectStmtusingSP("spGetVehicleSpares", null, null, null, null,"@vehicleNumber", completedCases.Select(x => x.VehicleNumber).FirstOrDefault());
+            var dtVehicleSpareParts = _helper.ExecuteSelectStmtusingSP("spGetVehicleSpares", null, null, null, null,
+                "@vehicleNumber", completedCases.Select(x => x.VehicleNumber).FirstOrDefault());
             Session["getVehicleSpares"] = dtVehicleSpareParts;
-            
+
             //ViewBag.SpareParts = new SelectList(dtVehicleSpareParts.AsDataView(), "Id", "PartName");
             //Session["JobCardNumber"] = pendingCases.Select(x => x.JobCardNumber).FirstOrDefault();
             return View();
@@ -332,27 +333,26 @@ namespace Fleet_WorkShop.Controllers
 
         public ActionResult GetInvoicePrint()
         {
-            
-            JobCardPendingCases completedCasesModel = Session["completedCasesModel"] as JobCardPendingCases;
+            var completedCasesModel = Session["completedCasesModel"] as JobCardPendingCases;
             if (completedCasesModel != null)
             {
-                string aggregateQuery =
+                var aggregateQuery =
                     "select mw.ServiceGroup_Name from t_VehicleJobCardDetails vj join M_FMS_MaintenanceWorksServiceGroupDetails mw on vj.NatureOfComplaint=mw.ServiceGroup_Id where vj.VehicleId=" +
                     completedCasesModel.VehicleIdData + "";
                 ViewBag.NatureOfComplaint = _helper.ExecuteSelectStmt(aggregateQuery);
-                string workshopdetails = "select* from m_workshop where workshop_name = '" +
-                                         completedCasesModel.WorkShopName + "'";
-                DataTable dtWorkShopDetails = _helper.ExecuteSelectStmt(workshopdetails);
-                ViewBag.Location=dtWorkShopDetails.AsEnumerable().Select(x => x.Field<string>("location")).FirstOrDefault();
-                ViewBag.Mobile= dtWorkShopDetails.AsEnumerable().Select(x => x.Field<string>("phone")).FirstOrDefault();
+                var workshopdetails = "select* from m_workshop where workshop_name = '" +
+                                      completedCasesModel.WorkShopName + "'";
+                var dtWorkShopDetails = _helper.ExecuteSelectStmt(workshopdetails);
+                ViewBag.Location = dtWorkShopDetails.AsEnumerable().Select(x => x.Field<string>("location"))
+                    .FirstOrDefault();
+                ViewBag.Mobile = dtWorkShopDetails.AsEnumerable().Select(x => x.Field<string>("phone"))
+                    .FirstOrDefault();
             }
             if (Session != null)
-            {
-                
                 if (completedCasesModel != null)
                 {
                     ViewBag.WorkShopName = completedCasesModel.WorkShopName;
-                    string vehicleNumber = completedCasesModel.VehicleNumber;
+                    var vehicleNumber = completedCasesModel.VehicleNumber;
                     ViewBag.VehicleNumber = vehicleNumber;
                     ViewBag.VehId = completedCasesModel.VehicleIdData;
                     ViewBag.AddressDetails = Session["AddressDetails"] as DataTable;
@@ -366,18 +366,15 @@ namespace Fleet_WorkShop.Controllers
                     ViewBag.CompletedDate = Convert.ToDateTime(completedCasesModel.CompletedDate).ToShortDateString();
                     ViewBag.DateOfRepair = Convert.ToDateTime(completedCasesModel.DateOfRepair).ToShortDateString();
                 }
-               
-            }           
-           return new PartialViewAsPdf("_GetVehicleCompletedStatusDetails", completedCasesModel);
+            return new PartialViewAsPdf("_GetVehicleCompletedStatusDetails", completedCasesModel);
 
-            
         }
+
         public ActionResult EditPendingStatusDetails1(Guid? id)
         {
             IEnumerable<JobCardPendingCases> pendingCases = new List<JobCardPendingCases>();
             if (id != null)
             {
-                
                 var dtPendingStatus = Session["PendingStatus"] as DataTable;
                 if (dtPendingStatus != null)
                     pendingCases = dtPendingStatus.AsEnumerable().Where(x => x.Field<Guid>("Id") == id)
@@ -394,14 +391,14 @@ namespace Fleet_WorkShop.Controllers
                             JobCardNumber = x.Field<int>("JobCardNumber"),
                             OutSourcingAmount = x.Field<decimal?>("Amount")
                         });
-                Session["VehicleIdsOnJobCard"]= pendingCases.Select(x => x.VehicleId).FirstOrDefault();
+                Session["VehicleIdsOnJobCard"] = pendingCases.Select(x => x.VehicleId).FirstOrDefault();
                 Session["workshopName"] = pendingCases.Select(x => x.WorkShopName).FirstOrDefault();
                 ViewBag.VehicleNumber = pendingCases.Select(x => x.VehicleNumber).FirstOrDefault();
                 ViewBag.DateOfRepair = pendingCases.Select(x => x.DateOfRepair).FirstOrDefault();
                 ViewBag.WorkShopName = pendingCases.Select(x => x.WorkShopName).FirstOrDefault();
                 ViewBag.Mechanic = pendingCases.Select(x => x.EmployeeName).FirstOrDefault();
                 ViewBag.OutSourcingAmount = pendingCases.Select(x => x.OutSourcingAmount).FirstOrDefault();
-                if(pendingCases.Select(x => x.Status).FirstOrDefault()=="Completed")
+                if (pendingCases.Select(x => x.Status).FirstOrDefault() == "Completed")
                     return RedirectToAction("GetPendingStatusDetails");
             }
             else
@@ -491,13 +488,14 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult AddIssues(int aggregates, int categories, int subCategories)
         {
             var vehicleNumber = Session["VehicleNumber"].ToString();
-            DataTable dtGetEmpmre =
-                _helper.ExecuteSelectStmtusingSP("spGetEMEPMRM", null, null, null, null, "@vehiclenumber", vehicleNumber);
-            int emt = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "EMT")
+            var dtGetEmpmre =
+                _helper.ExecuteSelectStmtusingSP("spGetEMEPMRM", null, null, null, null, "@vehiclenumber",
+                    vehicleNumber);
+            var emt = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "EMT")
                 .Select(x => x.Field<int>("empid")).FirstOrDefault();
-            int pm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "PM")
+            var pm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "PM")
                 .Select(x => x.Field<int>("empid")).FirstOrDefault();
-            int rm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "RM")
+            var rm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "RM")
                 .Select(x => x.Field<int>("empid")).FirstOrDefault();
             var dtVehicleInfo = Session["VehicleInfoByNumber"] as DataTable;
             var costQuery =
@@ -538,7 +536,7 @@ namespace Fleet_WorkShop.Controllers
                 vehDetails.ReceivedLocation, vehDetails.PilotId, vehDetails.PilotName, vehDetails.DateOfDelivery,
                 vehDetails.AggregateId, vehDetails.ApproximateCost, vehDetails.AllotedMechanic, vehDetails.WorkShopId,
                 vehDetails.ServiceEngineer, vehDetails.LaborCharges, vehDetails.IdCategory, vehDetails.SubCategory,
-                vehDetails.ManufacturerId,Convert.ToInt32(rm),Convert.ToInt32(pm),Convert.ToInt32(emt));
+                vehDetails.ManufacturerId, Convert.ToInt32(rm), Convert.ToInt32(pm), Convert.ToInt32(emt));
             return Json(returnVal, JsonRequestBehavior.AllowGet);
         }
 
@@ -563,7 +561,7 @@ namespace Fleet_WorkShop.Controllers
         }
 
         public ActionResult SaveCalculateFifo(VehicleModel pendingCases, string status)
-        {   
+        {
             var vehicleNumber = pendingCases.itemmodel.AsEnumerable().Select(x => x.VehicleNumber).FirstOrDefault();
             var pendingStatusSpares = Session["pendingStatusSpareDetails"] as List<JobCardPendingCases>;
 
@@ -584,25 +582,24 @@ namespace Fleet_WorkShop.Controllers
                     .Select(x => new {PartName = x.Field<string>("partnumber"), PartId = x.Field<int>("Id")});
                 foreach (var itemm in pendingCases.itemmodel)
                 foreach (var spare in spares)
-                {
                     if (itemm.SparePartId == spare.PartId)
                     {
                         var dtcostDetails = _helper.ExecuteSelectStmtusingSP("GetCostBySparePartNumber", null, null,
                             null, null, "@partnumber", spare.PartName);
                         var sumOfQuantity = dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity")).Sum();
                         if (itemm.Quantity <= sumOfQuantity)
-                        {
                             if (itemm.Quantity <= dtcostDetails.AsEnumerable().Select(x => x.Field<int>("Quantity"))
                                     .FirstOrDefault())
                             {
                                 var cost = dtcostDetails.AsEnumerable().Select(x => x.Field<decimal>("Cost"))
                                     .FirstOrDefault();
-                                    var billNumber= dtcostDetails.AsEnumerable().Select(x => x.Field<string>("BillNumber"))
-                                        .FirstOrDefault();
-                                    var totalAmount = cost * itemm.Quantity;
+                                var billNumber = dtcostDetails.AsEnumerable().Select(x => x.Field<string>("BillNumber"))
+                                    .FirstOrDefault();
+                                var totalAmount = cost * itemm.Quantity;
                                 var res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails",
                                     itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, itemm.Quantity,
-                                    totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status, Convert.ToString(billNumber, CultureInfo.CurrentCulture));
+                                    totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status,
+                                    Convert.ToString(billNumber, CultureInfo.CurrentCulture));
                                 if (res == 1)
                                 {
                                     var itemTotalQuantity =
@@ -616,14 +613,11 @@ namespace Fleet_WorkShop.Controllers
                                         receiptId, updatedQuantity);
 
                                     if (status == "Completed")
-                                    {
                                         UpdateStatusToComplete(status, vehicleNumber);
 
-                                    }
-
-                                        //return Json(res, JsonRequestBehavior.AllowGet);
+                                    //return Json(res, JsonRequestBehavior.AllowGet);
                                     return Json(res, JsonRequestBehavior.AllowGet);
-                                    }
+                                }
                             }
                             else
                             {
@@ -643,10 +637,11 @@ namespace Fleet_WorkShop.Controllers
                                             totalAmount = cost * Convert.ToInt32(row["Quantity"]);
                                             qty = Convert.ToInt32(row["Quantity"]);
                                         }
-                                        var billNumber = row["BillNumber"].ToString();                                         
-                                            var res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails",
+                                        var billNumber = row["BillNumber"].ToString();
+                                        var res = _helper.ExecuteInsertSparesIssueStatement("InsertSpareIssueDetails",
                                             itemm.VehicleNumber, pendingCases.WorkShopId, itemm.SparePartId, qty,
-                                            totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status,Convert.ToString(billNumber, CultureInfo.CurrentCulture));
+                                            totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status,
+                                            Convert.ToString(billNumber, CultureInfo.CurrentCulture));
 
                                         if (res == 1)
                                         {
@@ -663,17 +658,14 @@ namespace Fleet_WorkShop.Controllers
                                             if (result == 1)
                                                 if (remainingQuantity <= 0)
                                                     itemm.Quantity = -remainingQuantity;
-                                                //return Json(res, JsonRequestBehavior.AllowGet);
-                                            string deleteZeroQty = "delete from t_SpareParts_Stock where quantity=0";
+                                            //return Json(res, JsonRequestBehavior.AllowGet);
+                                            var deleteZeroQty = "delete from t_SpareParts_Stock where quantity=0";
                                             _helper.ExecuteSelectStmt(deleteZeroQty);
-                                            }
                                         }
+                                    }
                             }
-                        }
                         else
-                        {
                             return Json(result, JsonRequestBehavior.AllowGet);
-                        }
 
 
                         //string deleteZeroQty = "delete from t_SpareParts_Stock where quantity=0";
@@ -684,56 +676,56 @@ namespace Fleet_WorkShop.Controllers
                             return RedirectToAction("GetPendingStatusDetails", "Vehicle");
                         }
                     }
-                }
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetCostForEachSpare(int spareId)
         {
-            string costQuery = "select cost from m_spareparts where Id=" + spareId + "";
-            DataTable dtCost = _helper.ExecuteSelectStmt(costQuery);
-            decimal unitPrice = dtCost.AsEnumerable().Select(x => x.Field<decimal>("Cost")).FirstOrDefault();
+            var costQuery = "select cost from m_spareparts where Id=" + spareId + "";
+            var dtCost = _helper.ExecuteSelectStmt(costQuery);
+            var unitPrice = dtCost.AsEnumerable().Select(x => x.Field<decimal>("Cost")).FirstOrDefault();
             return Json(unitPrice, JsonRequestBehavior.AllowGet);
         }
 
-        public  void UpdateStatusToComplete(string status,string vehicleNumber)
+        public void UpdateStatusToComplete(string status, string vehicleNumber)
         {
-            int vehicId = 0;
-                string getVehicId =
-                    "select Id from m_GetVehicleDetails where vehiclenumber = '" +
-                    vehicleNumber + "'";
-                DataTable dtGetVehId = _helper.ExecuteSelectStmt(getVehicId);
-                vehicId = dtGetVehId.AsEnumerable().Select(x => x.Field<int>("Id"))
-                    .FirstOrDefault();
-            string updateQuerySpares = "update t_VehicleJobCardDetails set status='Completed' where VehicleId=" +
-                                       vehicId + "";
+            var vehicId = 0;
+            var getVehicId =
+                "select Id from m_GetVehicleDetails where vehiclenumber = '" +
+                vehicleNumber + "'";
+            var dtGetVehId = _helper.ExecuteSelectStmt(getVehicId);
+            vehicId = dtGetVehId.AsEnumerable().Select(x => x.Field<int>("Id"))
+                .FirstOrDefault();
+            var updateQuerySpares = "update t_VehicleJobCardDetails set status='Completed' where VehicleId=" +
+                                    vehicId + "";
             _helper.ExecuteSelectStmt(updateQuerySpares);
-
-
         }
+
         public ActionResult CheckSpareQuantity(int sparePartId, int quantity)
         {
-            string sparepartstotalQty = "select sum(quantity) as TotalQuantity from t_SpareParts_Stock where SparePartId=" +
-                                        Convert.ToInt32(sparePartId) + "";
-            DataTable dtCheckStocks=_helper.ExecuteSelectStmt(sparepartstotalQty);
-            int? response = dtCheckStocks.AsEnumerable().Select(x => x.Field<int?>("TotalQuantity")).FirstOrDefault();
-            int? remainingQuantity = response - quantity;
+            var sparepartstotalQty =
+                "select sum(quantity) as TotalQuantity from t_SpareParts_Stock where SparePartId=" +
+                Convert.ToInt32(sparePartId) + "";
+            var dtCheckStocks = _helper.ExecuteSelectStmt(sparepartstotalQty);
+            var response = dtCheckStocks.AsEnumerable().Select(x => x.Field<int?>("TotalQuantity")).FirstOrDefault();
+            var remainingQuantity = response - quantity;
             return Json(remainingQuantity, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult CheckLubesQuantity(int lubricantId, int quantity)
         {
-  
-            string lubespartstotalQty = "select sum(quantity) as TotalQuantity from t_Lubes_Stock where LubricantId=" +
-                                        Convert.ToInt32(lubricantId) + "";
-            DataTable dtCheckStocks = _helper.ExecuteSelectStmt(lubespartstotalQty);
-            
-                int? response = dtCheckStocks.AsEnumerable().Select(x => x.Field<int?>("TotalQuantity")).FirstOrDefault();
-                int? remainingQuantity = response - quantity;
+            var lubespartstotalQty = "select sum(quantity) as TotalQuantity from t_Lubes_Stock where LubricantId=" +
+                                     Convert.ToInt32(lubricantId) + "";
+            var dtCheckStocks = _helper.ExecuteSelectStmt(lubespartstotalQty);
+
+            var response = dtCheckStocks.AsEnumerable().Select(x => x.Field<int?>("TotalQuantity")).FirstOrDefault();
+            var remainingQuantity = response - quantity;
             if (response == null)
                 remainingQuantity = -1;
             return Json(remainingQuantity, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult SaveCalculateLubesFifo(VehicleModel pendingCases, string status = null)
         {
             var vehicleNumber = pendingCases.itemmodel.AsEnumerable().Select(x => x.VehicleNumber).FirstOrDefault();
@@ -762,7 +754,7 @@ namespace Fleet_WorkShop.Controllers
                             {
                                 var cost = dtcostDetails.AsEnumerable().Select(x => x.Field<decimal>("CostPerLitre"))
                                     .FirstOrDefault();
-                                    var totalAmount = cost * itemm.Quantity;
+                                var totalAmount = cost * itemm.Quantity;
                                 var res = _helper.ExecuteInsertSparesIssueStatement("InsertLubeIssueDetails",
                                     itemm.VehicleNumber, pendingCases.WorkShopId, itemm.LubricantId, itemm.Quantity,
                                     totalAmount, itemm.HandOverToId, pendingCases.JobCardId, status);
@@ -780,9 +772,8 @@ namespace Fleet_WorkShop.Controllers
                                     if (status == "Completed")
                                         UpdateStatusToComplete(status, vehicleNumber);
                                     return Json(res, JsonRequestBehavior.AllowGet);
-                                    }
-                                
                                 }
+                            }
                             else
                             {
                                 foreach (DataRow row in dtcostDetails.Rows)
@@ -819,9 +810,9 @@ namespace Fleet_WorkShop.Controllers
                                             if (result == 1)
                                                 if (remainingQuantity <= 0)
                                                     itemm.Quantity = -remainingQuantity;
-                                            string deleteZeroQty = "delete from t_Lubes_Stock where quantity=0";
+                                            var deleteZeroQty = "delete from t_Lubes_Stock where quantity=0";
                                             _helper.ExecuteSelectStmt(deleteZeroQty);
-                                            }
+                                        }
                                     }
                             }
                     }
@@ -836,7 +827,6 @@ namespace Fleet_WorkShop.Controllers
 
         public ActionResult GetSparePartCost(string spareId)
         {
-        
             var getPendingSparesForCompletion = new List<JobCardPendingCases>();
             if (spareId == "") return Content("", "application/json");
             var costDetails = new List<JobCardPendingCases>();
@@ -941,8 +931,5 @@ namespace Fleet_WorkShop.Controllers
             });
             return Content(costDetails1, "application/json");
         }
-
-      
-        
     }
 }

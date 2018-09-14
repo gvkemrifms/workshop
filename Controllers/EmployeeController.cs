@@ -192,8 +192,8 @@ namespace Fleet_WorkShop.Controllers
                 Quantity = infraModel.Quantity,
                 WorkShopId = workshopId
             };
-            var returnVal = _helper.ExecuteInsertInfraStatement("InsetInfraDetails", infraDetails.CategoryId,
-                infraDetails.InfraName, infraDetails.Quantity, infraDetails.WorkShopId);
+            var returnVal = _helper.ExecuteInsertStmtusingSp("InsetInfraDetails", "@CategoryId", infraDetails.CategoryId.ToString(),"@qty",
+                infraDetails.Quantity.ToString(),"@InfraName", infraDetails.InfraName, "@workshopid", infraDetails.WorkShopId.ToString());
             return returnVal;
         }
 
@@ -223,8 +223,8 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult EditInfra(InfraStructure postInfra)
         {
             var infra = Convert.ToInt32(Session["Infra_id"]);
-            _helper.ExecuteUpdateInfraStatement(infra, "spEditInfra", postInfra.InfraName, postInfra.CategoryId,
-                postInfra.Quantity);
+            _helper.ExecuteInsertStmtusingSp("spEditInfra", "@id", infra.ToString(), "@catid", postInfra.CategoryId.ToString(), "@Infraname", postInfra.InfraName,
+                "@Qty", postInfra.Quantity.ToString());
             return RedirectToAction("SaveInfraStructureDetails");
         }
 
@@ -246,21 +246,48 @@ namespace Fleet_WorkShop.Controllers
         {
             if (Session["Employee_Id"] == null)
                 return RedirectToAction("Login", "Account");
-            int workShopId = Convert.ToInt32(Session["WorkshopId"]);
-            string query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
-           DataTable dtworkshopName=_helper.ExecuteSelectStmt(query);
+            var workShopId = Convert.ToInt32(Session["WorkshopId"]);
+            var query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
+            var dtworkshopName = _helper.ExecuteSelectStmt(query);
             ViewBag.WorkShopName = dtworkshopName.AsEnumerable().Select(x => x.Field<string>("workshop_name"))
                 .FirstOrDefault();
-            string typeExpenseQuery = "select * from m_PettyExpenseTypeHeads";
-            DataTable dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
+            var typeExpenseQuery = "select * from m_PettyExpenseTypeHeads";
+            var dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
             ViewBag.TypeOfExpense = new SelectList(dtTypeOfExpense.AsDataView(), "Id", "ExpenseType");
             return View();
         }
+
         [HttpPost]
         public ActionResult PettyExpenses(PettyExpenses expenses)
         {
-            int workShopId = Convert.ToInt32(Session["WorkshopId"]);
-           int result= _helper.ExecuteInsertPettyDetails("spInsertPettyExpenses", Convert.ToInt32(workShopId), Convert.ToInt32(expenses.TypeOfExpense),
+            var workShopId = Convert.ToInt32(Session["WorkshopId"]);
+            var result = _helper.ExecuteInsertPettyDetails("spInsertPettyExpenses", Convert.ToInt32(workShopId),
+                Convert.ToInt32(expenses.TypeOfExpense),
+                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult CommonExpenses()
+        {
+            if (Session["Employee_Id"] == null)
+                return RedirectToAction("Login", "Account");
+            var workShopId = Convert.ToInt32(Session["WorkshopId"]);
+            var query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
+            var dtworkshopName = _helper.ExecuteSelectStmt(query);
+            ViewBag.WorkShopName = dtworkshopName.AsEnumerable().Select(x => x.Field<string>("workshop_name"))
+                .FirstOrDefault();
+            var typeExpenseQuery = "select * from m_commonExpensesTypeHeads";
+            var dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
+            ViewBag.TypeOfExpense = new SelectList(dtTypeOfExpense.AsDataView(), "Id", "ExpenseType");
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult CommonExpenses(PettyExpenses expenses)
+        {
+            var workShopId = Convert.ToInt32(Session["WorkshopId"]);
+            var result = _helper.ExecuteInsertPettyDetails("spInsertCommonExpenses", Convert.ToInt32(workShopId),
+                Convert.ToInt32(expenses.TypeOfExpense),
                 Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
             return Json(result, JsonRequestBehavior.AllowGet);
         }

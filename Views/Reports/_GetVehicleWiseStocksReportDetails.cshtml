@@ -1,17 +1,7 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
 
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
-<style>
-    #aligned {
-        margin-top: -460px;
-        margin-left: 1000px;
-        position: fixed;
-        display: block;
-        padding:20px;
-        font-size: 20px;
-        color: brown;
-    }
-</style>
+
 
 <table class="table">
     <tr>
@@ -81,5 +71,5 @@
 
 </table>
 <div id="aligned">
-    @Html.ActionLink("Back","Index","Home")
+    @Html.ActionLink("Back","GetVehicleWiseStocksReport",new {id=1})
 </div>

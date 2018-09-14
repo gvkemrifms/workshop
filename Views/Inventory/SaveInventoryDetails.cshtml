@@ -47,6 +47,39 @@
 
 
 <script type="text/javascript">
+    $(function () {
+        
+        $('#txtQuantity').blur(function () {
+            if ($('#SparePart option:selected').text() === "--Select--") {
+                $('#txtQuantity').val('');
+                return alert('Please select Manufacturer (And/Or) SparePart');
+                 
+            }
+            var data = {
+                qty: $('#txtQuantity').val(),
+                sparesid:$('#SparePart').val()
+        }
+            
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/CheckQuantity/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response === 0) {
+                        alert("Quantity entered is more than P.O Quantity");
+                        $('#txtQuantity').val('');
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return true;
+        });
+    });
     $(function() {
         $("#txtQuantity").keyup(function() {
             this.value = this.value.replace(/[^0-9\.]/g, '');
@@ -119,7 +152,7 @@
 
         $("#ManufacturerName").change(function() {
             if ($('#ManufacturerName option:selected').text().toLowerCase() === "--select--") {
-                $("#SparePart").val('0');
+                //$('#SparePart option:selected').text("");
                 $('#SparePart').prop("disabled", true);
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
@@ -193,7 +226,7 @@
         });
     });
     $(function() {
-        $("#SparePart").prop("disabled", false);
+    
         var serviceUrl = '/Inventory/GetSparePODetails';
         $('#txtPONumber').blur(function() {
             var data = {
@@ -231,7 +264,7 @@
                                 "</option>");
                         }
 
-                        $("#SparePart").prop("disabled", false);
+                   
                     }
 
                 },
@@ -401,7 +434,7 @@
                 success: function(response) {
                     if (response !== 0) {
                         alert('Record Inserted');
-                       location.reload();
+                        location.reload();
                     }
 
                 },

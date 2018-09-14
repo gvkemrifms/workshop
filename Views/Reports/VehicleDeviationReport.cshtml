@@ -1,4 +1,7 @@
-﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
+﻿@model Fleet_WorkShop.Models.PettyExpenses
+
+
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
 <script>
     $(document).ready(function () {
         var uri = window.location.toString();
@@ -8,24 +11,50 @@
         }
     });
 </script>
+<style>
+    hr {
+        display: block;
+        border-style: solid;
+        border-width: 1px;
+    }
+</style>
 <script type="text/javascript">
-    $(function () {
-        $('#txtStartDate,#txtEndDate').datepicker({
+   
+    function Validations() {
+       
+        var startDate = $('#txtstartdate').val();
+        if (startDate === "") {
+            return alert('Start Date is Mandatory');
+        }
+        var endDate = $('#txtenddate').val();
+        if (endDate === "") {
+            return alert('End Date is Mandatory');
+        }
+        return true;
+    }
+
+
+</script>
+<script type="text/javascript">
+
+    $(function() {
+        $('#txtstartdate,#txtenddate').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
             yearRange: "-60:+0"
         });
     });
-    $(function () {
-        $('#btn').click(function() {
-            var serviceUrl = '/Reports/VehicleWiseRepairReports';
-            var data = {
-                startDate: $('#txtStartDate').val(),
-                endDate: $('#txtEndDate').val(),
-                vehicleId: $('#Vehicle option:selected').val()
 
+    $(function () {
+        var serviceUrl = '/Reports/VehicleDeviationReport';
+        $('#btn').click(function() {
+
+            var data = {
+                startDate: $('#txtstartdate').val(),
+                endDate: $('#txtenddate').val()
             };
+           
             $.ajax({
                 type: "POST",
                 url: serviceUrl,
@@ -34,82 +63,75 @@
                 dataType: "json",
                 success: function(response) {
                     if (response !== 0) {
-                        alert('Record Inserted');
+                        alert('Record Saved');
                     }
 
                 },
                 failure: function(response) {
                     alert(response.responseText);
                 }
-
             });
-
         });
-
     });
 </script>
+@{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
     <div class="panel-heading">
-        VehicleWise Repair's Report
+        Petty Expenses
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="control-label  col-lg-4">Start Date</label>
+                    <label class="control-label col-lg-4">WorkShop</label>
                     <div class="col-lg-8">
-                        @*<select id="Vehicle" class="form-control" > </select>*@
-                        <input type="text" class="form-control" id="txtStartDate" placeholder="Start Date" onkeypress="return false;">
+                        <input type="text" class="form-control" id="txtWorkshop" value="@ViewBag.WorkShopName" placeholder="WorkShop" readonly="readonly">
                     </div>
                 </div>
+                
                 <div class="form-group">
                     <label class="control-label col-lg-4">End Date</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtEndDate" placeholder="EndDate" maxlength="10" onkeypress="return false;">
+
+                        <input type="text" class="form-control" id="txtenddate" onkeypress="return false;" placeholder="End Date">
                     </div>
                 </div>
-
             </form>
         </div>
         <div class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="control-label  col-lg-4">Vehicle</label>
-                    <div class="col-lg-8">               
-                        @Html.DropDownList("Vehicle",ViewBag.Vehicles as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                    <label class="control-label col-lg-4">Start Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtstartdate" onkeypress="return false;" placeholder="Start Date">
                     </div>
                 </div>
+                
             </form>
+      
         </div>
-        <div style="margin-bottom: 90px" class="col-lg-6">
+     
+
+     
+        <div class="col-lg-6 col-lg-offset-6" style="margin-top:auto">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                        <button type="submit" id="btn" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
+                    <div class="col-sm-4">
+                        <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
                     </div>
-
+                 
                 </div>
             </form>
-
         </div>
+        
     </div>
-
 
     <div class="panel-footer">
 
     </div>
-    <div class="col-lg-6" style="width:100%">
-        <form class="form-horizontal">
-            <div class="form-group">
-                <div style="margin-top:30px">
-                    @*@if (Model != null)
-                        {
-                            @Html.Partial("_GetVehicleWiseStocksReportDetails");
-                        }*@
-                </div>
-
-            </div>
-        </form>
-
-    </div>
 </div>
+
+
+
+
+

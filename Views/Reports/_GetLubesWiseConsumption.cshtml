@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+
+
 <table class="table">
     <tr>
         <th>
@@ -50,3 +52,5 @@
 
 </table>
 
+<br/>
+@Html.ActionLink("Back", "LubesWiseConsumption", new { id=1})

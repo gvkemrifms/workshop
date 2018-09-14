@@ -656,6 +656,24 @@ namespace Fleet_WorkShop.Controllers
             return Json(list, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult CheckQuantity(int qty,int sparesid)
+        {
+            string quantitycheck =
+                "select (Quantity-sum(ReceivedQuantity)) as tquantity from t_sparepartspodetails where sparepartid="+ sparesid+" group by quantity";
+            DataTable dtCheckSpares = _helper.ExecuteSelectStmt(quantitycheck);
+           int quantity= dtCheckSpares.AsEnumerable().Where(x => x.Field<int>("tquantity") > qty).Select(x=>x.Field<int>("tquantity")).FirstOrDefault();
+
+            return Json(quantity,JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult CheckLubesQuantity(int qty, int lubesid)
+        {
+            string quantitycheck =
+                "select (Quantity-sum(ReceivedQuantity)) as tquantity from t_LubesPodetails where LubricantId=" + lubesid + " group by quantity";
+            DataTable dtCheckSpares = _helper.ExecuteSelectStmt(quantitycheck);
+            int quantity = dtCheckSpares.AsEnumerable().Where(x => x.Field<int>("tquantity") > qty).Select(x => x.Field<int>("tquantity")).FirstOrDefault();
+
+            return Json(quantity, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult CheckLubricantNumber(string lubricantNumber)
         {
             if (!ModelState.IsValid) return null;

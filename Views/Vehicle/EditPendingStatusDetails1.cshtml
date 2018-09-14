@@ -353,7 +353,10 @@
                 duplicates = '';
             } else {
                 $('#orderItems').html('');
-                $('#btnSubmit').hide();
+                if ($('#LubesorderItems').val()==null) {
+                    $('#btnSubmit').hide();
+                }
+                
             }
         }
 
@@ -405,7 +408,10 @@
 
             } else {
                 $('#LubesorderItems').html('');
-                $('#btnSubmit').hide();
+                if ($('#orderItems').val()==null)
+                    {
+                    $('#btnSubmit').hide();
+                    }
             }
         }
 
@@ -603,7 +609,7 @@
                     </div>
                     <label class="control-label col-lg-4" style="margin-top: 15px;">Quantity</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;">
+                        <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                     <label class="control-label  col-lg-4" style="margin-top: 15px;">HandOver To</label>
                     <div class="col-lg-8">
@@ -636,7 +642,7 @@
                     </div>
                     <label class="control-label col-lg-4" style="margin-top: 15px;">Quantity</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;">
+                        <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                     <label class="control-label  col-lg-4" style="margin-top: 15px;">HandOver To</label>
                     <div class="col-lg-8">
@@ -651,18 +657,18 @@
             </form>
         </div>
 
-        <div class="form-group" style="margin-bottom: -100px">
-            <div class="col-lg-4">
-                <div class="panel-body" id="orderItems"></div>
+            <div class="form-group" style="margin-bottom: -100px">
+                <div class="col-lg-4">
+                    <div class="panel-body" id="orderItems"></div>
 
+                </div>
             </div>
-        </div>
-        <div class="form-group" style="margin-bottom: -100px; position: absolute;">
-            <div class="col-lg-4">
-                <div class="panel-body" id="LubesorderItems"></div>
+            <div class="form-group" style="margin-bottom: -100px; position: absolute;">
+                <div class="col-lg-4">
+                    <div class="panel-body" id="LubesorderItems"></div>
 
+                </div>
             </div>
-        </div>
         <div class="col-lg-6" style="margin-bottom: 350px; margin-left: 500px; margin-top: 10px;" id="divradio">
             <input name="clkradio" type="radio" value="Inprogress"/>In progress
             <input style="margin-left: 30px" name="clkradio" type="radio" value="Completed"/>Completed
@@ -690,7 +696,7 @@
                         <label>Completed Date:</label>
                         <input id="txtcompleteddate" name="Completed Date" type="text" onkeypress="return false;" style="border: 1px solid grey;">
                         <label>Amount:</label>
-                        <input id="txtAmount" name="Amount" type="text" style="border: 1px solid grey;">
+                        <input id="txtAmount" name="Amount" type="text" style="border: 1px solid grey;" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                         <input id="submit" type="submit" value="Submit">
                     </form>
                 </div>
@@ -700,7 +706,7 @@
 
 
         </div>
-
+     
     </div>
 
     <script>

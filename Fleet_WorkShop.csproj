@@ -412,6 +412,9 @@
     <Content Include="Views\Inventory\GetScrapDetails.cshtml" />
     <Content Include="Views\Inventory\_GetScrapDetails.cshtml" />
     <Content Include="Views\Inventory\_GetScrapDetails1.cshtml" />
+    <Content Include="Views\Employee\CommonExpenses.cshtml" />
+    <Content Include="Views\Reports\VehicleDeviationReport.cshtml" />
+    <Content Include="Views\Reports\_VehicleDeviationReports.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

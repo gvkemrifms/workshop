@@ -23,29 +23,31 @@
      
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Id)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Workshop)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Vehicle)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Sparepart)
-        </td>
-        <td>
-            @Html.DisplayNameFor(model => model.Quantity)
-        </td>
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Workshop)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vehicle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sparepart)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </td>
        
-        <td>
-            @Html.DisplayFor(modelItem => item.Manufacturer)
-        </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
 
-    </tr>
-}
+        </tr>
+    }
 
 </table>
+<br/>
+@Html.ActionLink("Back", "SparePartWiseConsumption",new {id=1})

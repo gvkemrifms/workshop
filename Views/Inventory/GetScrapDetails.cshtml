@@ -82,7 +82,7 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">Net Weight</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtNetWt"  placeholder="Net Weight">
+                        <input type="text" class="form-control" id="txtNetWt"  placeholder="Net Weight" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                 </div>
             </form>
@@ -92,7 +92,7 @@
                 <div class="form-group">
                     <label class="control-label  col-lg-4">Actual Quantity</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtActual"  placeholder="Actual Quantity">
+                        <input type="text" class="form-control" id="txtActual"  placeholder="Actual Quantity" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                     <div class="col-sm-4">
                         <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -50px;margin-left:-50px">Submit</button>
