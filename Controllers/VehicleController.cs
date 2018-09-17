@@ -405,7 +405,9 @@ namespace Fleet_WorkShop.Controllers
             {
                 return RedirectToAction("GetPendingStatusDetails");
             }
-
+            var dtgrabInprogressSpares = _helper.ExecuteSelectStmtusingSP("getSparesIssueGrid",null,null,null,null, "@vehiclenumber",
+                pendingCases.Select(x => x.VehicleNumber).FirstOrDefault());
+            ViewBag.InprogressSpares = dtgrabInprogressSpares;
             var dtVehicleSpareParts = _helper.ExecuteSelectStmtusingSP("spGetVehicleSpares", null, null, null, null,
                 "@vehicleNumber", pendingCases.Select(x => x.VehicleNumber).FirstOrDefault());
             Session["getVehicleSpares"] = dtVehicleSpareParts;
@@ -437,6 +439,7 @@ namespace Fleet_WorkShop.Controllers
             //--------------------------------------------------------------------------------
             pendingCases = dtgetComplaints.AsEnumerable().Select(x => new JobCardPendingCases
             {
+                JobCardNumber = x.Field<int>("jobcardnumber"),
                 VehicleIdData = x.Field<int>("VehicleId"),
                 VehicleNumberData = x.Field<string>("VehicleNumber"),
                 CategoryData = x.Field<string>("Categories"),
@@ -449,6 +452,22 @@ namespace Fleet_WorkShop.Controllers
             return View(pendingCases);
         }
 
+        public ActionResult DeleteStockIssueDetails(int? id)
+        {
+            string qty = "select * from t_SparepartsIssue where Id=" + id + "";
+            DataTable dtgetQty=_helper.ExecuteSelectStmt(qty);
+            int quantityIssued = dtgetQty.AsEnumerable().Select(x => x.Field<int>("quantity")).FirstOrDefault();
+            string billnumber= dtgetQty.AsEnumerable().Select(x => x.Field<string>("BillNumber")).FirstOrDefault();
+            int sparepartId = dtgetQty.AsEnumerable().Select(x => x.Field<int>("SparePartId")).FirstOrDefault();
+            string updatestocks = "update [t_SpareParts_Stock] set quantity=(quantity + "+ quantityIssued+") where BillNumber='" + billnumber + 
+                                  "' and SparePartId="+ sparepartId+"";
+            _helper.ExecuteSelectStmt(updatestocks);
+            //string deleteIssueQuery = "delete from t_SparepartsIssue where Id=" + id + "";
+           //DataTable dtrows= _helper.ExecuteSelectStmt(deleteIssueQuery);
+           int count= _helper.ExecuteInsertStmtusingSp("RemoveIssuedStock","@id", id.ToString());
+           
+            return Json(count, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult GetOutSourcingJobDetails(OutSourcingJobDetails outsourcing)
         {
             var vehicleId = Convert.ToInt32(Session["VehicleId"]);
@@ -578,6 +597,7 @@ namespace Fleet_WorkShop.Controllers
             var dtGetPartNumber = Session["getVehicleSpares"] as DataTable;
             if (dtGetPartNumber != null)
             {
+                
                 var spares = dtGetPartNumber.AsEnumerable()
                     .Select(x => new {PartName = x.Field<string>("partnumber"), PartId = x.Field<int>("Id")});
                 foreach (var itemm in pendingCases.itemmodel)
@@ -616,7 +636,8 @@ namespace Fleet_WorkShop.Controllers
                                         UpdateStatusToComplete(status, vehicleNumber);
 
                                     //return Json(res, JsonRequestBehavior.AllowGet);
-                                    return Json(res, JsonRequestBehavior.AllowGet);
+                                   //if(pendingCases.itemmodel.Count>0)
+                                   //return Json(res, JsonRequestBehavior.AllowGet);
                                 }
                             }
                             else
@@ -664,18 +685,20 @@ namespace Fleet_WorkShop.Controllers
                                         }
                                     }
                             }
-                        else
-                            return Json(result, JsonRequestBehavior.AllowGet);
+                            else
+                                return Json(result, JsonRequestBehavior.AllowGet);
 
 
-                        //string deleteZeroQty = "delete from t_SpareParts_Stock where quantity=0";
-                        //_helper.ExecuteSelectStmt(deleteZeroQty);
-                        if (status == "Completed")
+                            //string deleteZeroQty = "delete from t_SpareParts_Stock where quantity=0";
+                            //_helper.ExecuteSelectStmt(deleteZeroQty);
+                            if (status == "Completed")
                         {
                             UpdateStatusToComplete(status, vehicleNumber);
                             return RedirectToAction("GetPendingStatusDetails", "Vehicle");
                         }
-                    }
+                       
+                        }
+             
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }

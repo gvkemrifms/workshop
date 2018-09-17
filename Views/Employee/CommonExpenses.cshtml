@@ -108,7 +108,7 @@
                     <label class="control-label col-lg-4">Amount</label>
                     <div class="col-lg-8">
                       
-                        <input type="text" class="form-control" id="txtAmount" placeholder="Amount">
+                        <input type="text" class="form-control" id="txtAmount" placeholder="Amount" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                 </div>
             </form>

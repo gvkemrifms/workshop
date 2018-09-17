@@ -1,8 +1,23 @@
-﻿@model IEnumerable<JobCardPendingCases>
+﻿@using System.Data
+@model IEnumerable<JobCardPendingCases>
 
 @{
     var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    #tbldiv
+    {
+        margin-top: -500px;
+        margin-left: 150px;
+        margin-bottom: 20px;
+        position: absolute;
+        width: 95%;
+
+    }
+
+</style>
+
 @Html.Hidden("HiddenId");
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <link href="~/Content/css/outsourcing.css" rel="stylesheet"/>
@@ -83,7 +98,7 @@
                     responseObj = JSON.stringify(response[0]["Cost"]);
                     $('#tblCost').empty();
                     CostDetails(response);
-                    StatusDetails(response);
+                    // StatusDetails(response);
                     // GetCostDetails(response)
                 },
                 failure: function(response) {
@@ -98,9 +113,9 @@
 
     function CostDetails(data) {
         costDetailsData = JSON.stringify(data);
-       // alert(costDetailsData);
+        // alert(costDetailsData);
         var eTable =
-            "<table id=tblCosts  ><thead><tr><th id=datess >Last Entry Date</th><th>Quantity</th><th>Cost</th></tr></thead><tbody>";
+            "<table id=tblCosts><thead><tr><th id=datess >Last Entry Date</th><th>Quantity</th><th>Cost</th></tr></thead><tbody>";
         for (var i = 0; i < data.length; i++) {
             if (data[i]['LastEntryDate'] != null && data[i]['Quantity'] !== 0) {
                 eTable += "<tr>";
@@ -114,24 +129,24 @@
         $('#tblCost').html(eTable);
     }
 
-    function StatusDetails(data) {
-        var eTable =
-            "<table id=tblStatus  ><thead><tr><th>Quantity</th><th>Total Amount</th><th>Issued Date</th><th>Status</th></tr></thead><tbody>";
-        for (var i = 0; i < data.length; i++) {
-            if (data[i]['Quantity'] !== 0 && data[i]['StatusType'] != null) {
-                eTable += "<tr>";
-                eTable += "<td>" + data[i]['Quantity'] + "</td>";
-                eTable += "<td>" + data[i]['TotalAmount'] + "</td>";
-                eTable += "<td>" + data[i]['IssuedDate'] + "</td>";
-                eTable += "<td>" + data[i]['StatusType'] + "</td>";
-                eTable += "</tr>";
-                $('#btnSubmit').show();
-            }
+    //function StatusDetails(data) {
+    //    var eTable =
+    //        "<table id=tblStatus  ><thead><tr><th>Quantity</th><th>Total Amount</th><th>Issued Date</th><th>Status</th></tr></thead><tbody>";
+    //    for (var i = 0; i < data.length; i++) {
+    //        if (data[i]['Quantity'] !== 0 && data[i]['StatusType'] != null) {
+    //            eTable += "<tr>";
+    //            eTable += "<td>" + data[i]['Quantity'] + "</td>";
+    //            eTable += "<td>" + data[i]['TotalAmount'] + "</td>";
+    //            eTable += "<td>" + data[i]['IssuedDate'] + "</td>";
+    //            eTable += "<td>" + data[i]['StatusType'] + "</td>";
+    //            eTable += "</tr>";
+    //            $('#btnSubmit').show();
+    //        }
 
-        }
-        eTable += "</tbody></table>";
-        $('#tblCostStatus').html(eTable);
-    }
+    //    }
+    //    eTable += "</tbody></table>";
+    //    $('#tblCostStatus').html(eTable);
+    //}
 
     $(function () {
         var serviceUrl = '/Vehicle/CheckSpareQuantity';
@@ -156,7 +171,7 @@
                     }
                 },
                 failure: function (response) {
-                   // alert(response.responseText);
+                    // alert(response.responseText);
                 }
             });
         });
@@ -185,7 +200,7 @@
                     }
                 },
                 failure: function (response) {
-                  //  alert(response.responseText);
+                    //  alert(response.responseText);
                 }
             });
         });
@@ -216,7 +231,7 @@
 
                 },
                 failure: function(response) {
-                   // alert(response.responseText);
+                    // alert(response.responseText);
                 }
             });
             return true;
@@ -268,14 +283,14 @@
                 dataType: "json",
                 success: function (response) {
                     responseObj = response;
-                   //$('#txtCost1').val(response);
+                    //$('#txtCost1').val(response);
                     costItems.push({ ResponseCostDetails: response });
                     //costItems[0].ResponseCostDetails;
 
 
                 },
                 failure: function (response) {
-                   // alert(response.responseText);
+                    // alert(response.responseText);
 
                 }
 
@@ -300,11 +315,11 @@
                 });
                 //orderItems.concat(costItems);
                 //alert(orderItems);
-               generatedItemsTable();
+                generatedItemsTable();
 
                 return false;
             }
-          return true;
+            return true;
         });
 
         function generatedItemsTable() {
@@ -409,9 +424,9 @@
             } else {
                 $('#LubesorderItems').html('');
                 if ($('#orderItems').val()==null)
-                    {
+                {
                     $('#btnSubmit').hide();
-                    }
+                }
             }
         }
 
@@ -434,16 +449,20 @@
                     success: function(response) {
                         if (response > 0) {
                             alert('Record Inserted');
+                            window.location.reload(true);
                             //location.reload();
-                            window.location.href = "/Vehicle/GetPendingStatusDetails";
+                            //window.location.href = "/Vehicle/GetPendingStatusDetails";
                         }
                         else if (response < 0) {
                             alert('Available SpareParts Quantity in Stock is less than Requested Quantity');
+                        } else {
+                            window.location.reload(true);
                         }
                        
                     },
                     failure: function(response) {
                         //alert(response.responseText);
+                        window.location.reload(true);
                     }
                 });
             }
@@ -496,9 +515,9 @@
     }
 </script>
 
-@Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass"})
-@Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass"})
-<table class="table1" style="margin-left: 150px; margin-top: 5px; width: 700px;">
+@Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass" })
+@Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass",@style="margin-right:-10px"})
+<table class="table1" style="margin-left: 150px; margin-top: 1px; width: 700px;">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.WorkShopName)
@@ -593,8 +612,96 @@
 </div>
 
 <br/>
-<hr/>
-<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+<div class="panel panel-primary"  style="height:40%; margin-top: -100px; width: 65%; margin-left: -5px;position: relative" align="center" >
+    <div class="panel-heading">
+        Items Issued
+    </div>
+    <div class="panel-body">
+ 
+        <table style="border-collapse: collapse; margin-top: -80px;position: relative" align="right">
+
+            <tr>
+                <th>SparePart</th>
+                <th>Part Number </th>
+
+                <th>Quantity</th>
+
+                <th>Unit Price</th>
+                <th>Issued Date</th>
+                <th>Total Amount</th>
+
+            </tr>
+
+            @if (ViewBag.InprogressSpares != null)
+
+            {
+                var dataTable = ViewBag.InprogressSpares as DataTable;
+                if (dataTable != null)
+                {
+                    foreach (DataRow dr in dataTable.Rows)
+
+                    {
+                        <tr>
+                            <td>
+                                @dr["PartName"]
+                            </td>
+                            <td>
+
+                                @dr["PartNumber"]
+
+                            </td>
+
+                            <td>
+
+                                @dr["Quantity"]
+
+                            </td>
+                            <td>
+
+                                @dr["totalamount"]
+
+                            </td>
+
+                            <td>
+
+                                @dr["IssuedDate"]
+
+                            </td>
+                            <td>
+
+                                @dr["TotalCost"]
+
+                            </td>
+                            <td>
+                                @Ajax.ActionLink("Remove", "DeleteStockIssueDetails", new {id = dr["id"]}, new AjaxOptions()
+                                {
+                                    HttpMethod = "Delete",
+                                    Confirm = "Are you sure you want to delete this Record?",
+                                    OnComplete = "function() { $(this).parent().parent().remove() }",
+                                    OnSuccess = "onSuccess"
+                                })
+                                @*@Html.ActionLink("Remove", "DeleteStockIssueDetails", new {id = dr["id"]})*@
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+
+        </table>
+    </div>
+</div>
+<script>
+    function onSuccess(result) {
+        if (result>0) {
+            alert("Deleted");
+            window.location.reload(true);
+        } 
+        
+    }
+</script>
+
+<br/>
+<div class="panel panel-primary" style="height: 100%; margin-top: 10px; width: 100%; margin-bottom: 50px;position: relative" align="center">
     <div class="panel-heading">
         Vehicle Pending Status Details
     </div>
@@ -706,9 +813,9 @@
 
 
         </div>
-     
+       
     </div>
-
+   
     <script>
         $(document).ready(function() {
             $(function() {
@@ -746,7 +853,7 @@
 
                             },
                             failure: function(response) {
-                               // alert(response.responseText);
+                                // alert(response.responseText);
                             }
                         });
                     });
@@ -764,3 +871,4 @@
 <div>
     @Html.ActionLink("Back", "GetPendingStatusDetails")
 </div>
+
