@@ -54,19 +54,55 @@
 </style>
 
 <script type="text/javascript">
-        $(function () {
-            $("#myInput").on("keyup", function () {
-                var value = $(this).val().toLowerCase();
-                $("table tr").filter(function () {
+    $(function () {
+        $("#myInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("table tr").filter(function () {
                  
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                    $(this).prevAll('thead').first().show();
-                });
-
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                $(this).prevAll('thead').first().show();
             });
+
         });
+    });
 </script>
 <script type="text/javascript">
+    $(function () {
+
+        $('#txtQuantity').blur(function () {
+            if ($('#Lubes option:selected').text() === "--Select--") {
+                $('#txtQuantity').val('');
+                return alert('Please select Manufacturer (And/Or) Lubricant');
+
+            }
+            var data = {
+                qty: $('#txtQuantity').val(),
+                sparesid: $('#Lubes').val()
+            }
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/CheckLubesAvailableQuantity/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response === 0) {
+                        alert("Quantity entered is more than P.O Quantity");
+                        $('#txtQuantity').val('');
+                        $('#Lubes').prop('selectedIndex', 0);
+                        $('#txtunitprice').val('');
+                        $('#ManufacturerName').prop('selectedIndex', 0);
+                        $("#lblAmount").text('');
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return true;
+        });
+    });
     $(function () {
         $("#txtQuantity").keyup(function () {
             this.value = this.value.replace(/[^0-9\.]/g, '');
@@ -125,10 +161,10 @@
 
         $("#txtQuantity,#txtunitprice").blur(function () {
 
-                var unitPrice = $("#txtunitprice").val();
-                var quantity = $("#txtQuantity").val();
-                var amount = parseInt(unitPrice) * parseInt(quantity);
-                $("#lblAmount").text(amount);
+            var unitPrice = $("#txtunitprice").val();
+            var quantity = $("#txtQuantity").val();
+            var amount = parseInt(unitPrice) * parseInt(quantity);
+            $("#lblAmount").text(amount);
 
         });
 
@@ -140,10 +176,12 @@
 
         $("#ManufacturerName").change(function() {
             if ($('#ManufacturerName option:selected').text().toLowerCase() === "--select--") {
-                $("#Lubes").val('0');
+                $("#Lubes").prop('selectedIndex', 0);
                 $('#Lubes').prop("disabled", true);
                 $('#txtunitprice').val('');
-                $('#lblpartnumber').text('');
+                $('#lblLubricantNumber').text('');
+                $("#lblAmount").text('');
+                $("#txtQuantity").val('');
                 return false;
             } else {
                 $('#Lubes').prop("disabled", false);
@@ -453,7 +491,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
     <div class="panel-heading">
-        Lubricant Information
+        Lubricant(Receipts)
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -516,7 +554,7 @@
         <hr />
         <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
             <div class="panel-heading">
-                Orders
+                Items
             </div>
             <div class="panel-body">
                 <div class="col-lg-6">
@@ -585,7 +623,7 @@
 
                 <div class="tablecontainer panel panel-primary" style="width: 100%; height: 100%; margin-top: 200px;" align="center">
                     <div class="panel-heading">
-                        Order Details
+                        Items(In Cart)
                     </div>
                     <div class="panel-body" id="orderItems">
                     </div>

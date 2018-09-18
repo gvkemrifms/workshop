@@ -136,6 +136,8 @@
                 $('#SparePart').prop("disabled", true);
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
+                $("#lblAmount").text('');
+                $("#txtQuantity").val('');
                 return false;
             }
             var serviceUrl = '/Inventory/GetSparePartsDetailsForManufacturer';
@@ -338,7 +340,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-        P.O Details
+        P.O Details(Spares)
     </div>
     <div class="panel-body">
 
@@ -368,7 +370,7 @@
         <hr/>
         <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
             <div class="panel-heading">
-                Receipt Items
+                 Items
             </div>
             <div class="panel-body">
                 <div class="col-lg-6">
@@ -436,7 +438,7 @@
 
                 <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
                     <div class="panel-heading">
-                        Item Details
+                        Items(in Cart)
                     </div>
                     <div class="panel-body" id="orderItems">
                     </div>

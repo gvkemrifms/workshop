@@ -281,6 +281,7 @@
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="App_Browsers\qt.browser" />
+    <None Include="Properties\PublishProfiles\WorkShop.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -411,7 +412,6 @@
     <Content Include="Views\Reports\RmeWisePerformanceReports.cshtml" />
     <Content Include="Views\Inventory\GetScrapDetails.cshtml" />
     <Content Include="Views\Inventory\_GetScrapDetails.cshtml" />
-    <Content Include="Views\Inventory\_GetScrapDetails1.cshtml" />
     <Content Include="Views\Employee\CommonExpenses.cshtml" />
     <Content Include="Views\Reports\VehicleDeviationReport.cshtml" />
     <Content Include="Views\Reports\_VehicleDeviationReports.cshtml" />

@@ -1,0 +1,231 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.SparePartsModel>
+
+@{
+    ViewBag.Title = "SpareParts Master";
+}
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
+<style>
+    #tblSpares {
+        color: red;
+        margin-left: -300px;
+        position: absolute;
+        width: 70px;
+    }
+
+    #SearchDisplay {
+        align-content: center;
+        margin-left: 140px;
+        position: relative;
+        width: 200%;
+    }
+</style>
+<script type="text/javascript">
+
+    $(function() {
+        debugger;
+        $('#myInput').blur(function() {
+            var data = {
+                search: $(this).val().toLowerCase()
+            };
+
+
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/DisplaySparePartsDetails',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    $('#tblSpares').empty();
+                    SpareDetails(response);
+
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+
+    function SpareDetails(data) {
+
+        var eTable =
+            "<table id=tblSpares  ><thead><tr><th>Manufacturer Name</th><th>Part Name</th><th>Cost</th></tr></thead><tbody>";
+        for (var i = 0; i < data.length; i++) {
+
+            eTable += "<tr>";
+            eTable += "<td>" + data[i]['ManufacturerName'] + "</td>";
+            eTable += "<td>" + data[i]['PartName'] + "</td>";
+            eTable += "<td>" + data[i]['Cost'] + "</td>";
+            eTable += "</tr>";
+
+        }
+        eTable += "</tbody></table>";
+
+        $('#SearchDisplay').html(eTable);
+    }
+
+</script>
+
+
+<script type="text/javascript">
+
+    function Validations() {
+        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+            return alert("Please select Manufacturer");
+        }
+
+
+        var partName = $('#txtpartName').val();
+        if (partName === "") {
+
+            return alert('partName is Mandatory');
+        }
+        var partNumber = $('#txtPartNumber').val();
+        if (partNumber === "") {
+
+            return alert('PartNumber is Mandatory');
+        }
+        var cost = $('#txtCost').val();
+        if (cost === "") {
+
+            return alert('Cost is Required');
+        }
+        return true;
+    }
+
+    $(function() {
+        $('#txtPartNumber').blur(function() {
+            var serviceUrl = '/Inventory/CheckSparePartsNumber';
+            var data = {
+                PartNumber: $(this).val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response) {
+                        $('#txtPartNumber').val('');
+                        alert('PartNumber alredy Exists');
+
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+        });
+    });
+    $(function() {
+        $('#btn').click(function() {
+            var serviceUrl = '/Inventory/SparePartsMaster';
+            var data = {
+                ManufacturerId: $('#Manufacturer').val(),
+                PartName: $('#txtpartName').val(),
+                PartNumber: $('#txtPartNumber').val(),
+                Cost: $('#txtCost').val(),
+                ScrapBinId: $('#ScrapBin').val()
+
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response != 0) {
+                        alert('Record Inserted');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+@{ ViewContext.FormContext = new FormContext(); }
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Spare Parts Master
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Manufacturer</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", required = true})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Part Name</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtpartName" placeholder="Part Name" required="required">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Part Number</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtPartNumber" placeholder="Part Number" required="required">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Cost</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtCost" placeholder="Cost" required="required" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+
+                    <label class="control-label col-lg-4">Scrap Bin</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("ScrapBin", ViewBag.ScrapBin as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", required = true})
+                    </div>
+
+                </div>
+            </form>
+        </div>
+        <div style="margin-bottom: 150px" class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                        <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;" onclick="if (!Validations()) return false;">Submit</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;">Reset</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+    <input type="text" id="myInput" class="form-control" placeholder="Search Part Number.." style="float: left; margin-left: 30px; margin-top: -90px; width: 300px;" align="left">
+
+    <table id="SearchDisplay" style="width: 50%"></table>
+
+    <div class="panel-footer">
+
+    </div>
+</div>

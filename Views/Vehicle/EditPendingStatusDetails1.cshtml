@@ -56,8 +56,13 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    responseObj = response;
-                    $('#txtCost1').val(response);
+                    if (response != null) {
+                        responseObj = response;
+                        $('#txtCost1').val(response);
+                    } else {
+                        alert('Item not available in the stock');
+                        $('#txtCost1').val('');
+                    }
 
                     //costItems[0].ResponseCostDetails;
 
@@ -94,19 +99,31 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    responseObj = 0;
-                    responseObj = JSON.stringify(response[0]["Cost"]);
-                    $('#tblCost').empty();
-                    CostDetails(response);
+                $('#tblCost').empty();
+                    if (response.length <= 0) {
+                        $("#SpareParts").prop('selectedIndex', 0);
+                        alert('Item not available in stock');
+                        $('#tblCost').empty();
+                    }
+                    else {
+                       
+                        responseObj = 0;
+                        responseObj = JSON.stringify(response[0]["Cost"]);
+                        $('#tblCost').empty();
+                        CostDetails(response);
+                    }
                     // StatusDetails(response);
                     // GetCostDetails(response)
                 },
                 failure: function(response) {
                     //alert(response.responseText);
+                },
+                error: function (response) {
+
+                    $("#SpareParts").prop('selectedIndex', 0);
+                    alert('Item not available in stock');
+                    $('#tblCost').empty();
                 }
-                //error: function (response) {
-                //    alert(response.responseText);
-                //}
             });
         });
     });
@@ -226,8 +243,15 @@
                 dataType: "json",
                 success: function(response) {
                     $('#tblCost').empty();
-                    CostDetails(response);
-                    StatusDetails(response);
+                    if (response.length <= 0) {
+                        alert('Item not available in the stock');
+                        $('#Lubricant').prop('selectedIndex', 0);
+                    }
+                    else
+                        {
+                        CostDetails(response);
+                        }
+                    //StatusDetails(response);
 
                 },
                 failure: function(response) {
@@ -514,6 +538,7 @@
 
     }
 </script>
+<h3 style="color: white; margin-top: -15px; padding: 10px; background-color: maroon;" align="center" >Job Card</h3>
 
 @Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass" })
 @Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass",@style="margin-right:-10px"})

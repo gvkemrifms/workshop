@@ -19,12 +19,12 @@
         });
     });
     $(function () {
-        $('#btn').click(function () {
+        $('#btn').click(function() {
             var serviceURL = '/Reports/GetVehicleWiseStocksReportDetails';
             var data = {
                 startDate: $('#txtStartDate').val(),
                 endDate: $('#txtEndDate').val(),
-                
+
             };
             $.ajax({
                 type: "POST",
@@ -32,7 +32,7 @@
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     if (response != 0) {
                         alert('Record Inserted');
                     }
@@ -40,7 +40,7 @@
                     //    alert("Failed to Insert Please check ");
                     //}
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
                 //error: function (response) {
@@ -48,7 +48,7 @@
                 //}
             });
 
-        })
+        });
 
     });
 </script>

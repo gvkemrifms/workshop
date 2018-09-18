@@ -665,6 +665,15 @@ namespace Fleet_WorkShop.Controllers
 
             return Json(quantity,JsonRequestBehavior.AllowGet);
         }
+        public ActionResult CheckLubesAvailableQuantity(int qty, int sparesid)
+        {
+            string quantitycheck =
+                "select (Quantity-sum(ReceivedQuantity)) as tquantity from t_LubesPodetails where lubricantid=" + sparesid + " group by quantity";
+            DataTable dtCheckSpares = _helper.ExecuteSelectStmt(quantitycheck);
+            int quantity = dtCheckSpares.AsEnumerable().Where(x => x.Field<int>("tquantity") > qty).Select(x => x.Field<int>("tquantity")).FirstOrDefault();
+
+            return Json(quantity, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult CheckLubesQuantity(int qty, int lubesid)
         {
             string quantitycheck =

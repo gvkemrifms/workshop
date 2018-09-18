@@ -70,6 +70,10 @@
                     if (response === 0) {
                         alert("Quantity entered is more than P.O Quantity");
                         $('#txtQuantity').val('');
+                        $('#SparePart').prop('selectedIndex', 0);
+                        $('#txtunitprice').val('');
+                        $('#ManufacturerName').prop('selectedIndex', 0);
+                        $("#lblAmount").text('');
                     }
 
                 },
@@ -153,9 +157,12 @@
         $("#ManufacturerName").change(function() {
             if ($('#ManufacturerName option:selected').text().toLowerCase() === "--select--") {
                 //$('#SparePart option:selected').text("");
+                $('#SparePart').prop("selectedIndex", 0);
                 $('#SparePart').prop("disabled", true);
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
+                $("#lblAmount").text('');
+                $("#txtQuantity").val('');
                 return false;
             } else {
                 $('#SparePart').prop("disabled", false);
@@ -451,7 +458,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-        SparePart Receipts
+        SpareParts(Receipts)
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -533,7 +540,7 @@
     <hr/>
     <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
         <div class="panel-heading">
-            Receipt Items
+           Items
         </div>
         <div class="panel-body">
             <div class="col-lg-6">
@@ -598,7 +605,7 @@
 
             <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
                 <div class="panel-heading">
-                    Item Details
+                    Items(In Cart)
                 </div>
                 <div class="panel-body" id="orderItems">
                 </div>

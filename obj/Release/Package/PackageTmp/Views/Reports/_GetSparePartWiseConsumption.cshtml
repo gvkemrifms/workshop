@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Workshop)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Vehicle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Sparepart)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </th>     
+        <th>
+            @Html.DisplayNameFor(model => model.Manufacturer)
+        </th>
+     
+    </tr>
+
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Workshop)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vehicle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sparepart)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </td>
+       
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
+
+        </tr>
+    }
+
+</table>
+<br/>
+@Html.ActionLink("Back", "SparePartWiseConsumption",new {id=1})

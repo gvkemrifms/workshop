@@ -1,0 +1,91 @@
+﻿@model IEnumerable<Aggregates>
+<script type="text/javascript">
+    function Validations() {
+        var ddlAggregates = $('#Aggregates option:selected').text().toLowerCase();
+        if (ddlAggregates === '--select--' || ddlAggregates === '') {
+            return alert("Please select Aggregates");
+
+        }
+        var categoryName = $('#txtCategory').val();
+        if (categoryName === "") {
+            return alert('Category is Mandatory');
+
+        }
+
+        return true;
+    }
+
+    $(function() {
+        $('#btn').click(function() {
+            var serviceUrl = '/Job/CategoryGroup';
+            var data = {
+                AggregateId: $('#Aggregates option:selected').val(),
+                CategoryName: $('#txtCategory').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response != 0) {
+                        alert('Record Inserted');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+
+            });
+        });
+    });
+</script>
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Categories
+    </div>
+    <div class="panel-body" style="margin-top: 30px">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Aggregates</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Aggregates", ViewBag.AggregatesDrop as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Category</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtCategory" placeholder="Category">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-4">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                        <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;" onclick="if (!Validations()) return false;">Submit</button>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="col-lg-6" style="width: 100%">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div style="margin-top: 30px">
+                    @Html.Partial("_Category");
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>

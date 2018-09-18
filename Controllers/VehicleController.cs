@@ -633,12 +633,16 @@ namespace Fleet_WorkShop.Controllers
                                         receiptId, updatedQuantity);
 
                                     if (status == "Completed")
+                                    {
                                         UpdateStatusToComplete(status, vehicleNumber);
+                                        //return RedirectToAction("GetPendingStatusDetails", "Vehicle");
 
-                                    //return Json(res, JsonRequestBehavior.AllowGet);
-                                   //if(pendingCases.itemmodel.Count>0)
-                                   //return Json(res, JsonRequestBehavior.AllowGet);
-                                }
+                                        }
+
+                                        //return Json(res, JsonRequestBehavior.AllowGet);
+                                        //if(pendingCases.itemmodel.Count>0)
+                                        //return Json(res, JsonRequestBehavior.AllowGet);
+                                    }
                             }
                             else
                             {
@@ -694,9 +698,10 @@ namespace Fleet_WorkShop.Controllers
                             if (status == "Completed")
                         {
                             UpdateStatusToComplete(status, vehicleNumber);
-                            return RedirectToAction("GetPendingStatusDetails", "Vehicle");
-                        }
-                       
+                              return RedirectToAction("GetPendingStatusDetails", "Vehicle");
+
+                            }
+
                         }
              
             }

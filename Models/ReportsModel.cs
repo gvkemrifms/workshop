@@ -73,8 +73,8 @@ namespace Fleet_WorkShop.Models
         public string Manufacturer { get; set; }
         public int ServiceInchargeId { get; internal set; }
         [DisplayName(" Repair Completion Date")]
-        public DateTime DateOfRepairCompletion { get; internal set; }
-        public int DeviationTime { get; internal set; }
+        public DateTime? DateOfRepairCompletion { get; internal set; }
+        public int? DeviationTime { get; internal set; }
         [DisplayName("Delivary Date")]
         public string DalivaryDate { get; internal set; }
         [DisplayName("Repair Date")]

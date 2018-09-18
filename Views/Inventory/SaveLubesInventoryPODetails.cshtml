@@ -124,6 +124,9 @@
                 $('#Lubes option:selected').text("");
                 $('#Lubes').prop("disabled", true);
                 $('#txtunitprice').val('');
+                $("#lblAmount").text('');
+                $("#txtQuantity").val('');
+                $('#lblLubricantNumber').text('');
                 return false;
             }
             var serviceUrl = '/Inventory/GetLubesDetailsForManufacturer';
@@ -384,7 +387,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-        Lubricant Information
+        Lubricants(P.O Details)
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -413,7 +416,7 @@
         <hr/>
         <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
             <div class="panel-heading">
-                Orders
+                Items
             </div>
             <div class="panel-body">
                 <div class="col-lg-6">
@@ -480,7 +483,7 @@
 
                 <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
                     <div class="panel-heading">
-                        Order Details
+                        Items(In Cart)
                     </div>
                     <div class="panel-body" id="orderItems">
                     </div>
