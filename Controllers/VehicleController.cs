@@ -540,7 +540,6 @@ namespace Fleet_WorkShop.Controllers
                 WorkShopId = dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("WorkshopId")).FirstOrDefault(),
                 ServiceEngineer = dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("ServiceIncharge"))
                     .FirstOrDefault(),
-                LaborCharges = dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("LaborCharges")).FirstOrDefault(),
                 ManufacturerId = dtVehicleInfo.AsEnumerable().Select(x => x.Field<int>("ManufacturerId"))
                     .FirstOrDefault(),
                 Status = dtVehicleInfo.AsEnumerable().Select(x => x.Field<string>("Status")).FirstOrDefault(),
@@ -554,8 +553,8 @@ namespace Fleet_WorkShop.Controllers
                 vehDetails.VehId, vehDetails.DateOfRepair, vehDetails.ModelNumber, vehDetails.Odometer,
                 vehDetails.ReceivedLocation, vehDetails.PilotId, vehDetails.PilotName, vehDetails.DateOfDelivery,
                 vehDetails.AggregateId, vehDetails.ApproximateCost, vehDetails.AllotedMechanic, vehDetails.WorkShopId,
-                vehDetails.ServiceEngineer, vehDetails.LaborCharges, vehDetails.IdCategory, vehDetails.SubCategory,
-                vehDetails.ManufacturerId, Convert.ToInt32(rm), Convert.ToInt32(pm), Convert.ToInt32(emt));
+                vehDetails.ServiceEngineer,vehDetails.IdCategory, vehDetails.SubCategory,
+                vehDetails.ManufacturerId, Convert.ToInt32(rm), Convert.ToInt32(pm), Convert.ToInt32(emt),0);
             return Json(returnVal, JsonRequestBehavior.AllowGet);
         }
 

@@ -68,7 +68,7 @@ namespace Fleet_WorkShop.Controllers
             var retVal = SaveEmployee(employeeDetails);
             return retVal == 1
                 ? (ActionResult) Json(retVal, JsonRequestBehavior.AllowGet)
-                : RedirectToAction("EmployeeDetails", "Employee");
+                : RedirectToAction("SaveEmployeeDetails", "Employee");
         }
 
         [HttpPost]
@@ -82,8 +82,8 @@ namespace Fleet_WorkShop.Controllers
                 ContactNumber = employeeDetails.ContactNumber,
                 DeptName = employeeDetails.DeptName,
                 Desig = employeeDetails.Desig,
-                Dob = DateTime.Parse(employeeDetails.Dob.ToString(CultureInfo.InvariantCulture)),
-                Doj = DateTime.Parse(employeeDetails.Doj.ToString(CultureInfo.InvariantCulture)),
+                Dob = DateTime.Parse(employeeDetails.Dob.ToString(CultureInfo.CurrentCulture)),
+                Doj = DateTime.Parse(employeeDetails.Doj.ToString(CultureInfo.CurrentCulture)),
                 AadharNumber = employeeDetails.AadharNumber,
                 EmailAddress = employeeDetails.EmailAddress,
                 RelievingDate = employeeDetails.RelievingDate,
@@ -242,30 +242,30 @@ namespace Fleet_WorkShop.Controllers
             return list == null ? null : Json(list, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult PettyExpenses()
-        {
-            if (Session["Employee_Id"] == null)
-                return RedirectToAction("Login", "Account");
-            var workShopId = Convert.ToInt32(Session["WorkshopId"]);
-            var query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
-            var dtworkshopName = _helper.ExecuteSelectStmt(query);
-            ViewBag.WorkShopName = dtworkshopName.AsEnumerable().Select(x => x.Field<string>("workshop_name"))
-                .FirstOrDefault();
-            var typeExpenseQuery = "select * from m_PettyExpenseTypeHeads";
-            var dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
-            ViewBag.TypeOfExpense = new SelectList(dtTypeOfExpense.AsDataView(), "Id", "ExpenseType");
-            return View();
-        }
+        //public ActionResult PettyExpenses()
+        //{
+        //    if (Session["Employee_Id"] == null)
+        //        return RedirectToAction("Login", "Account");
+        //    var workShopId = Convert.ToInt32(Session["WorkshopId"]);
+        //    var query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
+        //    var dtworkshopName = _helper.ExecuteSelectStmt(query);
+        //    ViewBag.WorkShopName = dtworkshopName.AsEnumerable().Select(x => x.Field<string>("workshop_name"))
+        //        .FirstOrDefault();
+        //    var typeExpenseQuery = "select * from m_PettyExpenseTypeHeads";
+        //    var dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
+        //    ViewBag.TypeOfExpense = new SelectList(dtTypeOfExpense.AsDataView(), "Id", "ExpenseType");
+        //    return View();
+        //}
 
-        [HttpPost]
-        public ActionResult PettyExpenses(PettyExpenses expenses)
-        {
-            var workShopId = Convert.ToInt32(Session["WorkshopId"]);
-            var result = _helper.ExecuteInsertPettyDetails("spInsertPettyExpenses", Convert.ToInt32(workShopId),
-                Convert.ToInt32(expenses.TypeOfExpense),
-                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
+        //[HttpPost]
+        //public ActionResult PettyExpenses(PettyExpenses expenses)
+        //{
+        //    var workShopId = Convert.ToInt32(Session["WorkshopId"]);
+        //    var result = _helper.ExecuteInsertPettyDetails("spInsertPettyExpenses", Convert.ToInt32(workShopId),
+        //        Convert.ToInt32(expenses.TypeOfExpense),
+        //        Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
 
         public ActionResult CommonExpenses()
         {
@@ -288,7 +288,7 @@ namespace Fleet_WorkShop.Controllers
             var workShopId = Convert.ToInt32(Session["WorkshopId"]);
             var result = _helper.ExecuteInsertPettyDetails("spInsertCommonExpenses", Convert.ToInt32(workShopId),
                 Convert.ToInt32(expenses.TypeOfExpense),
-                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
+                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount),expenses.BillNumber.ToString());
             return Json(result, JsonRequestBehavior.AllowGet);
         }
     }

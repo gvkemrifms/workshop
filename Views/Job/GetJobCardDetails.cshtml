@@ -31,9 +31,7 @@
         <th>
             @Html.DisplayNameFor(model => model.AllotedMechanicName)
         </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LaborCharges)
-        </th>
+
         <th></th>
     </tr>
 
@@ -67,9 +65,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.AllotedMechanicName)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LaborCharges)
-            </td>
+
             <td>
                 @Html.ActionLink("Edit", "Edit", new {id = item.Id}) |
                 @Ajax.ActionLink("Delete", "Delete", new {id = item.Id}, new AjaxOptions

@@ -86,5 +86,6 @@ namespace Fleet_WorkShop.Models
         public int TypeOfExpense { get; set; }
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
+        public string BillNumber { get; set; }
     }
 }

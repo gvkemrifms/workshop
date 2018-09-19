@@ -39,6 +39,7 @@ namespace Fleet_WorkShop.Controllers
                 "ServiceGroup_Id", "ServiceGroup_Name");
             ViewBag.AllotedMechanic = new SelectList(dsVehicleDistrictDetails.Tables[3].AsDataView(), "empId", "name");
             ViewBag.ServiceEngineer = new SelectList(dsVehicleDistrictDetails.Tables[4].AsDataView(), "empId", "name");
+            ViewBag.Helper = new SelectList(dsVehicleDistrictDetails.Tables[5].AsDataView(), "empId", "name");
             _vehModel.DistrictId = Convert.ToInt32(Session["Id"]);
             var dsGetJobCardDetails = _helper.FillDropDownHelperMethodWithSp("spGetJobCardDetails");
             Session["GetJobCardDetails"] = dsGetJobCardDetails;
@@ -54,13 +55,13 @@ namespace Fleet_WorkShop.Controllers
                 PilotName = x.Field<string>("PilotName"),
                 ApproximateCost = x.Field<int>("ApproxCost"),
                 AllotedMechanicName = x.Field<string>("Name"),
-                LaborCharges = x.Field<int>("LaborCharges")
+               // LaborCharges = x.Field<int>("LaborCharges")
             });
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult SaveJobCardDetails(VehicleModel model, string vehicleNumber)
+        public ActionResult SaveJobCardDetails(VehicleModel model, string vehicleNumber,int? helperId)
         {
             foreach (var item in model.jobcarditems)
             {
@@ -80,7 +81,7 @@ namespace Fleet_WorkShop.Controllers
                     DateOfRepair = item.DateOfRepair,
                     AllotedMechanic = item.AllotedMechanic,
                     ServiceEngineer = item.ServiceEngineer,
-                    LaborCharges = item.LaborCharges,
+                    //LaborCharges = item.LaborCharges,
                     CategoryIdd = item.CategoryIdd,
                     SubCat = item.SubCat,
                     ManufacturerId = item.ManufacturerId
@@ -94,14 +95,15 @@ namespace Fleet_WorkShop.Controllers
                     .Select(x => x.Field<int>("empid")).FirstOrDefault();
                 var rm = dtGetEmpmre.AsEnumerable().Where(x => x.Field<string>("Designation") == "RM")
                     .Select(x => x.Field<int>("empid")).FirstOrDefault();
+                if (helperId == null) helperId = 0;
                 _helper.ExecuteInsertJobCardDetails("SpVehicleJobCardDetails", vehDetails.DistrictId, vehDetails.VehId,
                     vehDetails.DateOfRepair, vehDetails.ModelNumber, vehDetails.Odometer, vehDetails.ReceivedLocation,
                     vehDetails.PilotId, vehDetails.PilotName, vehDetails.DateOfDelivery, vehDetails.NatureOfComplaint,
                     vehDetails.ApproximateCost, Convert.ToInt32(vehDetails.AllotedMechanic), vehDetails.WorkShopId,
-                    Convert.ToInt32(vehDetails.ServiceEngineer), Convert.ToInt32(vehDetails.LaborCharges),
+                    Convert.ToInt32(vehDetails.ServiceEngineer),
                     Convert.ToInt32(vehDetails.CategoryIdd), Convert.ToInt32(item.SubCat),
                     Convert.ToInt32(item.ManufacturerId), Convert.ToInt32(rm), Convert.ToInt32(pm),
-                    Convert.ToInt32(emt));
+                    Convert.ToInt32(emt),Convert.ToInt32(helperId));
             }
 
             return RedirectToAction("SaveJobCardDetails");

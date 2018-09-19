@@ -235,7 +235,7 @@ namespace Fleet_WorkShop.Models
         internal int ExecuteInsertJobCardDetails(string insertStmt, int districtId, int vehId, DateTime dateOfRepair,
             int modelNumber, int odometer, string receivedLocation, string pilotId, string pilotName,
             DateTime dateOfDelivery, int natureOfComplaint, int approximateCost, int allotedmechanic, int workshopid,
-            int serviceEngineer, int laborCharges, int categoryid, int subCategory, int manufacturerId,int rmid,int pmid,int emeid)
+            int serviceEngineer, int categoryid, int subCategory, int manufacturerId,int rmid,int pmid,int emeid,int? helperId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -259,13 +259,13 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@allotedmechanic", allotedmechanic);
                     comm.Parameters.AddWithValue("@workshopid", workshopid);
                     comm.Parameters.AddWithValue("@serviceengineer", serviceEngineer);
-                    comm.Parameters.AddWithValue("@laborcharges", laborCharges);
                     comm.Parameters.AddWithValue("@categories", categoryid);
                     comm.Parameters.AddWithValue("@subcategory", subCategory);
                     comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
                     comm.Parameters.AddWithValue("@rmid", rmid);
                     comm.Parameters.AddWithValue("@pmid", pmid);
                     comm.Parameters.AddWithValue("@emeid", emeid);
+                    comm.Parameters.AddWithValue("@helperid", helperId);
                     try
                     {
                         conn.Open();
@@ -1744,7 +1744,7 @@ namespace Fleet_WorkShop.Models
             return ds;
         }
 
-        public int ExecuteInsertPettyDetails(string insertStmt, int workShopId, int expensesTypeOfExpense, DateTime expensesDate, decimal expensesAmount)
+        public int ExecuteInsertPettyDetails(string insertStmt, int workShopId, int expensesTypeOfExpense, DateTime expensesDate, decimal expensesAmount,string billNumber)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -1758,6 +1758,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@type0fexpense", expensesTypeOfExpense);
                     comm.Parameters.AddWithValue("@date", expensesDate);
                     comm.Parameters.AddWithValue("@amount", expensesAmount);
+                    comm.Parameters.AddWithValue("@billnumber", billNumber);
                     try
                     {
                         conn.Open();

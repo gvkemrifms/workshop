@@ -8,6 +8,8 @@ namespace Fleet_WorkShop.Models
 {
     public class VehicleModel
     {
+        public int HelperId { get; set; }
+        public string Helper { get; set; }
         [DisplayName("Mechanic Name")]
         public string AllotedMechanicName { get; set; }
 
@@ -31,7 +33,7 @@ namespace Fleet_WorkShop.Models
         [DisplayName("Pilot Name")]
         public string PilotName { get; set; }
 
-        [DisplayName("Approximate Cost")]
+        [DisplayName("Labor Charges")]
         public int ApproximateCost { get; set; }
 
         public int IdCategory { get; set; }
