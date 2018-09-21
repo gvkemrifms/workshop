@@ -405,9 +405,12 @@
             //$('#txtunitprice').val('').focus();
             //$('#txtQuantity,#lblAmount').val('');
             generatedItemsTable();
+            $("#Lubes option:selected").attr('disabled', 'disabled');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');
+            $('#Lubes').prop('selectedIndex', 0);
+            $('#lblLubricantNumber').text('');
             return false;
 
         });
@@ -433,6 +436,16 @@
                     $row.append($('<td class=amt/>').html(val.Amount));
                     var $remove = $('<a href="#">Remove</a>');
                     $remove.click(function (e) {
+                        var vals = $(this).closest("tr").find('td:eq(1)').text();
+                        $('#Lubes option').each(function () {
+
+                            if (this.text === vals) {
+                                $(this).attr('disabled', false);
+
+                                //$('#SpareParts  option').attr('disabled', false);
+                            }
+
+                        });
                         e.preventDefault();
                         orderItems.splice(i, 1);
                         generatedItemsTable();

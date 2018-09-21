@@ -348,7 +348,7 @@
         $('#btnAdd').click(function() {
             if ($('#ManufacturerName option:selected').text() === "--Select--" ||
                 $('#ManufacturerName option:selected').text() === "") {
-                $('#SparePart').val('');
+                $('#SparePart').prop('selectedIndex', 0);
                 $('#txtunitprice').val('');
                 $('#lblpartnumber').text('');
                 return false;
@@ -367,11 +367,12 @@
                 Amount: $('#lblAmount').text()
             });
             generatedItemsTable();
-
+            $("#SparePart option:selected").attr('disabled', 'disabled');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');
-
+            $('#SparePart').prop('selectedIndex', 0);
+            $('#lblpartnumber').text('');
             return false;
 
         });
@@ -399,7 +400,19 @@
                         $row.append($('<td/>').html(val.Quantity));
                         $row.append($('<td class=amt/>').html(val.Amount));
                         var $remove = $('<a href="#">Remove</a>');
-                        $remove.click(function(e) {
+                        $remove.click(function (e) {
+                            var vals = $(this).closest("tr").find('td:eq(1)').text();
+                            alert(vals);
+                            $('#SparePart option').each(function () {
+
+                                if (this.text === vals) {
+                                    alert(this.text);
+                                    $(this).attr('disabled', false);
+
+                                    //$('#SpareParts  option').attr('disabled', false);
+                                }
+
+                            });
                             e.preventDefault();
                             orderItems.splice(i, 1);
                             generatedItemsTable();
