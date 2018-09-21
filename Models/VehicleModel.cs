@@ -295,6 +295,7 @@ public class JobCardPendingCases
     public decimal LubesBill { get; internal set; }
     public decimal FinalBillAmount { get; internal set; }
     public object CompletedDate { get; internal set; }
+    public decimal OutSoucingSum { get; internal set; }
 }
 
 public class GetSparePartCostDetails

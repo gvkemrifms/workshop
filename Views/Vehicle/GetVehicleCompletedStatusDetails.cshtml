@@ -2,10 +2,28 @@
 <style>
     #tbl {
         border-collapse: collapse;
-        width: 50%;
+        width: 30%;
         margin-left: -400px;
+        padding: 0;
+        border: none;
+    }
+    #tbl tr td  {
+        border-collapse: collapse;
+        width: 30%;
+        margin-left: -400px;
+        border: none;
+        height: 40px;
+    }
+    #tbl tr {
+        border-collapse: collapse;
+        border: none
     }
     #tbltoalBill {
+        border-collapse: collapse;
+        border: 1px solid black;
+        width: 100%;
+    }
+    #tblOutSourcing {
         border-collapse: collapse;
         border: 1px solid black;
         width: 100%;
@@ -20,7 +38,7 @@
     }
     #tbllabours {
         border-collapse: collapse;
-        width: 50%;
+        width: 100%;
     }
 
 
@@ -61,9 +79,9 @@
     </div>
     <div class="panel-body" id="orderItems" style="margin-top:10px;" align="center">
         
-    <table id="tbl">
+    <table id="tbl" style="border: 1px solid blueviolet; color: brown;text-align: center" >
             
-        <tr>
+        @*<tr>
             <th>Vehicle Number</th>
             <th>District </th>
 
@@ -71,7 +89,7 @@
 
             <th>Odometer</th>
 
-        </tr>
+        </tr>*@
 
         @if (ViewBag.AddressDetails != null)
 
@@ -83,27 +101,39 @@
 
                 {
                     <tr>
+                        <td>Vehicle :</td>
                         <td>
                             @ViewBag.VehicleNumber
                         </td>
+                    </tr>
+                    <tr>
+                        <td>District : </td>
                         <td>
 
                             @dr["District"]
 
                         </td>
-
+                    </tr>
+                    <tr>
+                        <td>Location :</td>
                         <td>
 
                             @dr["Location"]
 
                         </td>
+                    </tr>
 
+                    <tr>
+                        <td>Odometer :</td>
                         <td>
 
                             @dr["Odometer"]
 
                         </td>
-                    </tr>
+                    </tr> 
+
+                        
+                  
                 }
             }
         }
@@ -144,8 +174,16 @@
                         @ViewBag.LaborBill
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        OutSourcing Amount
+                    </td>
+                    <td>
+                        @ViewBag.OutSourcingSum
+                    </td>
+                </tr>
             </table>
-            <label id="lblSparesTotalBill" style="color: brown; margin-top: 5px;margin-right: -35px">Final Bill:@ViewBag.FinalBillAmount</label>
+            <label id="lblSparesTotalBill" style="color: brown; margin-top: 5px;margin-right: -120px">Final Bill:@ViewBag.FinalBillAmount</label>
             
         </div>
 </div>
@@ -265,7 +303,7 @@
                 }
 
             </table>
-            <label id="lblLabor" style="margin-right: -35px; color: brown; margin-top: 10px">Total:@ViewBag.LaborBill</label>
+            <label id="lblLabor" style="margin-right: -250px; color: brown; margin-top: 10px">Total:@ViewBag.LaborBill</label>
         </div>
         <div class="panel-footer">
 
@@ -340,6 +378,82 @@
             </table>
             <label id="lblLubesTotal" style="margin-right: -700px; color: brown; margin-top: 10px">Total:@ViewBag.LubesBill</label>
         </div>
+        
+
+        <div class="panel-footer">
+
+        </div>
+    </div>
+    
+    <div class="panel panel-primary" style="height: 100%; margin-top: 15px; width: 100%;" align="center">
+        <div class="panel-heading">
+            OutSourcing Details
+        </div>
+        <div class="panel-body" id="outsourcinggrid" style="margin-top: 10px;" align="center">
+            <table id="tblOutSourcing">
+
+                <tr>
+                    <th>Vendor</th>
+                    <th>Job</th>
+                    <th>Work Order</th>
+                    <th>Completed Date</th>
+                    <th>OutSourcing Amount</th>
+                    <th>Status</th>
+
+                </tr>
+
+                @if (ViewBag.GetOutSourcingDetails != null)
+
+                {
+                    var dataTable = ViewBag.GetOutSourcingDetails as DataTable;
+                    if (dataTable != null)
+                    {
+                        foreach (DataRow dr in dataTable.Rows)
+
+                        {
+                            <tr>
+
+                                <td>
+
+                                    @dr["VendorName"]
+
+                                </td>
+
+                                <td>
+
+                                    @dr["jobwork"]
+
+                                </td>
+                                <td>
+
+                                    @dr["workorder"]
+
+                                </td>
+                                <td>
+
+                                    @dr["completeddate"]
+
+                                </td>
+                                <td>
+
+                                    @dr["Amount"]
+
+                                </td>
+                                <td>
+
+                                    @dr["outsourcingstatus"]
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+
+            </table>
+            <label id="lblOutSourcingTotal" style="margin-right: -700px; color: brown; margin-top: 10px;">Total:@ViewBag.OutSourcingSum</label>
+        </div>
+        
+
         <div class="panel-footer">
 
         </div>
