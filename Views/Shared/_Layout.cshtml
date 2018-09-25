@@ -282,8 +282,8 @@
                 <a href="~/Reports/Reports">Reports</a>
 
             </li>
-        @if (Convert.ToInt32(Session["RoleId"]) == 1)
-        {
+        @*@if (Convert.ToInt32(Session["RoleId"]) == 1)
+        {*@
             <li>
                 <a href="~/Reports/GetVehicleWiseStocksReport">Stock Receipts</a>
             </li>
@@ -308,7 +308,7 @@
             <li>
                 <a href="~/Reports/VehicleDeviationReport">Vehicle Deviation Report</a>
             </li>
-        }
+        @*}*@
             @*<li>
         <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
     </li>*@
