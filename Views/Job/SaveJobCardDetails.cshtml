@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleModel>
-
+<style>
+    #tbl {
+        width: 100%;
+        height: 100px;
+    }
+</style>
 <script type="text/javascript">
 
     $(function() {
@@ -43,6 +48,13 @@
             if ($('#SubCategory').prop('selectedIndex') === 0 || $('#txtEstimatedCost').val() === '')
                 return alert("Please Add Aggregates/Categories/Sub Categories");
             generatedItemsTable();
+            $('#SubCategory').prop('selectedIndex', 0);
+            $('#txtCategory').prop('selectedIndex', 0);
+            $('#txtNatureOfComplaint').prop('selectedIndex', 0);
+            $('#Manufacturer').prop('selectedIndex', 0);
+            $('#SubCategory').prop('disabled', true);
+            $('#txtCategory').prop('disabled', true);
+            $('#txtNatureOfComplaint').prop('disabled', true);;
             $("#btn").prop("disabled", false);
             return false;
 
@@ -463,18 +475,18 @@
         if (txtpilotId === "") {
             return alert('Please enter Pilot Id');
         }
-        var ddlAggregates = $('#txtNatureOfComplaint option:selected').text().toLowerCase();
-        if (ddlAggregates === '--select--' || ddlAggregates === '') {
-            return alert('Please select Aggregates');
-        }
-        var ddlCategory = $('#txtCategory option:selected').text().toLowerCase();
-        if (ddlCategory === '--select--' || ddlCategory === '') {
-            return alert('Please select Category');
-        }
-        var ddlSubCategory = $('#SubCategory option:selected').text().toLowerCase();
-        if (ddlSubCategory === '--select--' || ddlSubCategory === '') {
-            return alert('Please select SubCategory');
-        }
+        //var ddlAggregates = $('#txtNatureOfComplaint option:selected').text().toLowerCase();
+        //if (ddlAggregates === '--select--' || ddlAggregates === '') {
+        //    return alert('Please select Aggregates');
+        //}
+        //var ddlCategory = $('#txtCategory option:selected').text().toLowerCase();
+        //if (ddlCategory === '--select--' || ddlCategory === '') {
+        //    return alert('Please select Category');
+        //}
+        //var ddlSubCategory = $('#SubCategory option:selected').text().toLowerCase();
+        //if (ddlSubCategory === '--select--' || ddlSubCategory === '') {
+        //    return alert('Please select SubCategory');
+        //}
         var txtCost = $('#txtEstimatedCost').val();
         if (txtCost === "") {
             return alert('Please enter Cost');
@@ -492,7 +504,7 @@
     }
 
     $(function() {
- 
+        $('#isNewVehicle').prop('disabled', true);
         $('#isNewVehicle').change(function () {
             if ($('input[type=checkbox]').prop('checked')) {
                 $('#Vehicle').replaceWith($('<input/>', { 'type': 'text', 'value': '', 'class': "form-control",'id':'test' }));
@@ -697,8 +709,8 @@
 
     <br/>
     <div class="form-group" style="margin-bottom: -200px; position: relative;">
-        <div class="col-lg-4">
-            <div class="panel-body" id="orderItems"></div>
+        <div class="col-lg-8">
+            <div class="panel-body" style="width: 100%" id="orderItems"></div>
 
         </div>
     </div>

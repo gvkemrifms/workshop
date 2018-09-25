@@ -83,15 +83,19 @@ namespace Fleet_WorkShop.Controllers
                 Name = name.Field<string>("employeeName"),
                 Password = name.Field<string>("password"),
                 EmpId = name.Field<string>("employeeId"),
-                WorkShopId = name.Field<int>("workshop_id")
+                WorkShopId = name.Field<int>("workshop_id"),
+                RoleId = name.Field<int>("roleid")
             });
             var enumerable = employees.ToList();
             foreach (var usercred in enumerable)
             {
-                if (usercred.Name.ToUpper() != employeeName.ToUpper() && usercred.Password != password) continue;
-                Session["Employee_Name"] = employeeName.ToUpper();
-                Session["Employee_Id"] = usercred.EmpId;
-                Session["WorkshopId"] = usercred.WorkShopId;
+                if (usercred.Name.ToUpper() == employeeName.ToUpper() && usercred.Password == password)
+                {
+                    Session["Employee_Name"] = employeeName.ToUpper();
+                    Session["Employee_Id"] = usercred.EmpId;
+                    Session["WorkshopId"] = usercred.WorkShopId;
+                    Session["RoleId"] = usercred.RoleId;
+                }
             }
             return enumerable.Any(user => employeeName.ToUpper() == user.Name.ToUpper() && password == user.Password)
                 ? SignInStatus.Success

@@ -31,13 +31,22 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SparePartsMaster(SparePartsModel spareModel)
         {
-            if (spareModel == null) throw new ArgumentNullException(nameof(spareModel));
-            var returnVal = _helper.ExecuteInsertSparePartsMasterDetails("spSparePartsMaster",
-                spareModel.ManufacturerId, spareModel.PartName, spareModel.PartNumber, spareModel.Cost,
-                spareModel.ScrapBinId);
-            if (returnVal == 1)
-                return Json(returnVal, JsonRequestBehavior.AllowGet);
+            if (ModelState.IsValid)
+            {
+                if (spareModel == null) throw new ArgumentNullException(nameof(spareModel));
+                var returnVal = _helper.ExecuteInsertSparePartsMasterDetails("spSparePartsMaster",
+                    spareModel.ManufacturerId, spareModel.PartName, spareModel.PartNumber, spareModel.Cost,
+                    spareModel.ScrapBinId);
+                if (returnVal == 1)
+                    return Json(returnVal, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0, JsonRequestBehavior.AllowGet);
+            }
+
             return RedirectToAction("SparePartsMaster");
+
         }
 
         public ActionResult DisplaySparePartsDetails(string search)

@@ -3,13 +3,14 @@
 @{
     ViewBag.Title = "SpareParts Master";
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
 <style>
     #tblSpares {
         color: red;
         margin-left: -300px;
         position: absolute;
         width: 70px;
+        margin-bottom: 10px;
     }
 
     #SearchDisplay {
@@ -143,6 +144,8 @@
                 success: function(response) {
                     if (response != 0) {
                         alert('Record Inserted');
+                    } else {
+                        alert('Please fill all Mandatory fields');
                     }
 
                 },
@@ -157,7 +160,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-        Spare Parts 
+        Spare Parts
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -165,7 +168,7 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Manufacturer</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", required = true})
+                        @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", required = true })
                     </div>
                 </div>
                 <div class="form-group">
@@ -200,7 +203,7 @@
 
                     <label class="control-label col-lg-4">Scrap Bin</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("ScrapBin", ViewBag.ScrapBin as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", required = true})
+                        @Html.DropDownList("ScrapBin", ViewBag.ScrapBin as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", required = true })
                     </div>
 
                 </div>
@@ -223,7 +226,7 @@
     </div>
     <input type="text" id="myInput" class="form-control" placeholder="Search Part Number.." style="float: left; margin-left: 30px; margin-top: -90px; width: 300px;" align="left">
 
-    <table id="SearchDisplay" style="width: 50%"></table>
+    <table id="SearchDisplay" style="width: 50%;margin-bottom: 20px;"></table>
 
     <div class="panel-footer">
 
