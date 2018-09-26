@@ -124,6 +124,9 @@
                 $('#Lubes option:selected').text("");
                 $('#Lubes').prop("disabled", true);
                 $('#txtunitprice').val('');
+                $("#lblAmount").text('');
+                $("#txtQuantity").val('');
+                $('#lblLubricantNumber').text('');
                 return false;
             }
             var serviceUrl = '/Inventory/GetLubesDetailsForManufacturer';
@@ -163,7 +166,7 @@
     $(function() {
         $('#Lubes').change(function() {
             var lubricantId = $('#Lubes option:selected').val();
-            if ($('#Lubes option:selected').text() == '--Select--') {
+            if ($('#Lubes option:selected').text() === '--Select--') {
                 $('#txtunitprice').val('');
             }
             $.ajax({
@@ -276,9 +279,12 @@
                 Amount: $('#lblAmount').text()
             });
             generatedItemsTable();
+            $("#Lubes option:selected").attr('disabled', 'disabled');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');
+            $('#Lubes').prop('selectedIndex', 0);
+            $('#lblLubricantNumber').text('');
             return false;
 
         });
@@ -306,7 +312,17 @@
                         $row.append($('<td/>').html(val.Quantity));
                         $row.append($('<td class=amt/>').html(val.Amount));
                         var $remove = $('<a href="#">Remove</a>');
-                        $remove.click(function(e) {
+                        $remove.click(function (e) {
+                            var vals = $(this).closest("tr").find('td:eq(1)').text();
+                            $('#Lubes option').each(function () {
+
+                                if (this.text === vals) {
+                                    $(this).attr('disabled', false);
+
+                                    //$('#SpareParts  option').attr('disabled', false);
+                                }
+
+                            });
                             e.preventDefault();
                             orderItems.splice(i, 1);
                             generatedItemsTable();
@@ -384,7 +400,7 @@
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
-        Lubricant Information
+        Lubricants(P.O Details)
     </div>
     <div class="panel-body">
         <div class="col-lg-6">
@@ -413,7 +429,7 @@
         <hr/>
         <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
             <div class="panel-heading">
-                Orders
+                Items
             </div>
             <div class="panel-body">
                 <div class="col-lg-6">
@@ -480,7 +496,7 @@
 
                 <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
                     <div class="panel-heading">
-                        Order Details
+                        Items(In Cart)
                     </div>
                     <div class="panel-body" id="orderItems">
                     </div>

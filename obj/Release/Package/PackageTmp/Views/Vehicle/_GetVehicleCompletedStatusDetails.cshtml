@@ -94,17 +94,27 @@
         margin-top: 10px;
         border-collapse: collapse;
         width: 100%;
+        margin-bottom: 10px;
+
     }
     #tbllubes {
         border-collapse: collapse;
         width: 100%;
         margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    #tblOutSourcing {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 10px;
     }
     #tbllabours {
         border-collapse: collapse;
         width: 50%;
         margin-top: 10px;
         width: 100%;
+        margin-bottom: 10px;
     }
     img:hover {
         box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
@@ -321,11 +331,19 @@
                     @ViewBag.LaborBill
                 </td>
             </tr>
+            <tr>
+                <td>
+                    OutSourcing Amount
+                </td>
+                <td>
+                    @ViewBag.OutSourceBill
+                </td>
+            </tr>
         </table>
 <label id="lblSparesTotalBill" style="color: brown; margin-top: 5px; margin-left: 685px;">Final Bill:  @ViewBag.FinalBillAmount</label>  
 <br/>
-<label id="lblsparess" style="margin-top: 15px"><u>SpareParts</u></label>        
-<table id="tblSpares">
+<label id="lblsparess" style="margin-top: 15px"><u>Spare Parts</u></label>        
+<table id="tblSpares" style="margin-bottom: 10px;">
 
     <tr>
         <th>Id</th>
@@ -369,11 +387,12 @@
                         @dr["quantity"]
 
                     </td>
-                    <td>
+                    <td style="text-align: right">
 
                     @dr["Cost"]
+                        </td>
 
-                    <td>
+                    <td style="text-align: right">
 
                         @dr["totalamount"]
 
@@ -384,7 +403,7 @@
     }
 
 </table>
-<label id="lblSparesTotal" style="margin-left: 690px; color: brown; margin-top: 10px;" >Total:@ViewBag.SparePartsBill</label>
+<label id="lblSparesTotal" style="margin-left: 780px; color: brown; padding: 2px;" >Total:  @ViewBag.SparePartsBill</label>
     <br />
     <label id="lbllaborss" style="color:blueviolet; margin-top: 10px;margin-left:400px" ><u>Labor Charges</u></label>  
 
@@ -413,7 +432,7 @@
 
                     </td>
 
-                    <td>
+                    <td style="text-align: right">
 
                         @dr["LaborCharges"]
 
@@ -425,7 +444,7 @@
     }
 
 </table>
-<label id="lblLabor" style="margin-left: 700px; color: brown; margin-top: 10px;">Total:@ViewBag.LaborBill</label>
+<label id="lblLabor" style="margin-left: 780px; color: brown; margin-top: 10px;">Total:    @ViewBag.LaborBill</label>
 
 <br />
     <br/>
@@ -474,12 +493,12 @@
                         @dr["quantity"]
 
                     </td>
-                    <td>
+                    <td style="text-align: right">
 
                         @dr["CostPerLitre"]
 
                     </td>
-                    <td>
+                    <td style="text-align: right">
 
                         @dr["totalamount"]
 
@@ -490,7 +509,85 @@
     }
 
 </table>
-<label id="lblLubesTotal" style="margin-left: 690px; color: brown; margin-top: 10px">Total:@ViewBag.LubesBill</label>
+<label id="lblLubesTotal" style="margin-left: 780px; color: brown; margin-top: 10px">Total:    @ViewBag.LubesBill</label>
+
+
+<label id="lblOutSourcing" style="color:blueviolet; margin-top: 20px;margin-left: 400px"><u>OutSourcing Details</u></label>  
+<table id="tblOutSourcing">
+
+    <tr>
+        <th>Vendor</th>
+        <th>Job</th>
+        <th>Work Order</th>
+        <th>Completed Date</th>
+        <th>Status</th>
+        <th>OutSourcing Amount</th>
+      
+
+    </tr>
+
+    @if (ViewBag.GetOutSourcingDetailsList != null)
+
+    {
+        var dataTable = ViewBag.GetOutSourcingDetailsList as DataTable;
+        if (dataTable != null)
+        {
+            foreach (DataRow dr in dataTable.Rows)
+
+            {
+                <tr>
+
+                    <td>
+
+                        @dr["VendorName"]
+
+                    </td>
+
+                    <td>
+
+                        @dr["jobwork"]
+
+                    </td>
+                    <td>
+
+                        @dr["workorder"]
+
+                    </td>
+                    <td>
+
+                        @dr["completeddate"]
+
+                    </td>
+                    <td>
+
+                        @dr["outsourcingstatus"]
+
+                    </td>
+                    <td style="text-align: right">
+
+                        @dr["Amount"]
+
+                    </td>
+                    
+                </tr>
+            }
+        }
+    }
+
+</table>
+<label id="lblOutSourcingTotal" style="margin-left: 780px; color: brown; margin-top: 10px">Total:    @ViewBag.OutSourceBill</label>
+<hr/>
+<br/>
+<div align="right">
+    <br/>
+    -----------------------------------
+    <br/>
+
+              (General Manager)
+
+</div>
+
+
 
 
 

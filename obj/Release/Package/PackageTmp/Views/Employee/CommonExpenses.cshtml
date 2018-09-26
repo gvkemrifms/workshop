@@ -28,7 +28,7 @@
         if (billAmount === "") {
             return alert('Amount is Mandatory');
         }
-        return true;
+       
     }
 
 
@@ -51,7 +51,8 @@
             var data = {
                 Date: $('#txtBillDate').val(),
                 Amount: $('#txtAmount').val(),
-                TypeOfExpense: $('#ExpenseType option:selected').val()
+                TypeOfExpense: $('#ExpenseType option:selected').val(),
+                BillNumber:$('#txtBillNumber').val()
             };
            
             $.ajax({
@@ -99,22 +100,34 @@
         <div class="col-lg-6">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="control-label  col-lg-4">Expense Type</label>
+                    <label class="control-label col-lg-4">Bill Number</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("ExpenseType", ViewBag.TypeOfExpense as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+
+                        <input type="text" class="form-control" id="txtBillNumber" placeholder="Name">
+
                     </div>
                 </div>
+               
                 <div class="form-group">
                     <label class="control-label col-lg-4">Amount</label>
                     <div class="col-lg-8">
-                      
+
                         <input type="text" class="form-control" id="txtAmount" placeholder="Amount" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                 </div>
             </form>
       
         </div>
-     
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Expense Type</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("ExpenseType", ViewBag.TypeOfExpense as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                    </div>
+                </div>
+            </form>
+            </div>
 
      
         <div class="col-lg-6 col-lg-offset-6" style="margin-top:auto">

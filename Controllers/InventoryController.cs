@@ -329,7 +329,7 @@ namespace Fleet_WorkShop.Controllers
             foreach (var items in model.itemmodel)
             {
                 _helper.ExecuteInsertInventoryDetails("spInsertInventoryDetails", model.BillNo, items.ManufacturerId,
-                    items.SparePartId, items.UnitPrice, items.Quantity, items.Amount, model.VendorId);
+                    items.SparePartId, items.UnitPrice, items.Quantity, items.Amount, model.VendorId, billDetails.PoNumber);
                 foreach (var poitem in poQuantitySpares)
                     if (poitem.SparePartId == items.SparePartId)
                         result = _helper.UpdateSparePartsPoDetails("UpdateSparePartsPODetails",
@@ -368,36 +368,40 @@ namespace Fleet_WorkShop.Controllers
         [HttpGet]
         public ActionResult Edit(int? id = null)
         {
+    
             if (id == null)
                 return RedirectToAction("SaveInventoryDetails");
             //var dsGetManufacturerVendor = _helper.FillDropDownHelperMethodWithSp("spGetManufacturerVendor");
             var dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetReceiptDetails");
-            var row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
-            var manufacturerId = Convert.ToInt32(row["ManufacturerId"]);
-            var manufacturerQuery = "select * from m_VehicleManufacturer where Id=" + manufacturerId + " ";
-            var dtManufacturers = _helper.ExecuteSelectStmt(manufacturerQuery);
-            //spGetReceiptDetailsonBillNumber
-            var dtGetReceiptsDetailsonSpares = _helper.ExecuteSelectStmtusingSP("spGetReceiptDetailsonBillNumber", null,
-                null, null, null, "@billnumber", row["BillNumber"].ToString());
-            //var sparesList= dsGetReceiptsDetailsonSpares.AsEnumerable().Select(x=>x).Where(x => x.Field<string>("BillNumber") == row["BillNumber"].ToString());
-            //var sparePartId= dsGetReceiptsDetailsonSpares.Tables[0].AsEnumerable().Where(x => x.Field<string>("BillNumber") == row["BillNumber"].ToString()).Select(x => x.Field<int>("SparePartId")).FirstOrDefault();
-            var model = new InventoryModel
-            {
-                BillNo = row["BillNumber"].ToString(),
-                ManName = row["ManufacturerName"].ToString(),
-                PartName = row["PartName"].ToString(),
-                Uprice = Convert.ToDecimal(row["UnitPrice"]),
-                Qty = Convert.ToInt32(row["Quantity"]),
-                Amt = Convert.ToDecimal(row["Amount"]),
-                BillAmount = Convert.ToDecimal(row["BillAmount"]),
-                BillDate = DateTime.Parse(row["BillDate"].ToString()),
-                ManufacturerId = Convert.ToInt32(row["ManufacturerId"]),
-                Manufacturer = new SelectList(dtManufacturers.AsDataView(), "Id", "ManufacturerName"),
-                //SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName"),
-                SpareParts = new SelectList(dtGetReceiptsDetailsonSpares.AsDataView(), "SparePartId", "PartName"),
-                VendorId = Convert.ToInt32(row["vendorid"]),
-                SparePartId = Convert.ToInt32(row["SparePartId"])
-            };
+            if (dsGetReceiptsDetails.Tables[0].Rows.Count <= 0) return RedirectToAction("SaveInventoryDetails");
+            var row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int?>("Id") == id);
+                var manufacturerId = Convert.ToInt32(row["ManufacturerId"]);
+                var manufacturerQuery = "select * from m_VehicleManufacturer where Id=" + manufacturerId + " ";
+                var dtManufacturers = _helper.ExecuteSelectStmt(manufacturerQuery);
+                var dtGetReceiptsDetailsonSpares = _helper.ExecuteSelectStmtusingSP("spGetReceiptDetailsonBillNumber",
+                    null,
+                    null, null, null, "@billnumber", row["BillNumber"].ToString());
+                //var sparesList= dsGetReceiptsDetailsonSpares.AsEnumerable().Select(x=>x).Where(x => x.Field<string>("BillNumber") == row["BillNumber"].ToString());
+                //var sparePartId= dsGetReceiptsDetailsonSpares.Tables[0].AsEnumerable().Where(x => x.Field<string>("BillNumber") == row["BillNumber"].ToString()).Select(x => x.Field<int>("SparePartId")).FirstOrDefault();
+                var model = new InventoryModel
+                {
+                    BillNo = row["BillNumber"].ToString(),
+                    ManName = row["ManufacturerName"].ToString(),
+                    PartName = row["PartName"].ToString(),
+                    Uprice = Convert.ToDecimal(row["UnitPrice"]),
+                    Qty = Convert.ToInt32(row["Quantity"]),
+                    Amt = Convert.ToDecimal(row["Amount"]),
+                    BillAmount = Convert.ToDecimal(row["BillAmount"]),
+                    BillDate = DateTime.Parse(row["BillDate"].ToString()),
+                    ManufacturerId = Convert.ToInt32(row["ManufacturerId"]),
+                    Manufacturer = new SelectList(dtManufacturers.AsDataView(), "Id", "ManufacturerName"),
+                    //SpareParts = new SelectList(dsGetManufacturerVendor.Tables[2].AsDataView(), "Id", "PartName"),
+                    SpareParts = new SelectList(dtGetReceiptsDetailsonSpares.AsDataView(), "SparePartId", "PartName"),
+                    VendorId = Convert.ToInt32(row["vendorid"]),
+                    SparePartId = Convert.ToInt32(row["SparePartId"])
+                };
+            
+
             var dtgetAllSpares = _helper.ExecuteSelectStmtusingSP("getSparesForBillNumberAndVendors", "@vendorid",
                 model.VendorId.ToString(), null, null, "@billnumber", model.BillNo);
             ViewBag.CartItems = dtgetAllSpares;
@@ -417,7 +421,7 @@ namespace Fleet_WorkShop.Controllers
 
             return View(model);
         }
-
+        
         [HttpPost]
         public ActionResult Edit(InventoryModel postInventory)
         {
@@ -451,6 +455,11 @@ namespace Fleet_WorkShop.Controllers
             return RedirectToAction("SaveInventoryDetails");
         }
 
+        public ActionResult DeleteStockDetails(int? id,string bill, string ponumber,int? quantity)
+        {
+           int result= _helper.ExecuteInsertStmtusingSp("Spdeletestocks", "@sparepartid", id.ToString(),null,null, "@billnumber", bill,"@quantity", quantity.ToString(),null,null,null,null,null,null, "@ponumber", ponumber);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult EditOrderItemsInventoryDetails(InventoryModel postInventory)
         {
             return View();
@@ -578,7 +587,7 @@ namespace Fleet_WorkShop.Controllers
                 return RedirectToAction("SaveLubesInventoryDetails");
             var dsGetManufacturerVendor = _helper.FillDropDownHelperMethodWithSp("spGetManufacturerVendor");
             var dsGetReceiptsDetails = _helper.FillDropDownHelperMethodWithSp("spGetLubesReceiptDetails");
-            var row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
+            var row = dsGetReceiptsDetails.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int?>("Id") == id);
             var model = new InventoryModel
             {
                 BillNo = row["BillNumber"].ToString(),

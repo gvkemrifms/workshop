@@ -34,10 +34,10 @@
 
 <body>
 
-<div id="wrapper" style="border: 1px solid whitesmoke; display: block;">
+<div id="wrapper" style="border: 1px solid grey; display: block;background-color:linen">
 
 <!-- Navigation -->
-<div class="navbar-header" style="border: 1px solid whitesmoke; display: block;">
+<div class="navbar-header" style="border: 1px solid grey; display: block;">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
@@ -47,7 +47,7 @@
     <a href="~/Account/Login">
         <img src="~/Content/Images/gvk_group.png" style="height: 60px; margin: 5px; position: absolute; width: 180px;"/>
     </a>
-    <a class="navbar-brand" href="~/Account/Login" style="color: black; margin-left: 140px; margin-top: 30px; position: absolute;">WorkShop</a>
+    <a class="navbar-brand" href="~/Account/Login" style="color: black; margin-left: 140px; margin-top: 30px; position: absolute;"><marquee style="color: maroon; scrolldelay:10;">WorkShop</marquee></a>
 
 </div>
 
@@ -68,121 +68,120 @@
 </navbar-header>
 <!-- /.navbar-top-links -->
 
-<div class="navbar-default sidebar" style="background-color: lightyellow; border-top: 1px solid whitesmoke; margin-top: 0px;" role="navigation">
-<div class="sidebar-nav navbar-collapse">
-<ul class="nav" id="side-menu">
-<li class="sidebar-search">
-    <div class="input-group custom-search-form">
-        <input type="text" class="form-control" placeholder="Search...">
-        <span class="input-group-btn">
-            <button class="btn btn-default" type="button">
-                <i class="fa fa-search"></i>
-            </button>
-        </span>
-    </div>
-</li>
-<li>
-    <a href="~/home/index">
-        <i class="fa fa-dashboard fa-fw"></i> Dashboard
-    </a>
-</li>
-<li>
-    <a href="#">
-        <i class="fa fa-bar-chart-o fa-fw"></i> Master
-        <span class="fa arrow"></span>
-    </a>
-    <ul class="nav nav-second-level">
-        <li>
-            <a href="~/Employee/GetEmployeeDetails">Workshop Manpower</a>
-        </li>
-        <li>
-            <a href="/Employee/SaveInfraStructureDetails">Infrastructure</a>
-        </li>
-        <li>
-            <a href="/job/ServiceGroup">Aggregates</a>
-        </li>
-        <li>
-            <a href="/job/CategoryGroup">Category</a>
-        </li>
-        <li>
-            <a href="/job/SubCategoryGroup">Sub Category</a>
-        </li>
-       
-    </ul>
-</li>
-<li>
-    <a href="#">
-        <i class="fa fa-wrench fa-fw"></i> Inventory
-        <span class="fa arrow"></span>
-    </a>
-    <ul class="nav nav-second-level">
-        <li>
-            <a href="~/Inventory/SparePartsMaster">Spares Parts</a>
-        </li>
-        <li>
-            <a href="~/Inventory/LubesMaster">Lubes</a>
-        </li>
-        <li>
-            <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
-        </li>
-        <li>
-            <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
-        </li>
-        <li>
-            <a href="~/Inventory/SavePODetails">Purchase Order(Spares)</a>
-        </li>
-        <li>
-            <a href="~/Inventory/SaveLubesInventoryPODetails">Purchase Order(Lubes)</a>
-        </li>
-        <li>
-            <a href="~/inventory/getscrapdetails">Scrap Details</a>
-        </li>
-        
-        
-    </ul>
-</li>
-<li>
-    <a href="#">
-        <i class="fa fa-wrench fa-fw"></i> Operations
-        <span class="fa arrow"></span>
-    </a>
-    <ul class="nav nav-second-level">
-        <li>
-            <a href="~/Vehicle/GetVehicleDetails">Vehicle Details</a>
-        </li>
-        @*<li>
+    <div class="navbar-default sidebar" style="background-color:lightyellow; color: white; font-family: sans-serif; border-top: 1px solid grey; margin-top: 0px;" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+    <ul class="nav" id="side-menu">
+    <li class="sidebar-search">
+        <div class="input-group custom-search-form">
+            <input type="text" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">
+                    <i class="fa fa-search"></i>
+                </button>
+            </span>
+        </div>
+    </li>
+    <li>
+        <a href="~/home/index">
+            <i class="fa fa-dashboard fa-fw"></i> Dashboard
+        </a>
+    </li>
+    <li>
+        <a href="#">
+            <i class="fa fa-bar-chart-o fa-fw"></i> Master
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="~/Employee/GetEmployeeDetails">Workshop Manpower</a>
+            </li>
+            <li>
+                <a href="~/Employee/SaveInfraStructureDetails">Infrastructure</a>
+            </li>
+            <li>
+                <a href="~/job/ServiceGroup">Aggregates</a>
+            </li>
+            <li>
+                <a href="~/job/CategoryGroup">Category</a>
+            </li>
+            <li>
+                <a href="~/job/SubCategoryGroup">Sub Category</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="#">
+            <i class="fa fa-wrench fa-fw"></i> Inventory
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="~/Inventory/SparePartsMaster">Spares Parts</a>
+            </li>
+            <li>
+                <a href="~/Inventory/LubesMaster">Lubes</a>
+            </li>
+            <li>
+                <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
+            </li>
+            <li>
+                <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
+            </li>
+            <li>
+                <a href="~/Inventory/SavePODetails">Purchase Order(Spares)</a>
+            </li>
+            <li>
+                <a href="~/Inventory/SaveLubesInventoryPODetails">Purchase Order(Lubes)</a>
+            </li>
+            <li>
+                <a href="~/inventory/getscrapdetails">Scrap Details</a>
+            </li>
+
+
+        </ul>
+    </li>
+    <li>
+        <a href="#">
+            <i class="fa fa-wrench fa-fw"></i> Operations
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="~/Vehicle/GetVehicleDetails">Vehicle Details</a>
+            </li>
+            @*<li>
                             <a href="#">Repair & Maintenance Master</a>
                         </li>*@
-        @*<li>
+            @*<li>
                             <a href="~/job/SaveJobCardDetails">Repair & Maintenance</a>
                         </li>*@
-        @*<li>
+            @*<li>
                             <a href="~/Vehicle/GetPendingStatusDetails">Job Card</a>
                         </li>*@
-        @*<li>
+            @*<li>
                             <a href="#">Release of Vehicle</a>
                         </li>
                         <li>
                             <a href="#"> Bin Card</a>
                         </li>*@
-        @*<li>
+            @*<li>
                             <a href="grid.html">Grid</a>
                         </li>*@
-    </ul>
-</li>
-<li>
-<li>
-    <a href="~/job/SaveJobCardDetails">
-        <i class="fa fa-wrench fa-fw"></i> Repair & Maintenance
-        @*<span class="fa arrow"></span>*@
-    </a>
-</li>
-<li>
-    <a href="~/Vehicle/GetPendingStatusDetails">
-        <i class="fa fa-wrench fa-fw"></i> Job Card
-        @*<span class="fa arrow"></span>*@
-    </a>
-    @*<ul class="nav nav-second-level">
+        </ul>
+    </li>
+    <li>
+    <li>
+        <a href="~/job/SaveJobCardDetails">
+            <i class="fa fa-wrench fa-fw"></i> Repair & Maintenance
+            @*<span class="fa arrow"></span>*@
+        </a>
+    </li>
+    <li>
+        <a href="~/Vehicle/GetPendingStatusDetails">
+            <i class="fa fa-wrench fa-fw"></i> Job Card
+            @*<span class="fa arrow"></span>*@
+        </a>
+        @*<ul class="nav nav-second-level">
                         <li>
                             <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
                         </li>
@@ -190,14 +189,14 @@
                             <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
             </li>
                         </ul>*@
-    <!-- /.nav-second-level -->
-</li>
-<li>
-    <a href="~/Vehicle/GetCompletedStatusDetails">
-        <i class="fa fa-wrench fa-fw"></i> Invoice
-        @*<span class="fa arrow"></span>*@
-    </a>
-    @*<ul class="nav nav-second-level">
+        <!-- /.nav-second-level -->
+    </li>
+    <li>
+        <a href="~/Vehicle/GetCompletedStatusDetails">
+            <i class="fa fa-wrench fa-fw"></i> Invoice
+            @*<span class="fa arrow"></span>*@
+        </a>
+        @*<ul class="nav nav-second-level">
                         <li>
                             <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
                         </li>
@@ -205,14 +204,14 @@
                             <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
             </li>
                         </ul>*@
-    <!-- /.nav-second-level -->
-</li>
-@*<li>
+        <!-- /.nav-second-level -->
+    </li>
+    @*<li>
     <a href="~/employee/pettyexpenses">
         <i class="fa fa-wrench fa-fw"></i> Petty Expenses
         <span class="fa arrow"></span>
     </a>
-</li>*@ 
+</li>*@
     @*<ul class="nav nav-second-level">
                              <li>
                                  <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
@@ -223,13 +222,13 @@
                              </ul>*@
     <!-- /.nav-second-level -->
 
-<li>
-    <a href="~/employee/commonexpenses">
-        <i class="fa fa-wrench fa-fw"></i> General Expenses
-        @*<span class="fa arrow"></span>*@
-    </a>
-</li>
-@*<li>
+    <li>
+        <a href="~/employee/commonexpenses">
+            <i class="fa fa-wrench fa-fw"></i> General Expenses
+            @*<span class="fa arrow"></span>*@
+        </a>
+    </li>
+    @*<li>
                     <a href="#">
                         <i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown
                         <span class="fa arrow"></span>
@@ -264,77 +263,79 @@
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>*@
-<li>
-    <a href="~/Reports/Reports">
-        <i class="fa fa-files-o fa-fw"></i> Reports
-        <span class="fa arrow"></span>
-    </a>
-    <ul class="nav nav-second-level">
-        <li>
+    <li>
+        <a href="~/Reports/Reports">
+            <i class="fa fa-files-o fa-fw"></i> Reports
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
 
-            <a href="~/Reports/Reports">Reports</a>
+                <a href="~/Reports/Reports">Reports</a>
 
-        </li>
-
-
-        <li>
-            <a href="~/Reports/GetVehicleWiseStocksReport">Stock Receipts</a>
-        </li>
-        <li>
-            <a href="~/Reports/GetVehicleWiseLubesReport">Lube Receipts</a>
-        </li>
-        <li>
-            <a href="~/Reports/VehicleWiseRepairReport">Repair Receipts</a>
-        </li>
-        <li>
-            <a href="~/Reports/SparePartWiseConsumption">SparePartWise Consumption</a>
-        </li>
-        <li>
-            <a href="~/Reports/LubesWiseConsumption">LubesWise Consumption</a>
-        </li>
-        <li>
-            <a href="~/Reports/WorkShopMechanicReport">WorkShop_MechanicWise Report</a>
-        </li>
-        <li>
-            <a href="~/Reports/RmeWisePerformanceReport">RME Wise Report</a>
-        </li>
-        <li>
-            <a href="~/Reports/VehicleDeviationReport">Vehicle Deviation Report</a>
-        </li>
-    @*<li>
+            </li>
+        @*@if (Convert.ToInt32(Session["RoleId"]) == 1)
+        {*@
+            <li>
+                <a href="~/Reports/GetVehicleWiseStocksReport">Stock Receipts</a>
+            </li>
+            <li>
+                <a href="~/Reports/GetVehicleWiseLubesReport">Lube Receipts</a>
+            </li>
+            <li>
+                <a href="~/Reports/VehicleWiseRepairReport">Repair Receipts</a>
+            </li>
+            <li>
+                <a href="~/Reports/SparePartWiseConsumption">SparePartWise Consumption</a>
+            </li>
+            <li>
+                <a href="~/Reports/LubesWiseConsumption">LubesWise Consumption</a>
+            </li>
+            <li>
+                <a href="~/Reports/WorkShopMechanicReport">WorkShop_MechanicWise Report</a>
+            </li>
+            <li>
+                <a href="~/Reports/RmeWisePerformanceReport">RME Wise Report</a>
+            </li>
+            <li>
+                <a href="~/Reports/VehicleDeviationReport">Vehicle Deviation Report</a>
+            </li>
+        }
+            @*<li>
         <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
     </li>*@
-    </ul>
-</li>
+        </ul>
+    </li>
 
-<li>
-    @*<a href="#">
+    <li>
+        @*<a href="#">
                         <i class="fa fa-files-o fa-fw"></i> Reports
                         <span class="fa arrow"></span>
                     </a>*@
-    <ul class="nav nav-second-level">
-        <li>
-            <span class="fa arrow"></span>
-            <a href="#">Receipts</a>
+        <ul class="nav nav-second-level">
+            <li>
+                <span class="fa arrow"></span>
+                <a href="#">Receipts</a>
 
-            <ul class="nav nav-third-level">
-                @*<li>
+                <ul class="nav nav-third-level">
+                    @*<li>
                                     <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
                                 </li>
                                 <li>
                                     <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
                                 </li>*@
-            </ul>
-        </li>
+                </ul>
+            </li>
 
+        </ul>
+    </li>
     </ul>
-</li>
-</ul>
-</div>
-<!-- /.sidebar-collapse -->
-</div>
+    </div>
+    <!-- /.sidebar-collapse -->
+    </div>
+
 <!-- /.navbar-static-side -->
-<div id="page-wrapper" style="background-color: cornsilk; border: 1px solid whitesmoke; margin-top: 0px;">
+<div id="page-wrapper" style="background-color:lightgoldenrodyellow; border: 1px solid grey; margin-top: 0px;">
     @RenderBody()
     <body onLoad="noBack();" @*onpageshow="if (event.persisted) noBack();"*@ onUnload=""></body>
 </div>

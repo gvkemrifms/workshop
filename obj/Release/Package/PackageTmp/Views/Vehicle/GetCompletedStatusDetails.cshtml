@@ -67,6 +67,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.JobCardNumber)
                 </td>
+                <td>
+                    @Html.ActionLink("ReOpen","ReOpenCompletedJobs",new { vehicleNumber = item.VehicleNumber })
+                </td>
             </tr>
         }
 

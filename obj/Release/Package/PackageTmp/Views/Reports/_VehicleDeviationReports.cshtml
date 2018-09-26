@@ -1,7 +1,13 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
-
-<table class="table">
+<style>
+    .table {
+        width: 80%;
+        word-wrap: break-word;
+    }
+</style>
+<h1 style="color: brown" align="center"><u>Vehicle Deviation Report</u></h1>
+<table class="table" align="center">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.JobcardId)

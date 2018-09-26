@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleModel>
-
+<style>
+    #tbl {
+        width: 100%;
+        height: 100px;
+    }
+</style>
 <script type="text/javascript">
 
     $(function() {
@@ -12,7 +17,8 @@
     });
     $(function() {
         var orderItems = [];
-        $('#btnAddtest').click(function() {
+        $('#btnAddtest').click(function () {
+            
             orderItems.push({
                 VehicleNumberString: $('#Vehicle option:selected').text(),
                 Category: $('#txtCategory option:selected').text(),
@@ -33,16 +39,23 @@
                 ReceivedLocation: $('#txtVehicleRecivedLoc').val(),
                 AllotedMechanic: $('#AllotedMechanic option:selected').val(),
                 ServiceEngineer: $('#ServiceEngineer option:selected').val(),
-                LaborCharges: $('#txtLaborCharges').val(),
                 Aggregates: $('#txtNatureOfComplaint option:selected').text(),
                 SubCat: $('#SubCategory option:selected').val(),
                 SubCatName: $('#SubCategory option:selected').text(),
                 ManufacturerId: $('#Manufacturer option:selected').val()
 
             });
-            if ($('#txtNatureOfComplaint option:selected').text() !== '--Select--') {
-                generatedItemsTable();
-            }
+            if ($('#SubCategory').prop('selectedIndex') === 0 || $('#txtEstimatedCost').val() === '')
+                return alert("Please Add Aggregates/Categories/Sub Categories");
+            generatedItemsTable();
+            $('#SubCategory').prop('selectedIndex', 0);
+            $('#txtCategory').prop('selectedIndex', 0);
+            $('#txtNatureOfComplaint').prop('selectedIndex', 0);
+            $('#Manufacturer').prop('selectedIndex', 0);
+            $('#SubCategory').prop('disabled', true);
+            $('#txtCategory').prop('disabled', true);
+            $('#txtNatureOfComplaint').prop('disabled', true);;
+            $("#btn").prop("disabled", false);
             return false;
 
         });
@@ -70,6 +83,8 @@
                     $remove.click(function(e) {
                         e.preventDefault();
                         orderItems.splice(i, 1);
+                        if (i === 0)
+                            $("#btn").prop("disabled", true);
                         generatedItemsTable();
                     });
                     $row.append($('<td/>').html($remove));
@@ -84,10 +99,12 @@
 
         $('#btn').click(function() {
             var vehicleNumber = $('#Vehicle option:selected').text();
+           var helperIdd= $('#Helper option:selected').val();
             var serviceUrl = '/Job/SaveJobCardDetails';
             var data = {
                 jobcarditems: orderItems,
-                vehicleNumber: vehicleNumber
+                vehicleNumber: vehicleNumber,
+                helperId:helperIdd
             };
 
             $.ajax({
@@ -140,8 +157,8 @@
         $('#District').change(function() {
             $('#txtModel').val('');
         });
-        $("#Vehicle").blur(function() {
-            var data = { vehicleid: $(this).val() };
+        $("#Vehicle").change(function() {
+            var data = { vehicleid: $('#Vehicle').val() };
             if (true) {
                 $.ajax({
                     url: serviceUrl,
@@ -458,25 +475,21 @@
         if (txtpilotId === "") {
             return alert('Please enter Pilot Id');
         }
-        var ddlAggregates = $('#txtNatureOfComplaint option:selected').text().toLowerCase();
-        if (ddlAggregates === '--select--' || ddlAggregates === '') {
-            return alert('Please select Aggregates');
-        }
-        var ddlCategory = $('#txtCategory option:selected').text().toLowerCase();
-        if (ddlCategory === '--select--' || ddlCategory === '') {
-            return alert('Please select Category');
-        }
-        var ddlSubCategory = $('#SubCategory option:selected').text().toLowerCase();
-        if (ddlSubCategory === '--select--' || ddlSubCategory === '') {
-            return alert('Please select SubCategory');
-        }
+        //var ddlAggregates = $('#txtNatureOfComplaint option:selected').text().toLowerCase();
+        //if (ddlAggregates === '--select--' || ddlAggregates === '') {
+        //    return alert('Please select Aggregates');
+        //}
+        //var ddlCategory = $('#txtCategory option:selected').text().toLowerCase();
+        //if (ddlCategory === '--select--' || ddlCategory === '') {
+        //    return alert('Please select Category');
+        //}
+        //var ddlSubCategory = $('#SubCategory option:selected').text().toLowerCase();
+        //if (ddlSubCategory === '--select--' || ddlSubCategory === '') {
+        //    return alert('Please select SubCategory');
+        //}
         var txtCost = $('#txtEstimatedCost').val();
         if (txtCost === "") {
             return alert('Please enter Cost');
-        }
-        var txtLabour = $('#txtLaborCharges').val();
-        if (txtLabour === "") {
-            return alert('Please enter Labour Charges');
         }
         var ddlAllotedMechanic = $('#AllotedMechanic option:selected').text().toLowerCase();
         if (ddlAllotedMechanic === '--select--' || ddlAllotedMechanic === '') {
@@ -489,6 +502,29 @@
 
         return true;
     }
+
+    $(function() {
+        $('#isNewVehicle').prop('disabled', true);
+        $('#isNewVehicle').change(function () {
+            if ($('input[type=checkbox]').prop('checked')) {
+                $('#Vehicle').replaceWith($('<input/>', { 'type': 'text', 'value': '', 'class': "form-control",'id':'test' }));
+            } else
+            {
+                //$('#test').replaceWith('<select id="Vehicle" class= "form-control"></select>');
+                //    //'<option value="0">--Select--</option>' +
+                //    //'</select>');
+                //$('#District').prop('selectedIndex', 0);
+                //if ($('#District option:selected').text() === '--Select--') {
+                //    $('#Vehicle').prop('disabled', true);
+                //}
+                location.reload();
+
+            }
+               
+               
+            });
+        });
+   
 </script>
 
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
@@ -496,6 +532,7 @@
     Repair And Maintanence
 </div>
 <div class="panel-body" style="margin-top: 30px">
+    
     <div class="col-lg-6">
         <form class="form-horizontal">
             <div class="form-group">
@@ -517,8 +554,11 @@
         <form class="form-horizontal">
             <div class="form-group">
                 <label class="control-label  col-lg-4">Vehicle Number</label>
-                <div class="col-lg-8">
+                <div class="col-lg-5">
                     <select id="Vehicle" class="form-control"> </select>
+                </div>
+                <div class="col-lg-3">
+                    @Html.CheckBox("isNewVehicle", false) New Vehicle
                 </div>
             </div>
             <div class="form-group">
@@ -607,9 +647,9 @@
         <form class="form-horizontal">
 
             <div class="form-group">
-                <label class="control-label col-lg-4">Cost</label>
+                <label class="control-label col-lg-4">Labor Charges</label>
                 <div class="col-lg-8">
-                    <input type="text" class="form-control" id="txtEstimatedCost" placeholder="Cost" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                    <input type="text" class="form-control" id="txtEstimatedCost" placeholder="Labor Charges" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
 
                 </div>
             </div>
@@ -632,7 +672,7 @@
             </div>
         </form>
     </div>
-    <div class="col-lg-6">
+    @*<div class="col-lg-6">
         <form class="form-horizontal">
             <div class="form-group">
                 <label class="control-label col-lg-4">Labor Charges</label>
@@ -641,24 +681,36 @@
                 </div>
             </div>
         </form>
-    </div>
+    </div>*@
 
-    <div class="col-lg-6">
+<div class="col-lg-6">
 
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="control-label col-lg-4">Date Of Delivary(Approx)</label>
-                <div class="col-lg-8">
-                    <input type="text" class="form-control" id="txtDateOfDelivery" placeholder="Date Of Delivery(Approx)" onkeypress="return false;">
-                </div>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-lg-4">Date Of Delivary(Approx)</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtDateOfDelivery" placeholder="Date Of Delivery(Approx)" onkeypress="return false;">
             </div>
-        </form>
+        </div>
+            
+    </form>
+</div>
+<div class="col-lg-6">
+
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-lg-4">Helper </label>
+            <div class="col-lg-8">
+                @Html.DropDownList("Helper",ViewBag.Helper as IEnumerable<SelectListItem>, "N/A", new {@class = "form-control"})
+            </div>
+        </div>
+    </form>
     </div>
 
     <br/>
     <div class="form-group" style="margin-bottom: -200px; position: relative;">
-        <div class="col-lg-4">
-            <div class="panel-body" id="orderItems"></div>
+        <div class="col-lg-8">
+            <div class="panel-body" style="width: 100%" id="orderItems"></div>
 
         </div>
     </div>
@@ -669,7 +721,7 @@
         <form class="form-horizontal">
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                    <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;" onclick="if (!Validations()) return false;">Submit</button>
+                    <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;" disabled="disabled" onclick="if (!Validations()) return false;">Submit</button>
                 </div>
                 <div class="col-sm-2">
                     <button type="submit" id="btnAddtest" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;">Add SubCategories</button>

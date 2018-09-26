@@ -110,7 +110,7 @@ namespace Fleet_WorkShop.Models
         public int ExecuteInsertStmtusingSp(string insertStmt, string parameterName1 = null,
             string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null,
             string parameterName3 = null, string parameterValue3 = null, string parameterName4 = null, string parameterValue4 = null,
-            string parameterName5 = null, string parameterValue5 = null, string parameterName6 = null, string parameterValue6 = null, string parameterName7 = null, string parameterValue7 = null)
+            string parameterName5 = null, string parameterValue5 = null, string parameterName6 = null, string parameterValue6 = null, string parameterName7 = null, string parameterValue7 = null, string parameterName8 = null, string parameterValue8 = null)
         {
             var i = 0;
             var cs = ConfigurationManager.AppSettings["Str"];
@@ -128,6 +128,7 @@ namespace Fleet_WorkShop.Models
                 if (parameterValue5 != null) cmd.Parameters.AddWithValue(parameterName5, int.Parse(parameterValue5));
                 if (parameterValue6 != null) cmd.Parameters.AddWithValue(parameterName6, int.Parse(parameterValue6));
                 if (parameterValue7 != null) cmd.Parameters.AddWithValue(parameterName7, int.Parse(parameterValue7));
+                if (parameterValue8 != null) cmd.Parameters.AddWithValue(parameterName8, parameterValue8);
                 i = cmd.ExecuteNonQuery();
                 TraceService(insertStmt);
                 return i;
@@ -976,7 +977,7 @@ namespace Fleet_WorkShop.Models
         }
 
         internal int ExecuteInsertInventoryDetails(string insertStmt, string billnumber, int manufacturerid,
-            int sparepartid, decimal unitprice, int quantity, decimal amount, int vendorId)
+            int sparepartid, decimal unitprice, int quantity, decimal amount, int vendorId,string poNumber)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -993,6 +994,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@quantity", quantity);
                     comm.Parameters.AddWithValue("@amount", amount);
                     comm.Parameters.AddWithValue("@vendorid", vendorId);
+                    comm.Parameters.AddWithValue("@ponumber", poNumber);
                     try
                     {
                         conn.Open();
