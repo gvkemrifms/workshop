@@ -21,6 +21,15 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/ApplicationInsights.config">
       <publishTime>06/12/2018 11:44:26</publishTime>
     </File>
+    <File Include="bin/App_Browsers.dll">
+      <publishTime>09/26/2018 16:11:03</publishTime>
+    </File>
+    <File Include="bin/App_global.asax.compiled">
+      <publishTime>09/26/2018 16:11:02</publishTime>
+    </File>
+    <File Include="bin/App_global.asax.dll">
+      <publishTime>09/26/2018 16:11:02</publishTime>
+    </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>03/02/2015 09:32:26</publishTime>
     </File>
@@ -165,6 +174,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/WebGrease.dll">
       <publishTime>09/10/2013 17:28:38</publishTime>
     </File>
+    <File Include="bin/__browserCapabilitiesCompiler.compiled">
+      <publishTime>09/26/2018 16:11:03</publishTime>
+    </File>
     <File Include="Content/bootstrap.css">
       <publishTime>06/12/2018 11:43:27</publishTime>
     </File>
@@ -254,6 +266,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="packages.config">
       <publishTime>09/06/2018 12:42:00</publishTime>
+    </File>
+    <File Include="PrecompiledApp.config">
+      <publishTime>09/26/2018 16:10:54</publishTime>
     </File>
     <File Include="Rotativa/help-wkhtmltoimage.txt">
       <publishTime>09/06/2018 12:35:46</publishTime>
@@ -622,7 +637,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/18/2018 09:48:31</publishTime>
     </File>
     <File Include="Views/Reports/_VehicleDeviationReports.cshtml">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>09/18/2018 10:09:00</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>06/12/2018 11:43:36</publishTime>
@@ -631,7 +646,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/12/2018 11:43:37</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>09/26/2018 15:41:00</publishTime>
     </File>
     <File Include="Views/Shared/_LoginPartial.cshtml">
       <publishTime>06/12/2018 11:43:37</publishTime>
@@ -685,7 +700,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/13/2018 00:56:20</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>09/17/2018 17:11:23</publishTime>
+      <publishTime>09/26/2018 16:10:53</publishTime>
     </File>
   </ItemGroup>
 </Project>

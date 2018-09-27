@@ -1,0 +1,349 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/ScriptsCss/bootstrap.min.js"></script>
+    <script src="~/Content/css/jquery-ui.min.js"></script>
+    <link href="~/Content/css/jquery-ui.min.css" rel="stylesheet"/>
+    <script src="~/Scripts/select2.full.min.js"></script>
+    <link href="~/Content/css/select2.min.css" rel="stylesheet"/>
+    <script src="~/Scripts/jquery.ajax-combobox.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <link href="~/ScriptsCss/bootstrap.min.css" rel="stylesheet"/>
+    <script src="~/ScriptsCss/sb-admin-2.js"></script>
+    <link href="~/ScriptsCss/sb-admin-2.min.css" rel="stylesheet"/>
+    <link href="~/ScriptsCss/metisMenu.min.css" rel="stylesheet"/>
+    <script src="~/ScriptsCss/metisMenu.min.js"></script>
+    <link href="~/ScriptsCss/font-awesome.min.css" rel="stylesheet"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>FMS_WorkShop</title>
+    <script type="text/javascript">
+        window.history.forward();
+
+        function noBack() {
+            window.history.forward();
+        }
+    </script>
+</head>
+
+<body>
+
+<div id="wrapper" style="border: 1px solid grey; display: block;background-color:linen">
+
+<!-- Navigation -->
+<div class="navbar-header" style="border: 1px solid grey; display: block;">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    <a href="~/Account/Login">
+        <img src="~/Content/Images/gvk_group.png" style="height: 60px; margin: 5px; position: absolute; width: 180px;"/>
+    </a>
+    <a class="navbar-brand" href="~/Account/Login" style="color: black; margin-left: 140px; margin-top: 30px; position: absolute;"><marquee style="color: maroon; scrolldelay:10;">WorkShop</marquee></a>
+
+</div>
+
+<navbar-header>
+    <H4 align="center" style="color: brown; margin-top: 10px">
+        <u>WORKSHOP</u>
+    </H4>
+    <div align="right" style="color: brown">
+        @if (Session["Employee_Id"] != null)
+        {
+            <text>Welcome!!</text>
+            @Session["Employee_Name"]
+        }
+        <br/>
+        @Html.ActionLink("Log Out", "LogOff", "Home")
+    </div>
+
+</navbar-header>
+<!-- /.navbar-top-links -->
+
+    <div class="navbar-default sidebar" style="background-color:lightyellow; color: white; font-family: sans-serif; border-top: 1px solid grey; margin-top: 0px;" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+    <ul class="nav" id="side-menu">
+    <li class="sidebar-search">
+        <div class="input-group custom-search-form">
+            <input type="text" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button">
+                    <i class="fa fa-search"></i>
+                </button>
+            </span>
+        </div>
+    </li>
+    <li>
+        <a href="~/home/index">
+            <i class="fa fa-dashboard fa-fw"></i> Dashboard
+        </a>
+    </li>
+    <li>
+        <a href="#">
+            <i class="fa fa-bar-chart-o fa-fw"></i> Master
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="~/Employee/GetEmployeeDetails">Workshop Manpower</a>
+            </li>
+            <li>
+                <a href="~/Employee/SaveInfraStructureDetails">Infrastructure</a>
+            </li>
+            <li>
+                <a href="~/job/ServiceGroup">Aggregates</a>
+            </li>
+            <li>
+                <a href="~/job/CategoryGroup">Category</a>
+            </li>
+            <li>
+                <a href="~/job/SubCategoryGroup">Sub Category</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="#">
+            <i class="fa fa-wrench fa-fw"></i> Inventory
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="~/Inventory/SparePartsMaster">Spares Parts</a>
+            </li>
+            <li>
+                <a href="~/Inventory/LubesMaster">Lubes</a>
+            </li>
+            <li>
+                <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
+            </li>
+            <li>
+                <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
+            </li>
+            <li>
+                <a href="~/Inventory/SavePODetails">Purchase Order(Spares)</a>
+            </li>
+            <li>
+                <a href="~/Inventory/SaveLubesInventoryPODetails">Purchase Order(Lubes)</a>
+            </li>
+            <li>
+                <a href="~/inventory/getscrapdetails">Scrap Details</a>
+            </li>
+
+
+        </ul>
+    </li>
+    <li>
+        <a href="#">
+            <i class="fa fa-wrench fa-fw"></i> Operations
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="~/Vehicle/GetVehicleDetails">Vehicle Details</a>
+            </li>
+            @*<li>
+                            <a href="#">Repair & Maintenance Master</a>
+                        </li>*@
+            @*<li>
+                            <a href="~/job/SaveJobCardDetails">Repair & Maintenance</a>
+                        </li>*@
+            @*<li>
+                            <a href="~/Vehicle/GetPendingStatusDetails">Job Card</a>
+                        </li>*@
+            @*<li>
+                            <a href="#">Release of Vehicle</a>
+                        </li>
+                        <li>
+                            <a href="#"> Bin Card</a>
+                        </li>*@
+            @*<li>
+                            <a href="grid.html">Grid</a>
+                        </li>*@
+        </ul>
+    </li>
+    <li>
+    <li>
+        <a href="~/job/SaveJobCardDetails">
+            <i class="fa fa-wrench fa-fw"></i> Repair & Maintenance
+            @*<span class="fa arrow"></span>*@
+        </a>
+    </li>
+    <li>
+        <a href="~/Vehicle/GetPendingStatusDetails">
+            <i class="fa fa-wrench fa-fw"></i> Job Card
+            @*<span class="fa arrow"></span>*@
+        </a>
+        @*<ul class="nav nav-second-level">
+                        <li>
+                            <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
+                        </li>
+                        <li>
+                            <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
+            </li>
+                        </ul>*@
+        <!-- /.nav-second-level -->
+    </li>
+    <li>
+        <a href="~/Vehicle/GetCompletedStatusDetails">
+            <i class="fa fa-wrench fa-fw"></i> Invoice
+            @*<span class="fa arrow"></span>*@
+        </a>
+        @*<ul class="nav nav-second-level">
+                        <li>
+                            <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
+                        </li>
+                        <li>
+                            <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
+            </li>
+                        </ul>*@
+        <!-- /.nav-second-level -->
+    </li>
+    @*<li>
+    <a href="~/employee/pettyexpenses">
+        <i class="fa fa-wrench fa-fw"></i> Petty Expenses
+        <span class="fa arrow"></span>
+    </a>
+</li>*@
+    @*<ul class="nav nav-second-level">
+                             <li>
+                                 <a href="~/Vehicle/GetPendingStatusDetails">Spare Parts</a>
+                             </li>
+                             <li>
+                                 <a href="~/Vehicle/GetLubesPendingStatusDetails">Lubes</a>
+                 </li>
+                             </ul>*@
+    <!-- /.nav-second-level -->
+
+    <li>
+        <a href="~/employee/commonexpenses">
+            <i class="fa fa-wrench fa-fw"></i> General Expenses
+            @*<span class="fa arrow"></span>*@
+        </a>
+    </li>
+    @*<li>
+                    <a href="#">
+                        <i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="#">Second Level Item</a>
+                        </li>
+                        <li>
+                            <a href="#">Second Level Item</a>
+                        </li>
+                        <li>
+                            <a href="#">Third Level
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-third-level">
+                                <li>
+                                    <a href="#">Third Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Third Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Third Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Third Level Item</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-third-level -->
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>*@
+    <li>
+        <a href="~/Reports/Reports">
+            <i class="fa fa-files-o fa-fw"></i> Reports
+            <span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li>
+
+                <a href="~/Reports/Reports">Reports</a>
+
+            </li>
+        @*@if (Convert.ToInt32(Session["RoleId"]) == 1)
+        {*@
+            <li>
+                <a href="~/Reports/GetVehicleWiseStocksReport">Stock Receipts</a>
+            </li>
+            <li>
+                <a href="~/Reports/GetVehicleWiseLubesReport">Lube Receipts</a>
+            </li>
+            <li>
+                <a href="~/Reports/VehicleWiseRepairReport">Repair Receipts</a>
+            </li>
+            <li>
+                <a href="~/Reports/SparePartWiseConsumption">SparePartWise Consumption</a>
+            </li>
+            <li>
+                <a href="~/Reports/LubesWiseConsumption">LubesWise Consumption</a>
+            </li>
+            <li>
+                <a href="~/Reports/WorkShopMechanicReport">WorkShop_MechanicWise Report</a>
+            </li>
+            <li>
+                <a href="~/Reports/RmeWisePerformanceReport">RME Wise Report</a>
+            </li>
+            <li>
+                <a href="~/Reports/VehicleDeviationReport">Vehicle Deviation Report</a>
+            </li>
+        }
+            @*<li>
+        <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
+    </li>*@
+        </ul>
+    </li>
+
+    <li>
+        @*<a href="#">
+                        <i class="fa fa-files-o fa-fw"></i> Reports
+                        <span class="fa arrow"></span>
+                    </a>*@
+        <ul class="nav nav-second-level">
+            <li>
+                <span class="fa arrow"></span>
+                <a href="#">Receipts</a>
+
+                <ul class="nav nav-third-level">
+                    @*<li>
+                                    <a href="~/Inventory/saveLubesInventoryDetails">Lubricant Receipts</a>
+                                </li>
+                                <li>
+                                    <a href="~/Inventory/SaveInventoryDetails">SpareParts Receipts</a>
+                                </li>*@
+                </ul>
+            </li>
+
+        </ul>
+    </li>
+    </ul>
+    </div>
+    <!-- /.sidebar-collapse -->
+    </div>
+
+<!-- /.navbar-static-side -->
+<div id="page-wrapper" style="background-color:lightgoldenrodyellow; border: 1px solid grey; margin-top: 0px;">
+    @RenderBody()
+    <body onLoad="noBack();" @*onpageshow="if (event.persisted) noBack();"*@ onUnload=""></body>
+</div>
+
+</div>
+@*<footer align="center" style="background-color: darkkhaki;margin-left: 250px">
+    <p style="color:lightyellow">&copy; @DateTime.Now.Year - WorkShop</p>
+</footer>*@
+</body>
+
+</html>

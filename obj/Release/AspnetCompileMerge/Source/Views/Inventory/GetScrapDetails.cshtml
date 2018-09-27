@@ -1,0 +1,144 @@
+﻿@using System.Data
+@model IEnumerable<Fleet_WorkShop.Models.ScrapBinModel>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
+<style>
+    #tblSpares {
+        margin-top: 10px;
+        border-collapse: collapse;
+        width: 100%;
+    } 
+    #tbl {
+        margin-left: 160px;
+        width: 70%;
+    }
+</style>
+
+<script>
+    $(function () {
+
+        $('#Scrap').change(function () {
+            var data = {
+                scrapId: $('#Scrap option:selected').val()
+            };
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/GetScrapDetails/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response !== null) {
+                        generatedItemsTable(response);
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+
+    $(function() {
+        $('#btn').click(function() {
+            var data = {
+                netWeight: $('#txtNetWt').val(),
+                actualCount: $('#txtActual').val()
+            };
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/InsertScrapDetails/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response>0) {
+                        alert("Record Saved");
+                        location.reload();
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Scrap Details
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Scrap</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Scrap", ViewBag.ScrapBin as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Net Weight</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtNetWt"  placeholder="Net Weight" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Actual Quantity</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtActual"  placeholder="Actual Quantity" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -50px;margin-left:-50px">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div id="orderItems">
+    
+</div>
+<script>
+    function generatedItemsTable(orderItems) {
+        if (orderItems.length > 0) {
+
+            var $table = $('<table id=tbl/>');
+
+            $table.append(
+                '<thead><tr><th>SparePart</th><th>Part Number</th><th>Quantity</th></tr></thead>');
+
+            var $tbody = $('<tbody/>');
+            $.each(orderItems,
+                function (i, val) {
+
+                    var $row = $('<tr/>');
+                    //$row.append($('<td/>').html(val.ScrapBinId));
+                    $row.append($('<td/>').html(val.PartName));
+                    $row.append($('<td/>').html(val.PartNumber));
+                    $row.append($('<td/>').html(val.Quantity));
+                    $tbody.append($row);
+                });
+
+            $table.append($tbody);
+
+            $('#orderItems').html($table);
+
+        } else {
+            $('#orderItems').html('');
+        }
+    }
+</script>
+
+
+
+
+

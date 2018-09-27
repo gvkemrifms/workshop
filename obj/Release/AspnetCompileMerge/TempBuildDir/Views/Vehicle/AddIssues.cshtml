@@ -1,0 +1,198 @@
+﻿<script type="text/javascript">
+    $(document).ready(function() {
+
+        $("#Category").prop("disabled", true);
+
+        $("#Aggregates").change(function() {
+            if ($('#Aggregates option:selected').text().toLowerCase() == "--select--") {
+                $('#Category option:selected').text('');
+                $('#Category').prop("disabled", true);
+                return false;
+            }
+            var serviceUrl = '/Job/GetCategoriesForAggregates';
+            var data = {
+                AggregateId: $('#Aggregates').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(Response) {
+
+                    $('#Category').empty();
+                    $('#Category').append('<option value=0 selected="selected">--Select--</option>');
+                    for (var i = 0; i < Response.length; i++) {
+
+                        $('#Category').append("<option value='" +
+                            Response[i].split('-')[1] +
+                            "' >" +
+                            Response[i].split('-')[0] +
+                            "</option>");
+
+                    }
+
+                    $('#Category').prop("disabled", false);
+
+
+                }
+
+            });
+            return true;
+        });
+    });
+    $(document).ready(function() {
+
+        $("#SubCategory").prop("disabled", true);
+
+        $("#Category").change(function() {
+            if ($('#Category option:selected').text().toLowerCase() == "--select--") {
+                $('#Category option:selected').text("");
+                $('#SubCategory').prop("disabled", true);
+                return false;
+            }
+            var serviceUrl = '/Job/GetSubCategoryIds';
+            debugger;
+            var data = {
+                categoryId: $('#Category option:selected').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+
+                    $('#SubCategory').empty();
+                    $('#SubCategory').append('<option value=0 selected="selected">--Select--</option>');
+                    for (var i = 0; i < response.length; i++) {
+
+                        $('#SubCategory').append("<option value='" +
+                            response[i].split('-')[1] +
+                            "' >" +
+                            response[i].split('-')[0] +
+                            "</option>");
+
+                    }
+
+                    $('#SubCategory').prop("disabled", false);
+
+
+                }
+
+            });
+            return true;
+        });
+    });
+    $(function() {
+        $('#btnchange').click(function() {
+            var value = $(this).val();
+            if (value === 'Add New') {
+                $('#SubCategory').replaceWith($('<input/>',
+                    {
+                        'type': 'text',
+                        'placeholder': 'Add SubCategory',
+                        'id': 'txtSub',
+                        'class': "form-control",
+                        'style': "color:white;background-color:lightgrey"
+                    }));
+                $('#btnchange').val('Add Existing');
+            } else {
+                $("#txtSub").replaceWith('<select id="SubCategory" class="form-control"> </select>');
+                $('#btnchange').val('Add New');
+            }
+        });
+
+    });
+    $(function() {
+        $('#btn').click(function() {
+            var serviceUrl = '/Vehicle/AddIssues';
+            var data = {
+                Aggregates: $('#Aggregates option:selected').val(),
+                Categories: $('#Category option:selected').val(),
+                SubCategories: $('#SubCategory').val()
+            };
+            alert(JSON.stringify(data));
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Inserted');
+
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+
+            });
+        });
+    });
+</script>
+
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Add Aggregates
+    </div>
+    <div class="panel-body" style="margin-top: 30px">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Aggegates</label>
+                    <div class="col-lg-8">
+                        @*<select id="Aggregates" class="form-control"> </select>*@
+                        @Html.DropDownList("Aggregates", ViewBag.Aggregates as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Sub Category</label>
+                    <div class="col-lg-6">
+                        <select id="SubCategory" class="form-control"> </select>
+                    </div>
+                    @*<div class="col-lg-2">
+                        <input type="button" id="btnchange" style="background-color: blue; color: white;" value="Add New"/>
+                    </div>*@
+                </div>
+            </form>
+        </div>
+
+
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Category</label>
+                    <div class="col-lg-8">
+                        <select id="Category" class="form-control"> </select>
+                        @*@Html.DropDownList("Category", ViewBag.CategoryDrop as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-4">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                        <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -30px; margin-left: 350px">Submit</button>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+    @Html.ActionLink("Back", "EditPendingStatusDetails1")
+</div>

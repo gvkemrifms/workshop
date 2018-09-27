@@ -1,0 +1,147 @@
+﻿@model Fleet_WorkShop.Models.InventoryModel
+<script type="text/javascript">
+    $(function() {
+        $('#BillDate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0"
+        });
+    });
+    $(function() {
+        $("#Qty,#Uprice").blur(function() {
+            var unitPrice = $("#Uprice").val();
+            var quantity = $("#Qty").val();
+            var amount = parseInt(unitPrice) * parseInt(quantity);
+            $("#Amt").val('');
+            $("#Amt").val(amount);
+
+            $("#Amt").focus();
+        });
+
+        $('#LubricantId').change(function() {
+            var lubricantId = $('#LubricantId option:selected').val();
+            $.ajax({
+                type: "Post",
+                url: '/Inventory/GetLubesCostDetails/' + lubricantId,
+                data: JSON.stringify(lubricantId),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        $('#Uprice').val(response);
+                        $('#Qty').val('');
+                        $('#Amt').val('');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+
+    });
+
+
+</script>
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Billing Details
+    </div>
+
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+
+            <hr/>
+            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Manufacturer, new {@class = "control-label col-md-4"})
+                        <div class="col-md-8">
+
+                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.Manufacturer, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Lubricant, new {@class = "control-label col-md-4"})
+                        <div class="col-md-8">
+
+                            @Html.DropDownListFor(model => model.LubricantId, Model.Lubricant, "--Select--", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.Lubricant, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Uprice, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Uprice, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
+                        @Html.ValidationMessageFor(model => model.Uprice, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Qty, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Qty, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Amt, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Amt, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
+                        @Html.ValidationMessageFor(model => model.Amt, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.BillNo, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.BillNo, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.BillNo, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.BillDate, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.BillDate, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.BillDate, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10" style="margin-left: -60px; margin-top: 20px;">
+                    <input type="submit" id="btnEdit" style="background-color: blue; color: white; width: 100px" value="Save" class="btn btn-default"/>
+                </div>
+            </div>
+
+
+        </div>
+    }
+</div>
+<div>
+    @Html.ActionLink("Back", "SaveLubesInventoryDetails")
+</div>

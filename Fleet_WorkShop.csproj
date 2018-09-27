@@ -281,6 +281,7 @@
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="App_Browsers\qt.browser" />
+    <None Include="Properties\PublishProfiles\work.pubxml" />
     <None Include="Properties\PublishProfiles\WorkShop.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />

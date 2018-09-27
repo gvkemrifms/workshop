@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.ReportsModel>
+
+@{
+    WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
+}
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<table class="table" style="margin-top:30px">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.WorkShopName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Infrastructure)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Category)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </th>
+   
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.WorkShopName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Infrastructure)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Category)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Quantity)
+        </td>
+    </tr>
+}
+
+</table>

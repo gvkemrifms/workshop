@@ -1,0 +1,141 @@
+﻿@model Fleet_WorkShop.Models.PettyExpenses
+
+
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    hr {
+        display: block;
+        border-style: solid;
+        border-width: 1px;
+    }
+</style>
+<script type="text/javascript">
+   
+    function Validations() {
+        var billNumber = $('#txtBillNumber').val();
+        if (billNumber === "") {
+            return alert('Bill Number is Mandatory');
+        }
+        var ddlExpense = $('#ExpenseType option:selected').text().toLowerCase();
+        if (ddlExpense === '--select--' || ddlExpense === '') {
+            return alert("Please select Expense Type");
+        }
+        var billDate = $('#txtBillDate').val();
+        if (billDate === "") {
+            return alert('Bill Date is Mandatory');
+        }
+        var billAmount = $('#txtAmount').val();
+        if (billAmount === "") {
+            return alert('Amount is Mandatory');
+        }
+        return true;
+    }
+
+
+</script>
+<script type="text/javascript">
+
+    $(function() {
+        $('#txtBillDate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0"
+        });
+    });
+
+    $(function () {
+        var serviceUrl = '/Employee/PettyExpenses';
+        $('#btn').click(function() {
+
+            var data = {
+                Date: $('#txtBillDate').val(),
+                Amount: $('#txtAmount').val(),
+                TypeOfExpense: $('#ExpenseType option:selected').val()
+        };
+           
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Saved');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+</script>
+@{ ViewContext.FormContext = new FormContext(); }
+<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+    <div class="panel-heading">
+        Petty Expenses
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">WorkShop</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtWorkshop" value="@ViewBag.WorkShopName" placeholder="WorkShop" readonly="readonly">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtBillDate" onkeypress="return false;" placeholder="Bill Date">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Expense Type</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("ExpenseType", ViewBag.TypeOfExpense as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Amount</label>
+                    <div class="col-lg-8">
+                      
+                        <input type="text" class="form-control" id="txtAmount" placeholder="Amount">
+                    </div>
+                </div>
+            </form>
+      
+        </div>
+     
+
+     
+        <div class="col-lg-6 col-lg-offset-6" style="margin-top:auto">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+
+    <div class="panel-footer">
+
+    </div>
+</div>
+
+
+
