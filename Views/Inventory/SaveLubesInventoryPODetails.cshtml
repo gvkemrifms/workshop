@@ -129,7 +129,7 @@
                 $('#lblLubricantNumber').text('');
                 return false;
             }
-            var serviceUrl = '/Inventory/GetLubesDetailsForManufacturer';
+            var serviceUrl = '/workshop/Inventory/GetLubesDetailsForManufacturer';
 
             var data = {
                 ManufacturerId: $('#ManufacturerName option:selected').val()
@@ -171,7 +171,7 @@
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetLubesCostDetails/' + lubricantId,
+                url: '/workshop/Inventory/GetLubesCostDetails/' + lubricantId,
                 data: JSON.stringify(lubricantId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -344,7 +344,7 @@
         }
 
         $('#btn').click(function() {
-            var serviceUrl = '/Inventory/SaveLubesInventoryPODetails';
+            var serviceUrl = '/workshop/Inventory/SaveLubesInventoryPODetails';
             var data = {
                 PoNumber: $('#txtPONumber').val(),
                 PoDate: $('#txtPODate').val(),
@@ -372,7 +372,7 @@
     });
 
     $(function () {
-        var serviceUrl = '/Inventory/CheckLubesPoNumber';
+        var serviceUrl = '/workshop/Inventory/CheckLubesPoNumber';
         $('#txtPONumber').blur(function () {
             var data = {
                 PoNumber: $(this).val()

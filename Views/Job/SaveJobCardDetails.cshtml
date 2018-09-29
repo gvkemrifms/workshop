@@ -1,11 +1,39 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleModel>
 <style>
     #tbl {
-        width: 100%;
+        width: 70%;
         height: 100px;
+        align: left;
     }
 </style>
 <script type="text/javascript">
+    $(function() {
+        $('#txtpilotid').blur(function() {
+            var pilotIdd= $(this).val();
+            var serviceUrl = '/workshop/Job/CheckPilotId';
+            var data = {
+                PilotId:pilotIdd
+            };
+
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response <= 0) {
+                        alert('Specified Pilot Id does not exist');
+                        $('#txtpilotid').val('');
+                    }
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+        });
+        });
 
     $(function() {
         $('#txtDor,#txtDateOfDelivery').datepicker({
@@ -99,12 +127,14 @@
 
         $('#btn').click(function() {
             var vehicleNumber = $('#Vehicle option:selected').text();
-           var helperIdd= $('#Helper option:selected').val();
-            var serviceUrl = '/Job/SaveJobCardDetails';
+            var helperIdd = $('#Helper option:selected').val();
+            var distancetravelled = $('#lblDistance').text();
+            var serviceUrl = '/workshop/Job/SaveJobCardDetails';
             var data = {
                 jobcarditems: orderItems,
                 vehicleNumber: vehicleNumber,
-                helperId:helperIdd
+                helperId:helperIdd,
+                distanceTravelled: distancetravelled
             };
 
             $.ajax({
@@ -114,7 +144,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response != 0) {
+                    if (response !== 0) {
                         alert('Record Inserted');
                     }
                 },
@@ -128,7 +158,7 @@
 
     $(function() {
         $('#txtOdo').blur(function() {
-            var serviceUrl = '/Job/CheckOdoReading';
+            var serviceUrl = '/workshop/Job/CheckOdoReading';
             var data = {
                 Odo: $(this).val(),
                 vehicleid: $('#Vehicle option:selected').val()
@@ -153,11 +183,11 @@
     });
     $(function() {
 
-        var serviceUrl = '/Job/GetModelNumber';
+        var serviceUrl = '/workshop/Job/GetModelNumber';
         $('#District').change(function() {
             $('#txtModel').val('');
         });
-        $("#Vehicle").change(function() {
+        $("#Vehicle").blur(function() {
             var data = { vehicleid: $('#Vehicle').val() };
             if (true) {
                 $.ajax({
@@ -176,6 +206,31 @@
             }
         });
     });
+
+
+    $(function () {
+
+        var serviceUrl = '/workshop/Job/getDistancelatlong';
+        $("#Vehicle").change(function () {
+            var data = { vehicleid: $('#Vehicle').val() };
+            if (true) {
+                $.ajax({
+                    url: serviceUrl,
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: 'application/json',
+
+                    success: function (response) {
+                        if(response>=0)
+                        $('#lblDistance').text(response);
+                    }
+
+                });
+            }
+        });
+    });
+
     $(document).ready(function() {
 
         $("#Vehicle").prop("disabled", true);
@@ -186,7 +241,7 @@
                 $('#Vehicle').prop("disabled", true);
                 return false;
             }
-            var serviceUrl = '/Job/GetDistrictIds';
+            var serviceUrl = '/workshop/Job/GetDistrictIds';
             var data = {
                 districtId: $('#District').val()
 
@@ -214,7 +269,7 @@
 
                     $('#Vehicle').prop("disabled", false);
 
-
+                    $("#Vehicle").children().removeAttr('disabled');
                 }
 
             });
@@ -227,7 +282,7 @@
         $("#txtNatureOfComplaint").prop("disabled", true);
 
         $("#Manufacturer").change(function() {
-            if ($('#Manufacturer option:selected').text().toLowerCase() == "--select--") {
+            if ($('#Manufacturer option:selected').text().toLowerCase() === "--select--") {
                 $('#txtNatureOfComplaint option:selected').text("");
                 $('#SubCategory option:selected').text('');
                 $('#txtCategory option:selected').text('');
@@ -237,7 +292,7 @@
                 $('#txtEstimatedCost').val('');
                 return false;
             }
-            var serviceUrl = '/Job/GetAggregatesBasedOnManufacturers';
+            var serviceUrl = '/workshop/Job/GetAggregatesBasedOnManufacturers';
             debugger;
             var data = {
                 manufacturerId: $('#Manufacturer').val()
@@ -265,7 +320,7 @@
                     }
 
                     $('#txtNatureOfComplaint').prop("disabled", false);
-
+                    $("#txtNatureOfComplaint").children().removeAttr('disabled');
                 }
 
             });
@@ -279,7 +334,7 @@
         $("#txtCategory").prop("disabled", true);
 
         $("#txtNatureOfComplaint").change(function() {
-            if ($('#txtNatureOfComplaint option:selected').text().toLowerCase() == "--select--") {
+            if ($('#txtNatureOfComplaint option:selected').text().toLowerCase() === "--select--") {
                 $('#txtCategory option:selected').text("");
                 $('#SubCategory option:selected').text("");
                 $('#txtCategory').prop("disabled", true);
@@ -287,7 +342,7 @@
                 $('#txtEstimatedCost').val('');
                 return false;
             }
-            var serviceUrl = '/Job/GetCategoryIds';
+            var serviceUrl = '/workshop/Job/GetCategoryIds';
             debugger;
             var data = {
                 aggregatedId: $('#txtNatureOfComplaint').val()
@@ -315,7 +370,7 @@
                     }
 
                     $('#txtCategory').prop("disabled", false);
-
+                    $("#txtCategory").children().removeAttr('disabled');
 
                 }
 
@@ -335,7 +390,7 @@
                 $('#txtEstimatedCost').val('');
                 return false;
             }
-            var serviceUrl = '/Job/GetSubCategoryIds';
+            var serviceUrl = '/workshop/Job/GetSubCategoryIds';
             debugger;
             var data = {
                 categoryId: $('#txtCategory').val()
@@ -364,7 +419,7 @@
 
                     $('#SubCategory').prop("disabled", false);
 
-
+                    $("#SubCategory").children().removeAttr('disabled');
                 }
             });
             return true;
@@ -374,11 +429,11 @@
 
 
         $("#SubCategory").change(function() {
-            if ($('#SubCategory option:selected').text().toLowerCase() == "--select--") {
+            if ($('#SubCategory option:selected').text().toLowerCase() === "--select--") {
                 $('#txtEstimatedCost').val('');
                 return false;
             }
-            var serviceUrl = '/Job/GetEstimatedCostDetails';
+            var serviceUrl = '/workshop/Job/GetEstimatedCostDetails';
             var data = {
                 categoryId: $('#SubCategory').val()
 
@@ -532,7 +587,9 @@
     Repair And Maintanence
 </div>
 <div class="panel-body" style="margin-top: 30px">
-    
+<div class="col-lg-3" style="margin-top: -30px;float:right" align="right">
+    Distance Travelled(KM) : <label id="lblDistance" align="right" style="color: red;size: 10px"></label>
+</div>
     <div class="col-lg-6">
         <form class="form-horizontal">
             <div class="form-group">
@@ -561,6 +618,7 @@
                     @Html.CheckBox("isNewVehicle", false) New Vehicle
                 </div>
             </div>
+           
             <div class="form-group">
                 <label class="control-label col-lg-4">Model</label>
                 <div class="col-lg-8">

@@ -62,7 +62,7 @@
             
             $.ajax({
                 type: "Post",
-                url: '/Inventory/CheckQuantity/',
+                url: '/workshop/Inventory/CheckQuantity/',
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -215,7 +215,7 @@
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetCostDetails/' + sparePartId,
+                url: '/workshop/Inventory/GetCostDetails/' + sparePartId,
                 data: JSON.stringify(sparePartId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -234,7 +234,7 @@
     });
     $(function() {
     
-        var serviceUrl = '/Inventory/GetSparePODetails';
+        var serviceUrl = '/workshop/Inventory/GetSparePODetails';
         $('#txtPONumber').blur(function() {
             var data = {
                 Ponumber: $(this).val()
@@ -434,7 +434,7 @@
         }
 
         $('#btn').click(function() {
-            var serviceUrl = '/Inventory/SaveInventoryDetails';
+            var serviceUrl = '/workshop/Inventory/SaveInventoryDetails';
             var data = {
                 BillNo: $('#txtBillNumber').val(),
                 BillDate: $('#txtBillDate').val(),

@@ -9,7 +9,7 @@
                 $('#Category').prop("disabled", true);
                 return false;
             }
-            var serviceUrl = '/Job/GetCategoriesForAggregates';
+            var serviceUrl = '/workshop/Job/GetCategoriesForAggregates';
             var data = {
                 AggregateId: $('#Aggregates').val()
 
@@ -54,7 +54,7 @@
                 $('#SubCategory').prop("disabled", true);
                 return false;
             }
-            var serviceUrl = '/Job/GetSubCategoryIds';
+            var serviceUrl = '/workshop/Job/GetSubCategoryIds';
             debugger;
             var data = {
                 categoryId: $('#Category option:selected').val()
@@ -112,7 +112,7 @@
     });
     $(function() {
         $('#btn').click(function() {
-            var serviceUrl = '/Vehicle/AddIssues';
+            var serviceUrl = '/workshop/Vehicle/AddIssues';
             var data = {
                 Aggregates: $('#Aggregates option:selected').val(),
                 Categories: $('#Category option:selected').val(),

@@ -594,7 +594,7 @@ namespace Fleet_WorkShop.Controllers
                 vehDetails.ReceivedLocation, vehDetails.PilotId, vehDetails.PilotName, vehDetails.DateOfDelivery,
                 vehDetails.AggregateId, vehDetails.ApproximateCost, vehDetails.AllotedMechanic, vehDetails.WorkShopId,
                 vehDetails.ServiceEngineer,vehDetails.IdCategory, vehDetails.SubCategory,
-                vehDetails.ManufacturerId, Convert.ToInt32(rm), Convert.ToInt32(pm), Convert.ToInt32(emt), helperId);
+                vehDetails.ManufacturerId, Convert.ToInt32(rm), Convert.ToInt32(pm), Convert.ToInt32(emt), helperId,null);
             return Json(returnVal, JsonRequestBehavior.AllowGet);
         }
 
@@ -610,7 +610,6 @@ namespace Fleet_WorkShop.Controllers
                 DistrictName = x.Field<string>("District"),
                 DateOfRepair = x.Field<DateTime>("DateOfRepair"),
                 AggregateName = x.Field<string>("ServiceGroup_Name"),
-                LaborCharges = x.Field<int>("laborcharges"),
                 WorkShopName = x.Field<string>("workshop_name"),
                 Status = x.Field<string>("Status"),
                 VehicleNumber = vehicleNumber

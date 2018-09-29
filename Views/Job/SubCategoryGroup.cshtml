@@ -13,7 +13,7 @@
 
                 return false;
             }
-            var serviceUrl = '/Job/GetManufacturerNameForAggregates';
+            var serviceUrl = '/workshop/Job/GetManufacturerNameForAggregates';
             debugger;
             var data = {
                 ManufacturerId: $('#Manufacturer').val()
@@ -59,7 +59,7 @@
                 $('#Category').prop("disabled", true);
                 return false;
             }
-            var serviceUrl = '/Job/GetCategoriesForAggregates';
+            var serviceUrl = '/workshop/Job/GetCategoriesForAggregates';
             var data = {
                 AggregateId: $('#Aggregates').val()
 
@@ -125,7 +125,7 @@
 
     $(function() {
         $('#btn').click(function() {
-            var serviceUrl = '/Job/SubCategoryGroup';
+            var serviceUrl = '/workshop/Job/SubCategoryGroup';
             var data = {
                 ServiceGroupId: $('#Category option:selected').val(),
                 ServiceName: $('#txtSubCategories').val(),

@@ -348,7 +348,7 @@
     <Content Include="Views\Vehicle\GetVehicleDetails.cshtml" />
     <Content Include="Views\Vehicle\Edit.cshtml" />
     <Content Include="Views\Inventory\SaveInventoryDetails.cshtml" />
-    <Content Include="Views\Inventory\SparePartsMaster.cshtml" />
+    <Content Include="Views\Job\SparePartsMaster.cshtml" />
     <Content Include="Views\Inventory\LubesMaster.cshtml" />
     <Content Include="Views\Inventory\GetReceiptDetails.cshtml" />
     <Content Include="Views\Inventory\Edit.cshtml" />
@@ -416,6 +416,7 @@
     <Content Include="Views\Employee\CommonExpenses.cshtml" />
     <Content Include="Views\Reports\VehicleDeviationReport.cshtml" />
     <Content Include="Views\Reports\_VehicleDeviationReports.cshtml" />
+    <Content Include="Views\Job\getDistancelatlong.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -236,7 +236,7 @@ namespace Fleet_WorkShop.Models
         internal int ExecuteInsertJobCardDetails(string insertStmt, int districtId, int vehId, DateTime dateOfRepair,
             int modelNumber, int odometer, string receivedLocation, string pilotId, string pilotName,
             DateTime dateOfDelivery, int natureOfComplaint, int approximateCost, int allotedmechanic, int workshopid,
-            int serviceEngineer, int categoryid, int subCategory, int manufacturerId,int rmid,int pmid,int emeid,int? helperId)
+            int serviceEngineer, int categoryid, int subCategory, int manufacturerId,int rmid,int pmid,int emeid,int? helperId,int? distancetravelled)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
             {
@@ -267,6 +267,7 @@ namespace Fleet_WorkShop.Models
                     comm.Parameters.AddWithValue("@pmid", pmid);
                     comm.Parameters.AddWithValue("@emeid", emeid);
                     comm.Parameters.AddWithValue("@helperid", helperId);
+                    comm.Parameters.AddWithValue("@distancetravelled", distancetravelled);
                     try
                     {
                         conn.Open();
@@ -1458,7 +1459,27 @@ namespace Fleet_WorkShop.Models
                 }
             }
         }
+        public int GetDistanceFromLatLonInKm(decimal lat1, decimal lon1, decimal lat2, decimal lon2)
+        {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                    Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2)
+                ;
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            var d = R * c; // Distance in km
+            int distance = Convert.ToInt32(d);
+            return distance;
+        }
 
+        public double deg2rad(decimal deg)
+        {
+            return Convert.ToDouble(deg) * (Math.PI / 180);
+
+        }
         internal int ExecuteInsertVehicleDetails(string insertStmt, string vehicleId, int manufacturerId,
             int districtId, string model, string chasisNumber, string engineNumber, string locationOfCommission,
             DateTime? DOC)

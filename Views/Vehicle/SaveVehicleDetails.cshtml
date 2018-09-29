@@ -47,7 +47,7 @@
 
     $(function() {
         $('#txtVehicleNumber').blur(function() {
-            var serviceUrl = '/Vehicle/CheckVehicleNumber';
+            var serviceUrl = '/workshop/Vehicle/CheckVehicleNumber';
             var data = {
                 vehicleNumber: $('#txtVehicleNumber').val()
             };
@@ -72,7 +72,7 @@
     });
     $(function() {
         $('#btn').click(function() {
-            var serviceUrl = '/Vehicle/SaveVehicleDetails';
+            var serviceUrl = '/workshop/Vehicle/SaveVehicleDetails';
             var data = {
                 DistrictId: $('#District').val(),
                 ManufacturerId: $('#Manufacturer').val(),
@@ -92,6 +92,7 @@
                 success: function(response) {
                     if (response != 0) {
                         alert('Record Inserted');
+                        location.reload();
                     }
                 },
                 failure: function(response) {

@@ -15,7 +15,7 @@
     });
    
     $(function () {
-        var serviceURL = '/Employee/CheckEmployeeId';
+        var serviceURL = '/workshop/Employee/CheckEmployeeId';
         $('#txtEmpId').blur(function () {
             var data = {
                 empId: $(this).val()
@@ -28,7 +28,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    if (response != 0) {
+                    if (response !== 0) {
                         alert('Employee Id already exists');
                         $('#txtEmpId').val('');
                     }
@@ -104,7 +104,7 @@
     $(function () {
         $('#btn').click(function () {
 
-            var serviceURL = '/Employee/SaveEmployeeDetails';
+            var serviceURL = '/workshop/Employee/SaveEmployeeDetails';
             var data = {
                 EmployeeId:$('#txtEmpId').val(),
                 EmployeeName: $('#txtEmployeeName').val(),
@@ -159,14 +159,14 @@
                     <label class="control-label col-lg-4">Employee Name</label>
                     <div class="col-lg-8">
                         @*@Html.TextBoxFor(x => x.EmployeeName, new { @class = "form-control", placeholder = "Name",id="txtEmployeeName" })*@
-                        <input type="text" class="form-control" id="txtEmployeeName" placeholder="Name">
+                        <input type="text" class="form-control" id="txtEmployeeName" placeholder="Name" >
                         @*@Html.ValidationMessageFor(m => m.EmployeeName, "", new { @class = "text-danger" })*@
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-4">Employee Id</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtEmpId" placeholder="ID">
+                        <input type="text" class="form-control" id="txtEmpId" placeholder="ID" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
                     </div>
                 </div>
                 

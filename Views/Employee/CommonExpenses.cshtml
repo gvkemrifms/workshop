@@ -45,7 +45,7 @@
     });
 
     $(function () {
-        var serviceUrl = '/Employee/CommonExpenses';
+        var serviceUrl = '/workshop/Employee/CommonExpenses';
         $('#btn').click(function() {
 
             var data = {
@@ -64,6 +64,7 @@
                 success: function(response) {
                     if (response !== 0) {
                         alert('Record Saved');
+                        location.reload();
                     }
 
                 },

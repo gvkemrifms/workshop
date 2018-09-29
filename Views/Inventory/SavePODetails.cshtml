@@ -86,7 +86,7 @@
     }
 
     $(function () {
-        var serviceUrl = '/Inventory/CheckPoNumber';
+        var serviceUrl = '/workshop/Inventory/CheckPoNumber';
         $('#txtPONumber').blur(function () {
             var data = {
                 PoNumber: $(this).val()
@@ -140,7 +140,7 @@
                 $("#txtQuantity").val('');
                 return false;
             }
-            var serviceUrl = '/Inventory/GetSparePartsDetailsForManufacturer';
+            var serviceUrl = '/workshop/Inventory/GetSparePartsDetailsForManufacturer';
 
             var data = {
                 ManufacturerId: $('#ManufacturerName option:selected').val()
@@ -186,7 +186,7 @@
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetCostDetails/' + sparePartId,
+                url: '/workshop/Inventory/GetCostDetails/' + sparePartId,
                 data: JSON.stringify(sparePartId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -323,7 +323,7 @@
         }
 
         $('#btn').click(function() {
-            var serviceUrl = '/Inventory/SavePODetails';
+            var serviceUrl = '/workshop/Inventory/SavePODetails';
             var data = {
                 PoNumber: $('#txtPONumber').val(),
                 PoDate: $('#txtPODate').val(),

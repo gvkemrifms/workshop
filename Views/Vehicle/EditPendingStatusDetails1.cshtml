@@ -42,7 +42,7 @@
         });
     });
     $(function() {
-        var serviceUrl = '/Vehicle/GetCostForEachSpare';
+        var serviceUrl = '/workshop/Vehicle/GetCostForEachSpare';
         $('#SpareParts').blur(function() {
             var data = {
                 spareId: $('#SpareParts option:selected').val()
@@ -128,7 +128,7 @@
     //    });      
     //});
     $(function() {
-        var serviceUrl = '/Vehicle/GetSparePartCost';
+        var serviceUrl = '/workshop/Vehicle/GetSparePartCost';
         $('#SpareParts').change(function() {
             if ($('#SpareParts option:selected').text() === '--Select--') {
                 $("#Lubricant").prop('selectedIndex', 0);
@@ -216,7 +216,7 @@
     //}
 
     $(function() {
-        var serviceUrl = '/Vehicle/CheckSpareQuantity';
+        var serviceUrl = '/workshop/Vehicle/CheckSpareQuantity';
         $('#txtQuantity').blur(function() {
             var data = {
                 sparePartId: $("#SpareParts").val(),
@@ -245,7 +245,7 @@
     });
 
     $(function() {
-        var serviceUrl = '/Vehicle/CheckLubesQuantity';
+        var serviceUrl = '/workshop/Vehicle/CheckLubesQuantity';
         $('#txtLubesQuantity').blur(function() {
             var data = {
                 LubricantId: $("#Lubricant").val(),
@@ -274,7 +274,7 @@
     });
 
     $(function() {
-        var serviceUrl = '/Vehicle/GetLubesCost';
+        var serviceUrl = '/workshop/Vehicle/GetLubesCost';
         $('#Lubricant').change(function() {
             if ($('#Lubricant option:selected').text() === '--Select--') {
                 $("#SpareParts").prop('selectedIndex', 0);
@@ -315,7 +315,7 @@
         var orderItems = [];
         var lubesorderrItems = [];
         var costItems = [];
-        var serviceUrl = '/Vehicle/GetCostForEachSpare';
+        var serviceUrl = '/workshop/Vehicle/GetCostForEachSpare';
 
         $('#btnAdd').click(function() {
             $('#HiddenId').val('');
@@ -543,7 +543,7 @@
             var serviceUrl;
             var data;
             //if (orderItems.length > 0) {
-            serviceUrl = '/Vehicle/SaveCalculateFIFO';
+            serviceUrl = '/workshop/Vehicle/SaveCalculateFIFO';
             data = {
                 Status: $('input[name="clkradio"]:checked').val(),
                 itemmodel: orderItems,
@@ -567,7 +567,7 @@
                     }
                     else if (response === 0) {
                         alert('Record Inserted');
-                        window.location.href = "/Vehicle/GetCompletedStatusDetails";
+                        window.location.href = "/workshop/Vehicle/GetCompletedStatusDetails";
                     }
 
                 },
@@ -578,7 +578,7 @@
             });
             // }
             if (lubesorderrItems.length > 0) {
-                serviceUrl = '/Vehicle/SaveCalculateLubesFIFO';
+                serviceUrl = '/workshop/Vehicle/SaveCalculateLubesFIFO';
                 data = {
                     Status: $('input[name="clkradio"]:checked').val(),
                     itemmodel: lubesorderrItems
@@ -592,7 +592,7 @@
                     success: function(response) {
                         if (response >= 0) {
                             alert('Record Inserted');
-                            window.location.href = "/Vehicle/GetPendingStatusDetails";
+                            window.location.href = "/workshop/Vehicle/GetPendingStatusDetails";
                         } else if (response < 0) {
                             alert('Available  Quantity of Lubes is less than Requested Quantity');
                         }
@@ -1030,7 +1030,7 @@
                     });
                 $("#submit").on("click",
                     function() {
-                        var serviceUrl = "/Vehicle/getOutSourcingJobDetails";
+                        var serviceUrl = "/workshop/Vehicle/getOutSourcingJobDetails";
                         var newUrl = '@Url.Action("GetPendingStatusDetails", "Vehicle")';
                         var data = {
                             Vendor: $('#txtvendor').val(),

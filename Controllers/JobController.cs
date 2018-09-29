@@ -14,6 +14,7 @@ namespace Fleet_WorkShop.Controllers
         private readonly EmployeeHelper _helper = new EmployeeHelper();
         private readonly Aggregates _jobModel = new Aggregates();
 
+
         private readonly VehicleModel _vehModel = new VehicleModel();
 
         // GET: Job
@@ -24,6 +25,24 @@ namespace Fleet_WorkShop.Controllers
             return RedirectToAction("SaveJobCardDetails");
         }
 
+        public ActionResult getDistancelatlong(int? vehicleid)
+        {
+            
+            if (vehicleid == null) return null;
+            DataTable dtgetDistance=_helper.ExecuteSelectStmtusingSP("distanceCalculator", "@vehicleid", vehicleid.ToString());
+            decimal originLatitude = dtgetDistance.AsEnumerable().Select(x => x.Field<decimal>("olatitude"))
+                .FirstOrDefault();
+            decimal originLongitude= dtgetDistance.AsEnumerable().Select(x => x.Field<decimal>("olongitude"))
+                .FirstOrDefault();
+            decimal destLatitude = dtgetDistance.AsEnumerable().Select(x => x.Field<decimal>("destlatitude"))
+                .FirstOrDefault();
+            decimal destLongitude = dtgetDistance.AsEnumerable().Select(x => x.Field<decimal>("destlongitude"))
+                .FirstOrDefault();
+           int distanceinKm= _helper.GetDistanceFromLatLonInKm(originLatitude, originLongitude, destLatitude, destLongitude);
+            return Json(distanceinKm, JsonRequestBehavior.AllowGet);
+        }
+
+      
         public ActionResult SaveJobCardDetails()
         {
             if (Session["WorkshopId"] == null)
@@ -61,7 +80,7 @@ namespace Fleet_WorkShop.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveJobCardDetails(VehicleModel model, string vehicleNumber,int? helperId)
+        public ActionResult SaveJobCardDetails(VehicleModel model, string vehicleNumber,int? helperId,string distanceTravelled=null)
         {
             foreach (var item in model.jobcarditems)
             {
@@ -103,7 +122,7 @@ namespace Fleet_WorkShop.Controllers
                     Convert.ToInt32(vehDetails.ServiceEngineer),
                     Convert.ToInt32(vehDetails.CategoryIdd), Convert.ToInt32(item.SubCat),
                     Convert.ToInt32(item.ManufacturerId), Convert.ToInt32(rm), Convert.ToInt32(pm),
-                    Convert.ToInt32(emt),Convert.ToInt32(helperId));
+                    Convert.ToInt32(emt),Convert.ToInt32(helperId),Convert.ToInt32(distanceTravelled));
             }
 
             return RedirectToAction("SaveJobCardDetails");
@@ -236,6 +255,13 @@ namespace Fleet_WorkShop.Controllers
             return Content(list.ToString(), "application/json");
         }
 
+        public ActionResult CheckPilotId(int? PilotId)
+        {
+            if (PilotId == null) return null;
+           DataTable dtCheckPilotId= _helper.ExecuteSelectStmtusingSP("checkPilotId", "@empid", PilotId.ToString());
+                int count=dtCheckPilotId.Rows.Count;
+                return Json(count, JsonRequestBehavior.AllowGet);  
+        }
         public ActionResult Edit(int? id = null)
         {
             if (id == null)
@@ -458,6 +484,7 @@ namespace Fleet_WorkShop.Controllers
             var row = dtSubCategories.AsEnumerable().ToList().Single(x => x.Field<int>("Service_id") == id);
             var r1 = dtCategories.AsEnumerable()
                 .FirstOrDefault(x => x.Field<int>("Aggregate_ID") == Convert.ToInt32(row["ServiceGroup_Id"]));
+            if (r1 == null) return RedirectToAction("SubCategoryGroup");
             Session["Id"] = id;
             var aggregates = new Aggregates
             {

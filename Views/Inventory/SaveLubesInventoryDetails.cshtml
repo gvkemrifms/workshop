@@ -81,7 +81,7 @@
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/CheckLubesAvailableQuantity/',
+                url: '/workshop/Inventory/CheckLubesAvailableQuantity/',
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -235,7 +235,7 @@
             }
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetLubesCostDetails/' + lubricantId,
+                url: '/workshop/Inventory/GetLubesCostDetails/' + lubricantId,
                 data: JSON.stringify(lubricantId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -276,7 +276,7 @@
 
     $(function () {
 
-        var serviceUrl = '/Inventory/GetLubesPODetails';
+        var serviceUrl = '/workshop/Inventory/GetLubesPODetails';
         $('#txtPONumber').blur(function () {
             var data = {
 
@@ -467,7 +467,7 @@
             }
         }
         $('#btn').click(function () {
-            var serviceUrl = '/Inventory/SaveLubesInventoryDetails';
+            var serviceUrl = '/workshop/Inventory/SaveLubesInventoryDetails';
             var data = {
                 BillNo: $('#txtBillNumber').val(),
                 BillDate: $('#txtBillDate').val(),

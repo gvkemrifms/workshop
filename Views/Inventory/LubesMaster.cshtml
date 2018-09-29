@@ -11,7 +11,7 @@
 
     $(function() {
         $('#txtLubricantNumber').blur(function() {
-            var serviceUrl = '/Inventory/CheckLubricantNumber';
+            var serviceUrl = '/workshop/Inventory/CheckLubricantNumber';
             var data = {
                 LubricantNumber: $(this).val()
             };
@@ -63,7 +63,7 @@
     $(function() {
         $('#btn').click(function() {
             debugger;
-            var serviceUrl = '/Inventory/LubesMaster';
+            var serviceUrl = '/workshop/Inventory/LubesMaster';
             var data = {
                 ManufacturerId: $('#Manufacturer').val(),
                 OilName: $('#txtOil').val(),
@@ -78,7 +78,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response != 0) {
+                    if (response !== 0) {
                         alert('Record Inserted');
                     }
 
