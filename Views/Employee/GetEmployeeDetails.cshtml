@@ -3,8 +3,8 @@
 @{
     WebGrid webGrid = new WebGrid(source: Model, canSort: false, canPage: false);
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
 
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
     <table class="table" style="margin-top:30px">
         <tr>
             <th>
@@ -44,10 +44,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.RelievingDate)
             </th>
-
-
-
-            <th></th>
         </tr>
 
         @foreach (var item in Model)

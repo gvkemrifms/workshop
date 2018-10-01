@@ -31,10 +31,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/03/2015 09:32:26</publishTime>
     </File>
     <File Include="bin/Fleet_WorkShop.dll">
-      <publishTime>09/29/2018 11:15:13</publishTime>
+      <publishTime>01/10/2018 11:53:22</publishTime>
     </File>
     <File Include="bin/Fleet_WorkShop.pdb">
-      <publishTime>09/29/2018 11:15:13</publishTime>
+      <publishTime>01/10/2018 11:53:22</publishTime>
     </File>
     <File Include="bin/Microsoft.AI.Agent.Intercept.dll">
       <publishTime>07/12/2015 19:04:38</publishTime>
@@ -349,7 +349,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/25/2018 13:59:52</publishTime>
     </File>
     <File Include="ScriptsCss/Bindings.css">
-      <publishTime>07/19/2018 15:31:20</publishTime>
+      <publishTime>09/29/2018 15:50:47</publishTime>
     </File>
     <File Include="ScriptsCss/bootstrap.min.css">
       <publishTime>06/13/2018 17:33:13</publishTime>
@@ -400,7 +400,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/12/2018 11:43:36</publishTime>
     </File>
     <File Include="Views/Account/Login.cshtml">
-      <publishTime>06/26/2018 15:53:24</publishTime>
+      <publishTime>09/29/2018 14:43:28</publishTime>
     </File>
     <File Include="Views/Account/Register.cshtml">
       <publishTime>06/12/2018 11:43:36</publishTime>
@@ -430,7 +430,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/18/2018 17:35:39</publishTime>
     </File>
     <File Include="Views/Employee/GetEmployeeDetails.cshtml">
-      <publishTime>07/31/2018 17:41:35</publishTime>
+      <publishTime>09/29/2018 12:34:08</publishTime>
     </File>
     <File Include="Views/Employee/GetInfraStructureDetails.cshtml">
       <publishTime>07/18/2018 17:10:52</publishTime>
@@ -481,7 +481,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/27/2018 12:12:07</publishTime>
     </File>
     <File Include="Views/Inventory/SaveLubesInventoryDetails.cshtml">
-      <publishTime>09/27/2018 12:24:14</publishTime>
+      <publishTime>09/29/2018 14:37:22</publishTime>
     </File>
     <File Include="Views/Inventory/SaveLubesInventoryPODetails.cshtml">
       <publishTime>09/27/2018 12:18:08</publishTime>
@@ -535,7 +535,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/27/2018 10:30:26</publishTime>
     </File>
     <File Include="Views/Job/SaveJobCardDetails.cshtml">
-      <publishTime>09/29/2018 11:23:47</publishTime>
+      <publishTime>01/10/2018 10:15:30</publishTime>
     </File>
     <File Include="Views/Job/ServiceGroup.cshtml">
       <publishTime>09/27/2018 12:33:40</publishTime>
@@ -643,7 +643,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/12/2018 11:43:37</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>09/27/2018 10:13:14</publishTime>
+      <publishTime>09/29/2018 14:47:02</publishTime>
     </File>
     <File Include="Views/Shared/_LoginPartial.cshtml">
       <publishTime>06/12/2018 11:43:37</publishTime>
@@ -658,7 +658,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/27/2018 10:48:52</publishTime>
     </File>
     <File Include="Views/Vehicle/EditPendingStatusDetails1.cshtml">
-      <publishTime>09/27/2018 14:31:26</publishTime>
+      <publishTime>09/29/2018 15:50:06</publishTime>
     </File>
     <File Include="Views/Vehicle/GetCompletedStatusDetails.cshtml">
       <publishTime>09/19/2018 14:46:10</publishTime>
@@ -676,7 +676,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/27/2018 11:01:56</publishTime>
     </File>
     <File Include="Views/Vehicle/GetVehicleCompletedStatusDetails.cshtml">
-      <publishTime>09/24/2018 12:42:49</publishTime>
+      <publishTime>10/01/2018 10:55:39</publishTime>
     </File>
     <File Include="Views/Vehicle/GetVehicleDetails.cshtml">
       <publishTime>08/27/2018 11:02:13</publishTime>
@@ -697,7 +697,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/13/2018 00:56:20</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>09/29/2018 11:15:21</publishTime>
+      <publishTime>01/10/2018 11:53:32</publishTime>
     </File>
   </ItemGroup>
 </Project>
