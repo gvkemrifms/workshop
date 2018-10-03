@@ -1,0 +1,106 @@
+﻿@model Fleet_WorkShop.Models.VehicleModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Vehicle Information
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <hr/>
+            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+            @Html.HiddenFor(model => model.Id)
+            <div class="form-group">
+                @Html.LabelFor(model => model.District, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @foreach (var districtName in Model.District)
+                    {
+                        if (districtName.Text == Model.DistrictName)
+                        {
+                            Model.DistrictId = Convert.ToInt32(districtName.Value);
+                            @Html.DropDownListFor(model => model.DistrictId, Model.District, "--Select--", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.DistrictId, "", new {@class = "text-danger"})
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Manufacturer, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @foreach (var ManuName in Model.Manufacturer)
+                    {
+                        if (ManuName.Text == Model.ManufacturerName)
+                        {
+                            Model.ManufacturerId = Convert.ToInt32(ManuName.Value);
+                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.ManufacturerId, "", new {@class = "text-danger"})
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LocationOfCommission, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.LocationOfCommission, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.LocationOfCommission, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ChasisNumber, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.ChasisNumber, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.ChasisNumber, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.VehicleNumber, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+
+                    @Html.EditorFor(model => model.VehicleNumberString, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.VehicleNumberString, "", new {@class = "text-danger"})
+
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.EngineNumber, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.EngineNumber, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.EngineNumber, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Model, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.ModelYear, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.ModelYear, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.DateOfCommission, new {@class = "control-label col-md-2"})
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.DateOfCommission, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.DateOfCommission, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" style="background-color: blue; color: white" class="btn btn-default"/>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div>
+    @Html.ActionLink("Back", "GetVehicleDetails")
+</div>

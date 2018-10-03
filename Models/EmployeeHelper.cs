@@ -37,41 +37,6 @@ namespace Fleet_WorkShop.Models
         }
 
 
-        internal int ExecuteUpdateSparesMaster(int sparesId, string insertStmt, int manufacturerId, string partName,
-            decimal cost)
-        {
-            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
-            {
-                using (var comm = new SqlCommand())
-                {
-                    var i = 0;
-                    comm.Connection = conn;
-                    comm.CommandText = insertStmt;
-                    comm.CommandType = CommandType.StoredProcedure;
-                    comm.Parameters.AddWithValue("@id", sparesId);
-                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
-                    comm.Parameters.AddWithValue("@partname", partName);
-                    comm.Parameters.AddWithValue("@cost", cost);
-
-                    try
-                    {
-                        conn.Open();
-                        i = comm.ExecuteNonQuery();
-                        return i;
-                    }
-                    catch (SqlException ex)
-                    {
-                        TraceService(" executeInsertStatement " + ex + insertStmt);
-                        return i;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-        }
-
         public DataTable ExecuteSelectStmtusingSP(string insertStmt, string parameterName1 = null,
             string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null,
             string parameterName3 = null, string parameterValue3 = null,string parameterName4 = null, string parameterValue4 = null,
@@ -110,7 +75,7 @@ namespace Fleet_WorkShop.Models
         public int ExecuteInsertStmtusingSp(string insertStmt, string parameterName1 = null,
             string parameterValue1 = null, string parameterName2 = null, string parameterValue2 = null,
             string parameterName3 = null, string parameterValue3 = null, string parameterName4 = null, string parameterValue4 = null,
-            string parameterName5 = null, string parameterValue5 = null, string parameterName6 = null, string parameterValue6 = null, string parameterName7 = null, string parameterValue7 = null, string parameterName8 = null, string parameterValue8 = null)
+            string parameterName5 = null, string parameterValue5 = null, string parameterName6 = null, string parameterValue6 = null, string parameterName7 = null, string parameterValue7 = null, string parameterName8 = null, string parameterValue8 = null, string parameterName9 = null, string parameterValue9 = null)
         {
             var i = 0;
             var cs = ConfigurationManager.AppSettings["Str"];
@@ -129,6 +94,7 @@ namespace Fleet_WorkShop.Models
                 if (parameterValue6 != null) cmd.Parameters.AddWithValue(parameterName6, int.Parse(parameterValue6));
                 if (parameterValue7 != null) cmd.Parameters.AddWithValue(parameterName7, int.Parse(parameterValue7));
                 if (parameterValue8 != null) cmd.Parameters.AddWithValue(parameterName8, parameterValue8);
+                if (parameterValue9 != null) cmd.Parameters.AddWithValue(parameterName9, decimal.Parse(parameterValue9));
                 i = cmd.ExecuteNonQuery();
                 TraceService(insertStmt);
                 return i;
@@ -141,76 +107,6 @@ namespace Fleet_WorkShop.Models
             finally
             {
                 connection.Close();
-            }
-        }
-        internal int ExecuteInsertSparePartsMasterDetails(string insertStmt, int manufacturerId, string partName,
-            string partNumber, decimal cost, int ScrapBinId)
-        {
-            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
-            {
-                using (var comm = new SqlCommand())
-                {
-                    var i = 0;
-                    comm.Connection = conn;
-                    comm.CommandText = insertStmt;
-                    comm.CommandType = CommandType.StoredProcedure;
-                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
-                    comm.Parameters.AddWithValue("@partname", partName);
-                    comm.Parameters.AddWithValue("@partnumber", partNumber);
-                    comm.Parameters.AddWithValue("@cost", cost);
-                    comm.Parameters.AddWithValue("@scrapbinid", ScrapBinId);
-
-                    try
-                    {
-                        conn.Open();
-                        i = comm.ExecuteNonQuery();
-                        TraceService(insertStmt);
-                        return i;
-                    }
-                    catch (SqlException ex)
-                    {
-                        TraceService(" executeInsertStatement " + ex + insertStmt);
-                        return i;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-        }
-
-        internal int ExecuteUpdateLubesMaster(int lubesId, string insertStmt, int manufacturerId, string oilName,
-            decimal costPerLitre)
-        {
-            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
-            {
-                using (var comm = new SqlCommand())
-                {
-                    var i = 0;
-                    comm.Connection = conn;
-                    comm.CommandText = insertStmt;
-                    comm.CommandType = CommandType.StoredProcedure;
-                    comm.Parameters.AddWithValue("@oilname", oilName);
-                    comm.Parameters.AddWithValue("@costPerlitre", costPerLitre);
-                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
-                    comm.Parameters.AddWithValue("@id", lubesId);
-                    try
-                    {
-                        conn.Open();
-                        i = comm.ExecuteNonQuery();
-                        return i;
-                    }
-                    catch (SqlException ex)
-                    {
-                        TraceService(" executeInsertStatement " + ex + insertStmt);
-                        return i;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
             }
         }
 
@@ -847,44 +743,6 @@ namespace Fleet_WorkShop.Models
                 }
             }
         }
-
-        internal int ExecuteInsertLubesMasterDetails(string insertStmt, int manufacturerId, string oilName,
-            decimal costPerLitre, string LubricantNumber, int IsActive)
-        {
-            using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))
-            {
-                using (var comm = new SqlCommand())
-                {
-                    var i = 0;
-                    comm.Connection = conn;
-                    comm.CommandText = insertStmt;
-                    comm.CommandType = CommandType.StoredProcedure;
-                    comm.Parameters.AddWithValue("@manufacturerid", manufacturerId);
-                    comm.Parameters.AddWithValue("@oilname", oilName);
-                    comm.Parameters.AddWithValue("@costperlitre", costPerLitre);
-                    comm.Parameters.AddWithValue("@lubricantnumber", LubricantNumber);
-                    comm.Parameters.AddWithValue("@isactive", IsActive);
-
-                    try
-                    {
-                        conn.Open();
-                        i = comm.ExecuteNonQuery();
-                        TraceService(insertStmt);
-                        return i;
-                    }
-                    catch (SqlException ex)
-                    {
-                        TraceService(" executeInsertStatement " + ex + insertStmt);
-                        return i;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-        }
-
         internal void ExecuteJobSubCategoryUpdateCost(string insertStmt, int? approxCost, int subcategoryId)
         {
             using (var conn = new SqlConnection(ConfigurationManager.AppSettings["Str"]))

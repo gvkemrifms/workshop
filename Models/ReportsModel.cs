@@ -43,6 +43,14 @@ namespace Fleet_WorkShop.Models
         public string SubCategory { get; internal set; }
     }
 
+    public class IssueItemsReport
+    {
+        public int? Sparesid { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string VehicleNumber { get; set; }
+
+    }
     public class VehicleReport
     {
         public long Id { get; set; }

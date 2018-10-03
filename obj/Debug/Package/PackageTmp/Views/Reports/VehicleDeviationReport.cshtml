@@ -1,0 +1,137 @@
+﻿@model Fleet_WorkShop.Models.PettyExpenses
+
+
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        var uri = window.location.toString();
+        if (uri.indexOf("1") > 0) {
+            var cleanUri = uri.substring(0, uri.indexOf("1"));
+            window.history.replaceState({}, document.title, cleanUri);
+        }
+    });
+</script>
+<style>
+    hr {
+        display: block;
+        border-style: solid;
+        border-width: 1px;
+    }
+</style>
+<script type="text/javascript">
+   
+    function Validations() {
+       
+        var startDate = $('#txtstartdate').val();
+        if (startDate === "") {
+            return alert('Start Date is Mandatory');
+        }
+        var endDate = $('#txtenddate').val();
+        if (endDate === "") {
+            return alert('End Date is Mandatory');
+        }
+        return true;
+    }
+
+
+</script>
+<script type="text/javascript">
+
+    $(function() {
+        $('#txtstartdate,#txtenddate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0"
+        });
+    });
+
+    $(function () {
+        var serviceUrl = '/workshop/Reports/VehicleDeviationReport';
+        $('#btn').click(function() {
+
+            var data = {
+                startDate: $('#txtstartdate').val(),
+                endDate: $('#txtenddate').val()
+            };
+           
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Saved');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+</script>
+@{ ViewContext.FormContext = new FormContext(); }
+<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+    <div class="panel-heading">
+        Petty Expenses
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">WorkShop</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtWorkshop" value="@ViewBag.WorkShopName" placeholder="WorkShop" readonly="readonly">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="control-label col-lg-4">End Date</label>
+                    <div class="col-lg-8">
+
+                        <input type="text" class="form-control" id="txtenddate" onkeypress="return false;" placeholder="End Date">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Start Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtstartdate" onkeypress="return false;" placeholder="Start Date">
+                    </div>
+                </div>
+                
+            </form>
+      
+        </div>
+     
+
+     
+        <div class="col-lg-6 col-lg-offset-6" style="margin-top:auto">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                    </div>
+                 
+                </div>
+            </form>
+        </div>
+        
+    </div>
+
+    <div class="panel-footer">
+
+    </div>
+</div>
+
+
+
+
+

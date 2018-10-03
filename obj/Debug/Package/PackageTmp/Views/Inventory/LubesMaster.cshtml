@@ -1,0 +1,165 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.LubesModel>
+
+@{
+    ViewBag.Title = "SpareParts Master";
+}
+
+<script type="text/javascript">
+
+
+
+
+    $(function() {
+        $('#txtLubricantNumber').blur(function() {
+            var serviceUrl = '/workshop/Inventory/CheckLubricantNumber';
+            var data = {
+                LubricantNumber: $(this).val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response) {
+                        $('#txtLubricantNumber').val('');
+                        alert('Lubricant Number alredy Exists');
+
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+        });
+    });
+
+    function Validations() {
+        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+            return alert("Please select Manufacturer");
+        }
+
+        var oilName = $('#txtOil').val();
+        if (oilName === "") {
+            return alert('Oil Name is Mandatory');
+        }
+        var cost = $('#txtCost').val();
+        if (cost === "") {
+            return alert('Cost is Mandatory');
+        }
+        var lubricantNumber = $('#txtLubricantNumber').val();
+        if (lubricantNumber === "") {
+            return alert('Lubricant Number is Required');
+        }
+
+
+        return true;
+    }
+
+    $(function() {
+        $('#btn').click(function() {
+            debugger;
+            var serviceUrl = '/workshop/Inventory/LubesMaster';
+            var data = {
+                ManufacturerId: $('#Manufacturer').val(),
+                OilName: $('#txtOil').val(),
+                CostPerLitre: $('#txtCost').val(),
+                LubricantNumber: $('#txtLubricantNumber').val()
+
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Inserted');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+        });
+    });
+</script>
+@{ ViewContext.FormContext = new FormContext(); }
+
+
+    <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+        <div class="panel-heading">
+            Lubricants
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Manufacturer</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Manufacturer", ViewBag.Manufacturers as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Oil Name</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" name="OilName" id="txtOil" placeholder="Oil Name">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Cost Per Litre</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtCost" name="Cost" placeholder="Cost Per Litre" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Lubricant Number</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtLubricantNumber" placeholder="Lubricant Number">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div style="margin-bottom: 90px" class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                            <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;" onclick="if (!Validations()) return false;">Submit</button>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: -150px;">Reset</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div class="col-lg-6" style="width: 100%">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div style="margin-top: 30px">
+                        @Html.Partial("_LubesMaster");
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+        <div class="panel-footer">
+
+        </div>
+    </div>

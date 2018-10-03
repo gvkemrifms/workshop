@@ -417,6 +417,10 @@
     <Content Include="Views\Reports\VehicleDeviationReport.cshtml" />
     <Content Include="Views\Reports\_VehicleDeviationReports.cshtml" />
     <Content Include="Views\Job\getDistancelatlong.cshtml" />
+    <Content Include="Views\Reports\IssuedSparePartReport.cshtml" />
+    <Content Include="Views\Reports\IssuedLubricantReport.cshtml" />
+    <Content Include="Views\Reports\VehicleAndSparepartWiseReport.cshtml" />
+    <Content Include="Views\Reports\VehicleAndLubricantWiseReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -446,15 +450,14 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>59789</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:59789/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost/workshop</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

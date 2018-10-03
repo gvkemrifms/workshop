@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web.Mvc;
 using Fleet_WorkShop.Models;
 using Fleet_WorkShop.WorkShpModels;
+using Newtonsoft.Json;
 
 namespace Fleet_WorkShop.Controllers
 {
@@ -415,6 +416,98 @@ namespace Fleet_WorkShop.Controllers
             });
             Session["VehicleDeviationReport"] = vehicleDeviationReport;
             return RedirectToAction("VehicleDeviationReport");
+        }
+
+        public ActionResult IssuedSparePartReport()
+        {
+            string query = "select partName,Id from m_spareparts";
+           DataTable dtSparesReport= _helper.ExecuteSelectStmt(query);
+            ViewBag.SparesIssueReport = new SelectList(dtSparesReport.AsDataView(), "Id", "PartName"); 
+            return View();
+        }
+        [HttpPost]
+        public ActionResult GetIssuedSparesByPartNumber(IssueItemsReport issuedItem)
+        {
+            DataTable dtIssuedSpares = _helper.ExecuteSelectStmtForDateTime("report_sparepart_issue", "@sdate",
+                issuedItem.StartDate.ToString(), "@edate", issuedItem.EndDate.ToString(), null, null, "@SPID",
+                issuedItem.Sparesid.ToString());
+            var response = dtIssuedSpares.AsEnumerable().ToList();
+            var list = JsonConvert.SerializeObject(dtIssuedSpares, Formatting.None, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            return Content(list, "application/json");
+     
+        }
+        public ActionResult IssuedLubricantReport()
+        {
+            string query = "select OilName,Id from m_lubes";
+            DataTable dtLubesReport = _helper.ExecuteSelectStmt(query);
+            ViewBag.LubesIssueReport = new SelectList(dtLubesReport.AsDataView(), "Id", "OilName");
+            return View();
+        }
+        [HttpPost]
+        public ActionResult GetIssuedLubesByLubricantNumber(IssueItemsReport issuedItem)
+        {
+            DataTable dtIssuedLubes = _helper.ExecuteSelectStmtForDateTime("report_lubricant_issue", "@sdate",
+                issuedItem.StartDate.ToString(), "@edate", issuedItem.EndDate.ToString(), null, null, "@lbid",
+                issuedItem.Sparesid.ToString());
+            var response = dtIssuedLubes.AsEnumerable().ToList();
+            var list = JsonConvert.SerializeObject(dtIssuedLubes, Formatting.None, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            return Content(list, "application/json");
+
+        }
+        public ActionResult VehicleAndSparepartWiseReport()
+        {
+            string sparesQuery = "select partName,Id from m_spareparts";
+            string vehiclesQuery = "select id,vehiclenumber from m_GetVehicleDetails";
+            DataTable dtSparesReport = _helper.ExecuteSelectStmt(sparesQuery);
+            DataTable dtvehiclesReport = _helper.ExecuteSelectStmt(vehiclesQuery);
+            ViewBag.SparesReport = new SelectList(dtSparesReport.AsDataView(), "Id", "PartName");
+            ViewBag.VehiclesReport = new SelectList(dtvehiclesReport.AsDataView(), "id", "vehiclenumber");
+            return View();
+        }
+        [HttpPost]
+        public ActionResult GetVehicleAndSparepartWiseReport(IssueItemsReport issuedItem)
+        {
+            DataTable dtIssuedSpares = _helper.ExecuteSelectStmtForDateTime("report_vehiclewise_sparepartwise", "@sdate",
+                issuedItem.StartDate.ToString(), "@edate", issuedItem.EndDate.ToString(), null, null, "@SPID",
+                issuedItem.Sparesid.ToString(),null,null,null,null, "@veno", issuedItem.VehicleNumber);
+            var response = dtIssuedSpares.AsEnumerable().ToList();
+            var list = JsonConvert.SerializeObject(dtIssuedSpares, Formatting.None, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            return Content(list, "application/json");
+
+        }
+
+        public ActionResult VehicleAndLubricantWiseReport()
+        {
+            string sparesQuery = "select OilName,Id from m_lubes";
+            string vehiclesQuery = "select id,vehiclenumber from m_GetVehicleDetails";
+            DataTable dtLubesReport = _helper.ExecuteSelectStmt(sparesQuery);
+            DataTable dtvehiclesReport = _helper.ExecuteSelectStmt(vehiclesQuery);
+            ViewBag.LubesReport = new SelectList(dtLubesReport.AsDataView(), "Id", "OilName");
+            ViewBag.VehiclesReport = new SelectList(dtvehiclesReport.AsDataView(), "id", "vehiclenumber");
+            return View();
+        }
+        [HttpPost]
+        public ActionResult GetVehicleAndLubesWiseReport(IssueItemsReport issuedItem)
+        {
+            DataTable dtIssuedSpares = _helper.ExecuteSelectStmtForDateTime("report_vehiclewise_lubeswise", "@sdate",
+                issuedItem.StartDate.ToString(), "@edate", issuedItem.EndDate.ToString(), null, null, "@lbid",
+                issuedItem.Sparesid.ToString(), null, null, null, null, "@veno", issuedItem.VehicleNumber);
+            var response = dtIssuedSpares.AsEnumerable().ToList();
+            var list = JsonConvert.SerializeObject(dtIssuedSpares, Formatting.None, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            return Content(list, "application/json");
+
         }
     }
 }

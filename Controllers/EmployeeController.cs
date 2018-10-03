@@ -11,9 +11,6 @@ namespace Fleet_WorkShop.Controllers
     public class EmployeeController : Controller
     {
         private readonly EmployeeHelper _helper = new EmployeeHelper();
-
-        //private readonly IEnumerable<EmployeeModel> empModel;
-
         public object UserName { get; set; }
 
         // GET: Employee
@@ -24,26 +21,36 @@ namespace Fleet_WorkShop.Controllers
 
         public ActionResult SaveEmployeeDetails()
         {
-            IEnumerable<EmployeeModel> empModel = null;
             if (!ModelState.IsValid) return View((IEnumerable<EmployeeModel>) null);
             const string query = "select * from m_departments";
             const string desigQuery = "select * from emp_designation";
             const string payroll = "select * from m_payroll";
             if (Session["Employee_Id"] == null)
                 return RedirectToAction("Login", "Account");
-            var dtDepartments = _helper.ExecuteSelectStmt(query);
-            var dtDesignation = _helper.ExecuteSelectStmt(desigQuery);
-            var dtPayroll = _helper.ExecuteSelectStmt(payroll);
-            Session["Payroll"] = dtPayroll;
-            ViewBag.DepartmentName = new SelectList(dtDepartments.AsDataView(), "dept_id", "dept_name");
+            DataTable dtDesignation;
+            DataTable dtPayroll;
+            using (var dtDepartments = _helper.ExecuteSelectStmt(query))
+            {
+                dtDesignation = _helper.ExecuteSelectStmt(desigQuery);
+                dtPayroll = _helper.ExecuteSelectStmt(payroll);
+                Session["Payroll"] = dtPayroll;
+                ViewBag.DepartmentName = new SelectList(dtDepartments.AsDataView(), "dept_id", "dept_name");
+            }
+
             Session["DepartmentName"] = ViewBag.DepartmentName;
-            ViewBag.Designation = new SelectList(dtDesignation.AsDataView(), "id", "Designation");
+            if (dtDesignation != null)
+                ViewBag.Designation = new SelectList(dtDesignation.AsDataView(), "id", "Designation");
             Session["Designation"] = ViewBag.Designation;
-            ViewBag.Payroll = new SelectList(dtPayroll.AsDataView(), "payroll_Id", "payroll_name");
-            var dsGetEmployee = _helper.FillDropDownHelperMethodWithSp("spGetEmployeeDetails");
-            Session["GetEmployeeData"] = dsGetEmployee;
-            var list = dsGetEmployee.Tables[0].AsEnumerable().ToList();
-            empModel = list.Select(x => new EmployeeModel
+            if (dtPayroll != null)
+                ViewBag.Payroll = new SelectList(dtPayroll.AsDataView(), "payroll_Id", "payroll_name");
+            List<DataRow> list;
+            using (var dsGetEmployee = _helper.FillDropDownHelperMethodWithSp("spGetEmployeeDetails"))
+            {
+                Session["GetEmployeeData"] = dsGetEmployee;
+                list = dsGetEmployee.Tables[0].AsEnumerable().ToList();
+            }
+
+            var empModel = list.Select(x => new EmployeeModel
             {
                 Id = x.Field<int>("Id"),
                 EmployeeId = x.Field<string>("empId"),
@@ -65,6 +72,7 @@ namespace Fleet_WorkShop.Controllers
         [HttpPost]
         public ActionResult SaveEmployeeDetails(EmployeeModel employeeDetails)
         {
+            if (employeeDetails == null) return null;
             var retVal = SaveEmployee(employeeDetails);
             return retVal == 1
                 ? (ActionResult) Json(retVal, JsonRequestBehavior.AllowGet)
@@ -72,8 +80,9 @@ namespace Fleet_WorkShop.Controllers
         }
 
         [HttpPost]
-        public int SaveEmployee(EmployeeModel employeeDetails)
+        public int? SaveEmployee(EmployeeModel employeeDetails)
         {
+            if (employeeDetails == null) return null;
             var empDetails = new EmployeeModel
             {
                 WorkShopId = Convert.ToInt32(Session["WorkshopId"]),
@@ -109,9 +118,12 @@ namespace Fleet_WorkShop.Controllers
             var query = "select * from m_departments";
             var desigQuery = "select * from emp_designation";
             var model = new EmployeeModel();
-            var dsEditEmployee = /*_helper.FillDropDownHelperMethodWithSp("spEditEmployee");*/
-                Session["GetEmployeeData"] as DataSet;
-            var row = dsEditEmployee?.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
+            DataRow row;
+            using (var dsEditEmployee = Session["GetEmployeeData"] as DataSet)
+            {
+                row = dsEditEmployee?.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("Id") == id);
+            }
+
             if (row != null)
             {
                 model.EmployeeName = row["name"].ToString();
@@ -131,6 +143,7 @@ namespace Fleet_WorkShop.Controllers
                 model.PayrollCompany = row["payroll_name"].ToString();
                 model.PayrollId = Convert.ToInt32(row["payroll_id"]);
             }
+
             var dtPayroll = Session["Payroll"] as DataTable;
             if (dtPayroll != null) model.Payroll = new SelectList(dtPayroll.AsDataView(), "payroll_id", "payroll_name");
             return View(model);
@@ -153,14 +166,8 @@ namespace Fleet_WorkShop.Controllers
             return RedirectToAction("SaveEmployeeDetails");
         }
 
-        public ActionResult Infrastructure()
-        {
-            return View();
-        }
-
         public ActionResult SaveInfraStructureDetails()
         {
-            IEnumerable<InfraStructure> infastructureModel = null;
             if (Session["Employee_Id"] == null)
                 return RedirectToAction("Login", "Account");
             if (!ModelState.IsValid) return View((IEnumerable<InfraStructure>) null);
@@ -169,13 +176,14 @@ namespace Fleet_WorkShop.Controllers
             ViewBag.categoryName = new SelectList(dtinfra.AsDataView(), "category_id", "category_name");
             var dsGetInfra = _helper.FillDropDownHelperMethodWithSp("spGetInfraDetails");
             Session["InfraTable"] = dsGetInfra;
-            infastructureModel = dsGetInfra.Tables[0].AsEnumerable().ToList().Select(x => new InfraStructure
-            {
-                infra_id = x.Field<int>("infra_id"),
-                InfraName = x.Field<string>("Infra_Name"),
-                CategoryName = x.Field<string>("category_name"),
-                Quantity = x.Field<int?>("quantity")
-            }).ToList();
+            IEnumerable<InfraStructure> infastructureModel = dsGetInfra.Tables[0].AsEnumerable().ToList().Select(x =>
+                new InfraStructure
+                {
+                    infra_id = x.Field<int>("infra_id"),
+                    InfraName = x.Field<string>("Infra_Name"),
+                    CategoryName = x.Field<string>("category_name"),
+                    Quantity = x.Field<int?>("quantity")
+                }).ToList();
             return View(infastructureModel);
         }
 
@@ -192,8 +200,10 @@ namespace Fleet_WorkShop.Controllers
                 Quantity = infraModel.Quantity,
                 WorkShopId = workshopId
             };
-            var returnVal = _helper.ExecuteInsertStmtusingSp("InsetInfraDetails", "@CategoryId", infraDetails.CategoryId.ToString(),"@qty",
-                infraDetails.Quantity.ToString(),"@InfraName", infraDetails.InfraName, "@workshopid", infraDetails.WorkShopId.ToString());
+            var returnVal = _helper.ExecuteInsertStmtusingSp("InsetInfraDetails", "@CategoryId",
+                infraDetails.CategoryId.ToString(), "@qty",
+                infraDetails.Quantity.ToString(), "@InfraName", infraDetails.InfraName, "@workshopid",
+                infraDetails.WorkShopId.ToString());
             return returnVal;
         }
 
@@ -204,8 +214,7 @@ namespace Fleet_WorkShop.Controllers
             const string infraQuery = "select * from m_infra_category";
             var dtinfra = _helper.ExecuteSelectStmt(infraQuery);
             var model = new InfraStructure();
-            var dsEditInfra = /*_helper.FillDropDownHelperMethodWithSp("spEditEmployee");*/
-                Session["InfraTable"] as DataSet;
+            var dsEditInfra = Session["InfraTable"] as DataSet;
             if (dsEditInfra != null)
             {
                 var row = dsEditInfra.Tables[0].AsEnumerable().ToList().Single(x => x.Field<int>("infra_id") == id);
@@ -215,6 +224,7 @@ namespace Fleet_WorkShop.Controllers
                 model.CategoryName = row["category_name"].ToString();
                 model.Quantity = Convert.ToInt32(row["quantity"]);
             }
+
             model.Category = new SelectList(dtinfra.AsDataView(), "category_id", "category_name");
             return View(model);
         }
@@ -223,7 +233,8 @@ namespace Fleet_WorkShop.Controllers
         public ActionResult EditInfra(InfraStructure postInfra)
         {
             var infra = Convert.ToInt32(Session["Infra_id"]);
-            _helper.ExecuteInsertStmtusingSp("spEditInfra", "@id", infra.ToString(), "@catid", postInfra.CategoryId.ToString(), "@Infraname", postInfra.InfraName,
+            _helper.ExecuteInsertStmtusingSp("spEditInfra", "@id", infra.ToString(), "@catid",
+                postInfra.CategoryId.ToString(), "@Infraname", postInfra.InfraName,
                 "@Qty", postInfra.Quantity.ToString());
             return RedirectToAction("SaveInfraStructureDetails");
         }
@@ -241,31 +252,6 @@ namespace Fleet_WorkShop.Controllers
             var list = dtCheckIds.AsEnumerable().Select(x => x.Field<string>("empid")).FirstOrDefault();
             return list == null ? null : Json(list, JsonRequestBehavior.AllowGet);
         }
-
-        //public ActionResult PettyExpenses()
-        //{
-        //    if (Session["Employee_Id"] == null)
-        //        return RedirectToAction("Login", "Account");
-        //    var workShopId = Convert.ToInt32(Session["WorkshopId"]);
-        //    var query = "select workshop_name from m_workshop where workshop_id =" + workShopId + "";
-        //    var dtworkshopName = _helper.ExecuteSelectStmt(query);
-        //    ViewBag.WorkShopName = dtworkshopName.AsEnumerable().Select(x => x.Field<string>("workshop_name"))
-        //        .FirstOrDefault();
-        //    var typeExpenseQuery = "select * from m_PettyExpenseTypeHeads";
-        //    var dtTypeOfExpense = _helper.ExecuteSelectStmt(typeExpenseQuery);
-        //    ViewBag.TypeOfExpense = new SelectList(dtTypeOfExpense.AsDataView(), "Id", "ExpenseType");
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public ActionResult PettyExpenses(PettyExpenses expenses)
-        //{
-        //    var workShopId = Convert.ToInt32(Session["WorkshopId"]);
-        //    var result = _helper.ExecuteInsertPettyDetails("spInsertPettyExpenses", Convert.ToInt32(workShopId),
-        //        Convert.ToInt32(expenses.TypeOfExpense),
-        //        Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount));
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
 
         public ActionResult CommonExpenses()
         {
@@ -288,7 +274,7 @@ namespace Fleet_WorkShop.Controllers
             var workShopId = Convert.ToInt32(Session["WorkshopId"]);
             var result = _helper.ExecuteInsertPettyDetails("spInsertCommonExpenses", Convert.ToInt32(workShopId),
                 Convert.ToInt32(expenses.TypeOfExpense),
-                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount),expenses.BillNumber.ToString());
+                Convert.ToDateTime(expenses.Date), Convert.ToDecimal(expenses.Amount), expenses.BillNumber);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
