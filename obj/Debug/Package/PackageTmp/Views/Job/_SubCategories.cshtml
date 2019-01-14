@@ -31,12 +31,12 @@
             </td>
             <td>
                 @Html.ActionLink("Edit", "EditSubCategories", new {id = item.ServiceId}) |
-                @Ajax.ActionLink("Delete", "DeleteSubCategories", new {id = item.IdCategory}, new AjaxOptions
-                {
-                    HttpMethod = "Delete",
-                    Confirm = "Are you sure you want to delete this Record?",
-                    OnComplete = "function() { $(this).parent().parent().remove() }"
-                })
+                @Ajax.ActionLink("Delete", "DeleteSubCategories", new {id = item.ServiceId }, new AjaxOptions
+           {
+               HttpMethod = "Delete",
+               Confirm = "Are you sure you want to delete this Record?",
+               OnComplete = "function() { $(this).parent().parent().remove() }"
+           })
             </td>
         </tr>
     }

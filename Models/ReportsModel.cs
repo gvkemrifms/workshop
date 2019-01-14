@@ -41,6 +41,7 @@ namespace Fleet_WorkShop.Models
         public string Status { get; internal set; }
         public string Mechanic { get; internal set; }
         public string SubCategory { get; internal set; }
+        public decimal Quantityy { get; internal set; }
     }
 
     public class IssueItemsReport
@@ -54,15 +55,18 @@ namespace Fleet_WorkShop.Models
     public class VehicleReport
     {
         public long Id { get; set; }
+        [DisplayName("ZWS Name")]
         public string Workshop { get; set; }
         public string Vehicle { get; set; }
+        [DisplayName("Spare Part")]
         public string Sparepart { get; set; }
-        public int Quantity { get; set; }
+        public int Quantityy { get; set; }
         public decimal Amount { get; set; }
-        [DisplayName("JobCard")]
+        [DisplayName("Job Card")]
         public int JobcardId { get; set; }
-     
+        [DisplayName("HandOver To")]
         public string HandOverTo { get; set; }
+        [DisplayName("Issued Date")]
         public DateTime IssuedDate { get; set; }
         public string Status { get; set; }
         public string District { get; set; }
@@ -73,7 +77,9 @@ namespace Fleet_WorkShop.Models
         public string Aggregate { get; set; }
         public string Mechanic { get; set; }
         public string Category { get; set; }
+        [DisplayName("Sub Category")]
         public string SubCategory { get; set; }
+        [DisplayName("Namufacturer")]
         public int ManufacturerName { get; internal set; }
         public string Lubricant { get; internal set; }
         [DisplayName("Service Incharge")]
@@ -87,5 +93,19 @@ namespace Fleet_WorkShop.Models
         public string DalivaryDate { get; internal set; }
         [DisplayName("Repair Date")]
         public string RepairDate { get; internal set; }
+        public string Project { get; internal set; }
+        [DisplayName("Vehicle Location")]
+        public string VehicleLocation { get; internal set; }
+        public int Odometer { get; internal set; }
+        [DisplayName("Total Completion Time")]
+        public string TotalCompletionTime { get; internal set; }
+        [DisplayName("Distance Travelled")]
+        public int DistanceTravelled { get; internal set; }
+        public int ScheduledSeervice { get; internal set; }
+        [DisplayName("Scheduled Service")]
+        public string ScheduledService { get; internal set; }
+        [DisplayName("OffRoad Id")]
+        public int? OffroadId { get; internal set; }
+        public decimal Quantity { get; internal set; }
     }
 }

@@ -1,6 +1,13 @@
 ﻿@using System.Data
 @model Fleet_WorkShop.Models.InventoryModel
 <style>
+    body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.1;
+    color: #333;
+    background-color: #fff;
+}
     hr {
         border-style: solid;
         border-width: 1px;
@@ -41,31 +48,95 @@
 </style>
 
 <script type="text/javascript">
+
     var finalAmount1 = $('#BillAmount').val();
 
-    $(function() {
-        $("#Qty,#Uprice").blur(function() {
-            var unitPrice = $("#Uprice").val();
-            var quantity = $("#Qty").val();
-            var amount = parseInt(unitPrice) * parseInt(quantity);
-            $("#Amt").val('');
-            $("#Amt").val(amount);
+    $(function () {
+        if ($('#SparePartId').prop('selectedIndex') == 0) {
+            $('#btnAdd').prop('disabled', true);
+        }
+        else {
+            $('#btnAdd').prop('disabled', false);
 
-            $("#Amt").focus();
+        }
+        if ($("#Qty").val() == '')
+        {
+            $('#btnAdd').prop('disabled', true);
+
+        }
+        else
+        {
+            $('#btnAdd').prop('disabled', false);
+        }
+        $("#Qty,#Uprice").blur(function () {
+            if ($('#SparePartId').prop('selectedIndex') == 0) {
+                $("#Amt").val('');
+                $('#Qty').val('');
+                $('#SparePartId').prop('selectedIndex', 0);
+                $("#Uprice").val('');
+                alert('Please select SparePart');
+            }
+            else {
+                var unitPrice = $("#Uprice").val();
+                var quantity = $("#Qty").val();
+                var amount = parseInt(unitPrice) * parseInt(quantity);
+                $("#Amt").val('');
+                $("#Amt").val(amount);
+
+                $("#Amt").focus();
+
+                var sparePartId = $('#SparePartId option:selected').val();
+                var serviceUrl = '/workshop/Inventory/CheckQuantitySparesEdit';
+                var data = {
+                    qty: $('#Qty').val(),
+                    sparesid: sparePartId
+                };
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response == 0) {
+                            $("#Amt").val('');
+                            $('#Qty').val('');
+                            $('#SparePartId').prop('selectedIndex', 0);
+                            $("#Uprice").val('');
+                            $('#BillAmount').val('');
+                            alert('Please check the quantity entered');
+                            return false;
+                        }
+
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            }
         });
-        $('#SparePartId').change(function() {
+       
+        $('#SparePartId').change(function () {
+            if ($('#SparePartId').prop('selectedIndex') == 0) {
+                $('#btnAdd').prop('disabled', true);
+            }
+            else {
+                $('#btnAdd').prop('disabled', false);
+
+            }
             var sparePartId = $('#SparePartId option:selected').val();
             $.ajax({
                 type: "Post",
-                url: '/Inventory/GetSpareCostDetails/' + sparePartId,
+                url: '/workshop/Inventory/GetSpareCostDetails/' + sparePartId,
                 data: JSON.stringify(sparePartId),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response !== 0) {
+                    if (response >= 0) {
                         $('#Uprice').val(response);
                         $('#Qty').val('');
                         $('#Amt').val('');
+                        $('#BillAmount').val(0);
                     }
 
                 },
@@ -79,7 +150,11 @@
 
     $(function() {
         var orderItems = [];
-        $('#btnAdd').click(function() {
+        $('#btnAdd').click(function () {
+            if ($('#SparePartId').prop('selectedIndex') == 0) {
+               return alert("Please select sparepart");
+               
+            }
             orderItems.push({
                 ManufacturerName: $('#ManufacturerId option:selected').text(),
                 ManufacturerId: $('#ManufacturerId option:selected').val(),
@@ -169,10 +244,11 @@
             alert(finalAmount1);
         }
         $('#btnEdit').click(function() {
-            var serviceUrl = '/Inventory/EditOrderItemsInventoryDetails';
+            var serviceUrl = '/workshop/Inventory/EditOrderItemsInventoryDetails';
             var data = {
-                itemmodel: orderItems
-            };
+                itemmodel: orderItems,
+                BillNo: $('#BillNo').val()
+        };
             $.ajax({
                 type: "POST",
                 url: serviceUrl,
@@ -181,7 +257,8 @@
                 dataType: "json",
                 success: function (response) {
                     if (response !== 0) {
-                        alert('Record Inserted');
+                        $('#BillAmount').val(response);
+                        alert('Record Updated');
                         location.reload();
                     }
 
@@ -194,7 +271,8 @@
     });
 
 </script>
-<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px;margin-bottom:20px; width: 100%;" align="center">
     <div class="panel-heading">
         Billing Edit
     </div>
@@ -203,23 +281,23 @@
         @Html.AntiForgeryToken()
 
         <div class="form-horizontal">
-            <hr/>
-            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.Id)
             <div class="col-lg-6">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        @Html.LabelFor(model => model.BillNo, new {@class = "control-label col-md-4"})
+                        @Html.LabelFor(model => model.BillNo, new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
-                            @Html.EditorFor(model => model.BillNo, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.EditorFor(model => model.BillNo, new { htmlAttributes = new { @class = "form-control" } })
                             @*@Html.ValidationMessageFor(model => model.BillNo, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
-                    <hr/>
+                    <hr />
                     <div class="form-group">
-                        @Html.LabelFor(model => model.Manufacturer, new {@class = "control-label col-md-4"})
+                        @Html.LabelFor(model => model.Manufacturer, new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
-                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new {@class = "form-control"})
+                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new { @class = "form-control" })
                             @*@Html.ValidationMessageFor(model => model.Manufacturer, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
@@ -229,18 +307,18 @@
             <div class="col-lg-6">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        @Html.LabelFor(model => model.BillDate, new {@class = "control-label col-md-4"})
+                        @Html.LabelFor(model => model.BillDate, new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
-                            @Html.EditorFor(model => model.BillDate, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.EditorFor(model => model.BillDate, new { htmlAttributes = new { @class = "form-control" } })
                             @*@Html.ValidationMessageFor(model => model.BillDate, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
-                    <hr/>
+                    <hr />
                     <div class="form-group">
-                        @Html.LabelFor(model => model.SpareParts, new {@class = "control-label col-md-4"})
+                        @Html.LabelFor(model => model.SpareParts, new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
 
-                            @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new {@class = "form-control"})
+                            @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new { @class = "form-control" })
                             @*@Html.ValidationMessageFor(model => model.SpareParts, "", new {@class = "text-danger"})*@
                         </div>
                     </div>
@@ -251,16 +329,16 @@
             <div class="col-lg-6">
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.Uprice, new {@class = "control-label col-md-4"})
+                    @Html.LabelFor(model => model.Uprice, new { @class = "control-label col-md-4" })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.Uprice, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
+                        @Html.EditorFor(model => model.Uprice, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
                         @*@Html.ValidationMessageFor(model => model.Uprice, "", new {@class = "text-danger"})*@
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(model => model.Amt, new {@class = "control-label col-md-4"})
+                    @Html.LabelFor(model => model.Amt, new { @class = "control-label col-md-4" })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.Amt, new {htmlAttributes = new {@class = "form-control", @readonly = true}})
+                        @Html.EditorFor(model => model.Amt, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
                         @*@Html.ValidationMessageFor(model => model.Amt, "", new {@class = "text-danger"})*@
                     </div>
                 </div>
@@ -268,27 +346,42 @@
 
             </div>
             <div class="col-lg-6">
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Qty, new {@class = "control-label col-md-4"})
-                    <div class="col-md-8">
-                        @Html.EditorFor(model => model.Qty, new {htmlAttributes = new {@class = "form-control"}})
-                        @*@Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})*@
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Qty, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Qty, new { htmlAttributes = new { @class = "form-control" } })
+                            @*@Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})*@
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => model.BillAmount, new { @class = "control-label col-md-4" })
-                    <div class="col-md-8">
-                        @Html.EditorFor(model => model.BillAmount, new { htmlAttributes = new { @class = "form-control" } })
-                        @*@Html.ValidationMessageFor(model => model.BillAmount, "", new { @class = "text-danger" })*@
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BillAmount, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.BillAmount, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
+                            @*@Html.ValidationMessageFor(model => model.BillAmount, "", new { @class = "text-danger" })*@
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10" style="margin-left: -180px">
-                        <input type="submit" id="btnAdd" style="background-color: blue; margin-top: -80px; margin-left: -25px; color: white; width: 70px" value="Add" class="btn btn-default"/>
+                </form>
+            </div>
+            <hr/>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10" style="margin-left: 670px">
+                            <input type="submit" id="btnAdd" style="background-color: blue; margin-top: -120px; margin-left: -670px; color: white; width: 70px" value="Add" class="btn btn-default" />
+                        </div>
                     </div>
-                    <div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:10px; margin-top: 50px; width: 70%; ">
+                </form>
+   
+            </div>
+         
+            <div class="col-lg-6">
+
+                <div class="form-group">
+                    @*<div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:90px; margin-top: 5px; width: 70%; ">*@
+                    <div class="tablecontainer panel panel-primary" style="width:80%;margin: 100px; position: absolute; margin-top: -15px;margin-left: 40px ">
                         <div class="panel-heading">
-                            Available Spares Quantity 
+                            Available Spares Quantity
                         </div>
                         <div class="panel-body" id="AddedItemsId">
 
@@ -344,116 +437,128 @@
                         </div>
 
                     </div>
-                    
-
-                    <div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:-950px; margin-top:-245px; width: 110%;">
-                        <div class="panel-heading">
-                            Added Items
-                        </div>
-                        <div class="panel-body" id="AddedItemsId">
-
-
-                            <table>
-
-                                <tr>
-
-                                    <th>Manufacturer Name</th>
-
-                                    <th>SparePart Name</th>
-
-                                    <th>Unit Price</th>
-                                    <th>Quantity</th>
-                                    <th>Amount</th>
-
-                                </tr>
-
-                                @if (ViewBag.CartItems != null)
-
-                                {
-                                    foreach (DataRow dr in (ViewBag.CartItems as DataTable).Rows)
-
-                                    {
-                                        <tr>
-
-                                            <td>
-
-                                                @dr["ManufacturerName"]
-
-                                            </td>
-
-                                            <td>
-
-                                                @dr["PartName"]
-
-                                            </td>
-
-                                            <td>
-
-                                                @dr["UnitPrice"]
-
-                                            </td>
-                                            <td>
-
-                                                @dr["Quantity"]
-
-                                            </td>
-                                            <td>
-
-                                                @dr["Amount"]
-
-                                            </td>
-                                            <td>
-                                                @Ajax.ActionLink("Remove", "DeleteStockDetails", new {id = dr["sparepartId"],bill=dr["BillNumber"],ponumber= dr["PONumber"],quantity= dr["Quantity"] }, new AjaxOptions
-                                           {
-                                               HttpMethod = "Delete",
-                                               Confirm = "Are you sure you want to delete this Record?",
-                                               OnComplete = "function() { $(this).parent().parent().remove() }",
-                                               OnSuccess = "onSuccess"
-                                           })
-                                               
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-
-                            </table>
-
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-                <script>
-                    function onSuccess(result) {
-                        if (result > 0) {
-                            alert("Deleted");
-                            window.location.reload(true);
-                        }
-
-                    }
-                </script>
-                <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 50px; width: 100%;" align="center">
-                    <div class="panel-heading">
-                        Order New Items
-                    </div>
-                    <div class="panel-body" id="orderItems">
-                    </div>
 
                 </div>
             </div>
+           
+            <div class="col-lg-6">
+                    <div class="form-group">
+                        <div class="tablecontainer panel panel-primary" style="width: 100%;margin-left: -500px;margin-top: 1px; line-height: .8em;position: absolute">
+                            @*<div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:20px; margin-top:-120px; width: 110%;">*@
+                            <div class="panel-heading">
+                                Added Items
+                            </div>
+                            <div class="panel-body" id="AddedItemsId">
+
+
+                                <table>
+
+                                    <tr>
+
+                                        <th>Manufacturer Name</th>
+
+                                        <th>SparePart Name</th>
+
+                                        <th>Unit Price</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+
+                                    </tr>
+
+                                    @if (ViewBag.CartItems != null)
+
+                                    {
+                                        foreach (DataRow dr in (ViewBag.CartItems as DataTable).Rows)
+
+                                        {
+                                            <tr>
+
+                                                <td>
+
+                                                    @dr["ManufacturerName"]
+
+                                                </td>
+
+                                                <td>
+
+                                                    @dr["PartName"]
+
+                                                </td>
+
+                                                <td>
+
+                                                    @dr["UnitPrice"]
+
+                                                </td>
+                                                <td>
+
+                                                    @dr["Quantity"]
+
+                                                </td>
+                                                <td>
+
+                                                    @dr["Amount"]
+
+                                                </td>
+                                                <td>
+                                                    @Ajax.ActionLink("Remove", "DeleteStockDetails", new { id = dr["sparepartId"], bill = dr["BillNumber"], ponumber = dr["PONumber"], quantity = dr["Quantity"] }, new AjaxOptions
+                                               {
+                                                   HttpMethod = "Delete",
+                                                   Confirm = "Are you sure you want to delete this Record?",
+                                                   OnComplete = "function() { $(this).parent().parent().remove() }",
+                                                   OnSuccess = "onSuccess"
+                                               })
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                </table>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+
+
+
+            <script>
+                function onSuccess(result) {
+                    if (result > 0) {
+                        alert("Deleted");
+                        window.location.href = '/workshop/Inventory/Edit'
+                    }
+
+                }
+            </script>
+
+
+            <div class="form-group">
+                <div class="tablecontainer panel panel-primary" style="height: 100%; margin-right:-430px; margin-top:300px; width:50%;" align="center">
+                    <div class="panel-heading">
+                        Modify Cart Items
+                    </div>
+                    <div class="panel-body" id="orderItems">
+                    </div>
+                </div>
+            </div>
+
+
 
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10" style="margin-left: -60px; margin-top: 20px;">
-                    <input type="submit" id="btnEdit" style="background-color: blue; color: white; width: 100px" value="Save" class="btn btn-default"/>
+                    <input type="submit" id="btnEdit" style="background-color: blue; color: white; width: 100px" value="Save" class="btn btn-default" />
                 </div>
             </div>
 
 
         </div>
     }
-</div>
-<div>
-    @Html.ActionLink("Back", "SaveInventoryDetails")
-</div>
+    </div>
+   
+            <div>
+                @Html.ActionLink("Back", "SaveInventoryDetails")
+            </div>

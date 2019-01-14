@@ -4,15 +4,16 @@
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
     });
 </script>
 <script>
     $(document).ready(function () {
         var uri = window.location.toString();
-        if (uri.indexOf("1") > 0) {
-            var cleanUri = uri.substring(0, uri.indexOf("1"));
+        if (uri.lastIndexOf("1") > 0) {
+            var cleanUri = uri.substring(0, uri.lastIndexOf("1"));
             window.history.replaceState({}, document.title, cleanUri);
         }
     });

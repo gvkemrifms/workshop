@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.SparePartsModel>
 
 
-<table class="table">
+<table class="table table-borderless table-striped table-earning">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.ManufacturerName)
@@ -27,10 +27,10 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Cost)
             </td>
-            <td>
+            @*<td>
                 @Html.ActionLink("Edit", "EditSpares", new {id = item.Id}) |
                 @Html.ActionLink("Delete", "DeleteSpares", new {id = item.Id})
-            </td>
+            </td>*@
         </tr>
     }
 

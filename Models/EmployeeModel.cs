@@ -6,17 +6,27 @@ using System.Web.Mvc;
 
 namespace Fleet_WorkShop.Models
 {
+    public class EmpModels
+    {
+        [Required(ErrorMessage = "Payroll is Required")]
+        public int PayrollId { get; set; }
+
+    }
     public class EmployeeModel
     {
+        [Required(ErrorMessage = "Payroll is Required")]
         public int PayrollId { get; set; }
         public SelectList Payroll { get; set; }
         public int WorkShopId { get; set; }
         [DisplayName("ID")]
         public int Id { get; set; }
+        public int StatusId { get; set; }
         public int DesigEmp { get; set; }
+        public int TransferId { get; set; }
         public int DeptEmp { get; set; }
         [DisplayName("Employee ID")]
-        public int EmpId { get; set; }
+        //public int EmpId { get; set; }
+        [Required(ErrorMessage = "EmployeeId is Required")]
         public string EmployeeId { get; set; }
         [Required(ErrorMessage = "Name is Required")]
         [DisplayName("Employee Name")]
@@ -33,10 +43,10 @@ namespace Fleet_WorkShop.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MMM/yyyy}")]
         [DisplayName("Birth Date")]
         public DateTime Dob { get;set; }
-        [Required(ErrorMessage = "Department is Required")]
+
         [DisplayName("Department")]
         public SelectList DepartmentName { get;set; }
-        [Required(ErrorMessage = "Designation is Required")]
+
         public SelectList Designation { get;set; }
         [Required(ErrorMessage ="Aadhar Number is Required")]
         [Display(Name="Aadhar")]
@@ -48,22 +58,28 @@ namespace Fleet_WorkShop.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MMM/yyyy}")]
         [DisplayName("Joining Date")]
         public DateTime Doj{ get;set; }
-       
+        [Required(ErrorMessage = "Department is Required")]
         public int DeptName { get; set; }
         [Display(Name ="Department")]
-        [Required(ErrorMessage = "Department is Required")]
+     
         public string DepartName { get; set; }
         [Display(Name = "Designation")]
-        [Required(ErrorMessage = "Employee Designation is Required")]
+       
         public string EmpDesignation { get; set; }
+        [Required(ErrorMessage = "Designation is Required")]
         public int Desig { get; set; }
         [DisplayName("Relieving Date")]
         [DataType(DataType.DateTime)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MMM/yyyy}")]
         public DateTime? RelievingDate { get; set; }
-        public EmpDepatmentDetails empDepartment = new EmpDepatmentDetails();
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MMM/yyyy}")]
+        public DateTime? TransferredDate { get; set; }
+        [Required(ErrorMessage = "Qualification is Required")]
         public string Qualification { get; set; }
+        [Required(ErrorMessage = "Experience is Required")]
         public int Experience { get; set; }
+        [Required(ErrorMessage = "Salary is Required")]
         public int Salary { get; set; }
 
         [Display(Name = "Payroll")]
@@ -87,5 +103,18 @@ namespace Fleet_WorkShop.Models
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public string BillNumber { get; set; }
+        public int paymentType { get; set; }
+    }
+
+    public class VendorModel
+    {
+        public string VendorName { get; set; }
+        public long ContactNumber { get; set; }
+        public string EmailAddress { get; set; }
+        public int Districts { get; set; }
+        public int VendorType { get; set; }
+        public string GstNumber { get; set; }
+        public string PanNumber { get; set; }
+        public string Location { get; set; }
     }
 }

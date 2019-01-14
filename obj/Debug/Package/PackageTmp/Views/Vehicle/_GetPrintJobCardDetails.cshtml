@@ -1,0 +1,302 @@
+﻿@using System.Data
+<style>
+    #tbl {
+        border-collapse: collapse;
+        width: 30%;
+        border: none;
+        margin-top: -30px;
+    }
+
+    #tbldates {
+        border-collapse: collapse;
+        width: 30%;
+        border: none;
+        margin-top: -30px;
+    }
+
+        #tbldates tr td {
+            border-collapse: collapse;
+            border: none;
+            width: 50px;
+            word-spacing: 50%;
+            text-align: left;
+            color: brown;
+            padding: 3px;
+        }
+
+    #tblwork {
+        border-collapse: collapse;
+        border: none;
+        width: 30px;
+        margin-top: -20px;
+        word-spacing: 60%;
+        word-wrap: break-word;
+    }
+
+        #tblwork tr td {
+            border-collapse: collapse;
+            border: none;
+            width: 50px;
+            word-spacing: 50%;
+            text-align: left;
+            color: brown;
+            padding: 3px;
+        }
+
+    #tbl tr td {
+        border-collapse: collapse;
+        border: none;
+        border-top: none;
+        border-style: unset;
+        word-spacing: 50%;
+        text-align: left;
+        color: brown;
+        padding: 3px;
+    }
+
+    #tblwork tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    #img1 {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        width: 150px;
+        display: block;
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+        margin-top: -50px;
+    }
+
+    #tbltoalBill {
+        border-collapse: collapse;
+        border: 1px solid black;
+        width: 50%;
+        margin-top: -100px;
+        margin-left: 600px;
+    }
+
+    #lbltotbill, #lblSparesTotalBill {
+        margin-left: 600px;
+        color: blueviolet;
+        padding: 20px;
+        font-size: 18px;
+    }
+
+    #lblComplaint {
+        color: blueviolet;
+        padding: 20px;
+        font-size: 18px;
+    }
+
+    #lblsparess {
+        margin-left: 370px;
+        color: blueviolet;
+        padding: 20px;
+        font-size: 18px;
+        line-height: 
+    }
+
+    #tbltoalBill tr td {
+        line-height: 40px;
+    }
+
+    #tblSpares {
+        margin-top: 10px;
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 10px;
+        margin-top: 30px;
+        line-height: 2em;
+    }
+
+    #tbllubes {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    #tblOutSourcing {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    #tbllabours {
+        border-collapse: collapse;
+        width: 50%;
+        margin-top: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    img:hover {
+        box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+    }
+
+    #tbl, th, td {
+        border: 1px solid black;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+        th td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+    td {
+        height: 20px;
+        vertical-align: bottom;
+    }
+
+    h1 {
+        align: center;
+        margin-left: 400px;
+        font-family: sans-serif;
+        text-decoration: underline;
+        text-decoration-color: brown;
+    }
+
+    #workdiv {
+        color: blue;
+        padding: 10px;
+        word-spacing: 10px;
+    }
+
+    #lbl #lbl1 #lbl2 {
+        margin-left: 15px;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+<h2 align="center" style="color:blueviolet"><u>JOB CARD DETAILS</u></h2>
+<br />
+<table align="center" id="tblwork" style="width: 35%">
+    <tr>
+        <td>
+            WorkShop:
+        </td>
+        <td>
+            @ViewBag.WorkShop
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Vehicle:
+        </td>
+        <td>
+            @ViewBag.VehicleNumber
+        </td>
+    </tr>
+    <tr>
+        <td>
+            District:
+        </td>
+        <td>
+            @ViewBag.District
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Date Of Repair:
+        </td>
+        <td>
+            @ViewBag.DOR
+        </td>
+    </tr>
+    <tr>
+        <td>
+            DOD (Approx):
+        </td>
+        <td>
+            @ViewBag.DOD
+        </td>
+    </tr>
+</table>
+
+<table id="tblSpares" style="margin-bottom:10px; margin-top: 30px;">
+
+    <tr>
+        <th>Id</th>
+        <th>Aggregates</th>
+        <th>Categories</th>
+        <th>Sub Category</th>
+        <th>Approximate Cost</th>
+        <th>Estimated Time(In Min)</th>
+
+    </tr>
+
+    @if (ViewBag.Issues != null)
+
+    {
+        var dataTable = ViewBag.Issues as DataTable;
+        if (dataTable != null)
+        {
+            foreach (DataRow dr in dataTable.Rows)
+
+            {
+                <tr>
+
+                    <td>
+
+                        @dr["jobcardnumber"]
+
+                    </td>
+
+                    <td>
+
+                        @dr["Aggregates"]
+
+                    </td>
+                    <td>
+
+                        @dr["Categories"]
+
+                    </td>
+                    <td>
+
+                        @dr["Service_Name"]
+
+                    </td>
+                    <td style="text-align: right">
+
+                        @dr["ApproxCost"]
+                    </td>
+
+                    <td style="text-align: right">
+
+                        @dr["EstimatedTime"]
+
+                    </td>
+                </tr>
+            }
+        }
+    }
+
+</table>
+<span style="margin-left: 580px; margin-top: 5px;color: red">Total:  @ViewBag.Cost</span>
+<br/>
+<div align="right">
+    <br/>
+   <br/>
+    <br/>
+    -----------------------------------
+    <br/>
+
+    (PILOT)
+
+</div>

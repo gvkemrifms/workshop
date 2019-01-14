@@ -2,8 +2,8 @@
 <script>
     $(document).ready(function () {
         var uri = window.location.toString();
-        if (uri.indexOf("1") > 0) {
-            var cleanUri = uri.substring(0, uri.indexOf("1"));
+        if (uri.lastIndexOf("1") > 0) {
+            var cleanUri = uri.substring(0, uri.lastIndexOf("1"));
             window.history.replaceState({}, document.title, cleanUri);
         }
     });
@@ -15,15 +15,30 @@
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
     });
+
+   
+    
     $(function () {
+        var out = true;
         $('#btn').click(function() {
+            var fit_start_time = $("#txtStartDate").val();
+            var fit_end_time = $("#txtEndDate").val();
+
+            if (Date.parse(fit_end_time) <= Date.parse(fit_start_time)) {
+                alert("Please select a different End Date.");
+                $("#txtEndDate").val('');
+                out = false;
+            }
+            if(out==true)
+            {
             var serviceURL = '/workshop/Reports/GetVehicleWiseStocksReportDetails';
             var data = {
                 startDate: $('#txtStartDate').val(),
-                endDate: $('#txtEndDate').val(),
+                endDate: $('#txtEndDate').val()
 
             };
             $.ajax({
@@ -33,7 +48,8 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(response) {
-                    if (response != 0) {
+                  
+                    if (response !== 0) {
                         alert('Record Inserted');
                     }
                     //else {
@@ -47,7 +63,9 @@
                 //    alert(response.responseText);
                 //}
             });
-
+           }
+            if (!out) { event.preventDefault(); }
+            return out;
         });
 
     });
@@ -69,7 +87,7 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">End Date</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtEndDate" placeholder="EndDate" maxlength="10" onkeypress="return false;">
+                        <input class="form-control" id="txtEndDate" maxlength="10" onkeypress="return false;" placeholder="EndDate" type="text">
                     </div>
                 </div>
 

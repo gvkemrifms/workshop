@@ -1,0 +1,104 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    a {
+        color: white;
+        padding: 5px;
+        margin: 10px;
+        font-size: 14px;
+        position: fixed;
+        background-color: blueviolet;
+    }
+</style>
+
+<h1 style="color: brown" align="center">WorShop Report(Mechanic Wise)</h1>
+@Html.ActionLink("Back", "WorkShopMechanicReport", new { id = 1 })
+<br />
+<table class="table" align="center" style="width: 90%;">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Workshop)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Vehicle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.JobcardId)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.District)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateOfRepair)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateOfDelivery)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Aggregate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Mechanic)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ServiceIncharge)
+        </th>
+        
+        <th>
+            @Html.DisplayNameFor(model => model.Category)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SubCategory)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Workshop)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vehicle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobcardId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.District)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfRepair)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfDelivery)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Aggregate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mechanic)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ServiceInchargeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubCategory)
+            </td>
+        </tr>
+    }
+
+</table>
+<br/>
+
+

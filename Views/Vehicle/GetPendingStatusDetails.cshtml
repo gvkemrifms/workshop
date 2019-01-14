@@ -5,12 +5,12 @@
 }
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
 <script type="text/javascript">
-    $(function() {
-        $('#btnSubmit').filter(function() {
-            $(this).hide();
+    //$(function() {
+    //    $('#btnSubmit').filter(function() {
+    //        $(this).hide();
 
-        });
-    });
+    //    });
+    //});
 
     var vehicleNumber = 0;
     $(function() {
@@ -22,92 +22,92 @@
         });
     });
 
-    $(function() {
-        var orderItems = [];
-        $('#btnAdd').click(function() {
-            $('#btnSubmit').show();
-            orderItems.push({
-                VehicleNumber: vehicleNumber,
-                SparePartId: $('#SpareParts').val(),
-                SparePartName: $('#SpareParts option:selected').text(),
-                Quantity: $('#txtQuantity').val().trim(),
-                HandOverToId: $('#HandOver').val(),
-                HandOverToName: $('#HandOver option:selected').text(),
-                Status: $('input[type="radio"]').val(),
-                WorkShopName: $('#WorkShopName').text()
-            });
-            generatedItemsTable();
-            return false;
+    //$(function() {
+    //    var orderItems = [];
+    //    $('#btnAdd').click(function() {
+    //        $('#btnSubmit').show();
+    //        orderItems.push({
+    //            VehicleNumber: vehicleNumber,
+    //            SparePartId: $('#SpareParts').val(),
+    //            SparePartName: $('#SpareParts option:selected').text(),
+    //            Quantity: $('#txtQuantity').val().trim(),
+    //            HandOverToId: $('#HandOver').val(),
+    //            HandOverToName: $('#HandOver option:selected').text(),
+    //            Status: $('input[type="radio"]').val(),
+    //            WorkShopName: $('#WorkShopName').text()
+    //        });
+    //        generatedItemsTable();
+    //        return false;
 
-        });
+    //    });
 
-        function generatedItemsTable() {
-            if (orderItems.length > 0) {
+    //    function generatedItemsTable() {
+    //        if (orderItems.length > 0) {
 
-                var $table = $('<table id=tbl/>');
+    //            var $table = $('<table id=tbl/>');
 
-                $table.append(
-                    '<thead><tr><th>Vehicle Number</th><th>SpareParts Name</th><th>Quantity</th><th>HandOver To</th></tr></thead>');
+    //            $table.append(
+    //                '<thead><tr><th>Vehicle Number</th><th>SpareParts Name</th><th>Quantity</th><th>HandOver To</th></tr></thead>');
 
-                var $tbody = $('<tbody/>');
-                $.each(orderItems,
-                    function(i, val) {
+    //            var $tbody = $('<tbody/>');
+    //            $.each(orderItems,
+    //                function(i, val) {
 
-                        var $row = $('<tr/>');
+    //                    var $row = $('<tr/>');
 
-                        $row.append($('<td/>').html(val.VehicleNumber));
+    //                    $row.append($('<td/>').html(val.VehicleNumber));
 
-                        $row.append($('<td/>').html(val.SparePartName));
+    //                    $row.append($('<td/>').html(val.SparePartName));
 
-                        $row.append($('<td/>').html(val.Quantity));
-                        $row.append($('<td class=amt/>').html(val.HandOverToName));
-                        var $remove = $('<a href="#">Remove</a>');
-                        $remove.click(function(e) {
-                            e.preventDefault();
-                            orderItems.splice(i, 1);
-                            generatedItemsTable();
-                        });
-                        $row.append($('<td/>').html($remove));
-                        $tbody.append($row);
-                    });
+    //                    $row.append($('<td/>').html(val.Quantity));
+    //                    $row.append($('<td class=amt/>').html(val.HandOverToName));
+    //                    var $remove = $('<a href="#">Remove</a>');
+    //                    $remove.click(function(e) {
+    //                        e.preventDefault();
+    //                        orderItems.splice(i, 1);
+    //                        generatedItemsTable();
+    //                    });
+    //                    $row.append($('<td/>').html($remove));
+    //                    $tbody.append($row);
+    //                });
 
-                $table.append($tbody);
+    //            $table.append($tbody);
 
-                $('#orderItems').html($table);
+    //            $('#orderItems').html($table);
 
-            } else {
-                $('#orderItems').html('');
-            }
-        }
+    //        } else {
+    //            $('#orderItems').html('');
+    //        }
+    //    }
 
-        $('#btnSubmit').click(function() {
-            if (orderItems.length > 0) {
-                var serviceUrl = '/Vehicle/SaveCalculateFIFO';
-            }
+    //    $('#btnSubmit').click(function() {
+    //        if (orderItems.length > 0) {
+    //            var serviceUrl = '/Vehicle/SaveCalculateFIFO';
+    //        }
 
 
-            var data = {
-                itemmodel: orderItems
-            };
-            $.ajax({
-                type: "POST",
-                url: serviceUrl,
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(response) {
-                    if (response !== 0) {
-                        alert('Record Inserted');
-                    }
+    //        var data = {
+    //            itemmodel: orderItems
+    //        };
+    //        $.ajax({
+    //            type: "POST",
+    //            url: serviceUrl,
+    //            data: JSON.stringify(data),
+    //            contentType: "application/json; charset=utf-8",
+    //            dataType: "json",
+    //            success: function(response) {
+    //                if (response !== 0) {
+    //                    alert('Record Inserted');
+    //                }
 
-                },
-                failure: function(response) {
-                    alert(response.responseText);
-                }
-            });
-        });
+    //            },
+    //            failure: function(response) {
+    //                alert(response.responseText);
+    //            }
+    //        });
+    //    });
 
-    });
+    //});
 </script>
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
@@ -124,9 +124,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.DateOfRepair)
             </th>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.Complaint)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.WorkShopName)
             </th>
@@ -156,9 +156,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.DateOfRepair)
                 </td>
-                <td>
+                @*<td>
                     @Html.DisplayFor(modelItem => item.Complaint)
-                </td>
+                </td>*@
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkShopName)
                 </td>
@@ -170,6 +170,10 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.JobCardNumber)
+                </td>
+                <td>
+                    @Html.ActionLink("Print", "PrintPendingStatusDetails","Vehicle", new {id = item.VehicleId, target = "_blank" })
+
                 </td>
             </tr>
         }

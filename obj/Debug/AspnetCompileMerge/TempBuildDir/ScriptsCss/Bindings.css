@@ -1,0 +1,54 @@
+﻿
+    body {
+        font-family: Arial;
+        font-size: 12px;
+    }
+
+    table {    
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+        background-color: #fff;
+        /*width: 100%;*/ 
+        /*word-wrap:break-word;*/
+        /*table-layout: fixed;*/
+    }
+
+        table th {
+            /*background-color: #B8DBFD;*/
+            background-color: slategrey;
+            /*color: #333;*/
+            color:whitesmoke;
+            font-weight: bold;
+        }
+
+        table th, table td {
+            padding: 2px;
+            border: 1px solid #ccc;
+        }
+
+        table, table table td {
+            border: 0px solid #ccc;
+        }
+
+    .Pager span {
+        text-align: center;
+        color: #333;
+        display: inline-block;
+        width: 20px;
+        background-color: #B8DBFD;
+        margin-right: 3px;
+        line-height: 100%;
+        border: 1px solid #B8DBFD;
+    }
+
+    .Pager a {
+        text-align: center;
+        display: inline-block;
+        width: 20px;
+        background-color: #ccc;
+        color: #333;
+        border: 1px solid #ccc;
+        margin-right: 3px;
+        line-height: 100%;
+        text-decoration: none;
+    }

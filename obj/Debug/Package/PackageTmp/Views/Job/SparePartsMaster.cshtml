@@ -72,30 +72,34 @@
 
 <script type="text/javascript">
 
-    function Validations() {
-        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
-        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
-            return alert("Please select Manufacturer");
-        }
+    //function Validations() {
+    //    var out = true;
+    //    var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+    //    if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+    //        alert("Please select Manufacturer");
+    //        out = false;
+    //    }
 
 
-        var partName = $('#txtpartName').val();
-        if (partName === "") {
+    //    var partName = $('#txtpartName').val();
+    //    if (partName === "") {
+    //        alert('partName is Mandatory');
+    //        out = false;
+    //    }
+    //    var partNumber = $('#txtPartNumber').val();
+    //    if (partNumber === "") {
+    //        alert('PartNumber is Mandatory');
+    //        out = false;
+    //    }
+    //    var cost = $('#txtCost').val();
+    //    if (cost === "") {
 
-            return alert('partName is Mandatory');
-        }
-        var partNumber = $('#txtPartNumber').val();
-        if (partNumber === "") {
-
-            return alert('PartNumber is Mandatory');
-        }
-        var cost = $('#txtCost').val();
-        if (cost === "") {
-
-            return alert('Cost is Required');
-        }
-        return true;
-    }
+    //        alert('Cost is Required');
+    //        out = false;
+    //    }
+    //    if (!out) { event.preventDefault(); }
+    //    return out;
+    //}
 
     $(function() {
         $('#txtPartNumber').blur(function() {
@@ -124,37 +128,73 @@
 
         });
     });
-    $(function() {
-        $('#btn').click(function() {
-            var serviceUrl = '/workshop/Inventory/SparePartsMaster';
-            var data = {
-                ManufacturerId: $('#Manufacturer').val(),
-                PartName: $('#txtpartName').val(),
-                PartNumber: $('#txtPartNumber').val(),
-                Cost: $('#txtCost').val(),
-                ScrapBinId: $('#ScrapBin').val()
+    function Validations() {
+        var out = true;
+        var ddlManufacturer = $('#Manufacturer option:selected').text().toLowerCase();
+        if (ddlManufacturer === '--select--' || ddlManufacturer === '') {
+            alert("Please select Manufacturer");
+            out = false;
+            event.preventDefault();
+        }
+        var partName = $('#txtpartName').val();
+        if (partName === "") {
+            alert('partName is Mandatory');
+            out = false;
+            event.preventDefault();
+        }
+        var partNumber = $('#txtPartNumber').val();
+        if (partNumber === "") {
+            alert('PartNumber is Mandatory');
+            out = false;
+            event.preventDefault();
+        }
+        var cost = $('#txtCost').val();
+        if (cost === "") {
+            alert('Cost is Required');
+            out = false;
+            event.preventDefault();
+        }
+        return out;
+    }
+    $(function () {
+       
+      
+        $('#btn').click(function () {
+            var output = true;
+            if (Validations()===false) {
+                output = false;
+                alert(output);
+            }
+            else {
+                var serviceUrl = '/workshop/Inventory/SparePartsMaster';
+                var data = {
+                    ManufacturerId: $('#Manufacturer').val(),
+                    PartName: $('#txtpartName').val(),
+                    PartNumber: $('#txtPartNumber').val(),
+                    Cost: $('#txtCost').val(),
+                    ScrapBinId: $('#ScrapBin').val()
 
-            };
-            $.ajax({
-                type: "POST",
-                url: serviceUrl,
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(response) {
-                    if (response !== 0) {
-                        alert('Record Inserted');
-                    } else {
-                        alert('Please fill all Mandatory fields');
+                };
+                alert(JSON.stringify(data));
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response !== 0) {
+                            alert('Record Inserted');
+                        } 
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
                     }
-
-                },
-                failure: function(response) {
-                    alert(response.responseText);
-                }
-            });
-
+                });
+            }
+            return output;
         });
+        return output;
     });
 </script>
 @{ ViewContext.FormContext = new FormContext(); }

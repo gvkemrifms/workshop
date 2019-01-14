@@ -1,0 +1,281 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.EmployeeModel>
+
+@{
+    ViewBag.Title = "Vendor Details";
+
+}
+<style>
+    .form-group.required .control-label:after {
+        content: "*";
+        color: red;
+    }
+</style>
+<script type="text/javascript">
+    $(function() {
+        $('#txtpanNumber').blur(function () {
+
+            var panNumber = $(this).val();
+            if (!panNumber.match('^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$')) {
+                alert('PAN NUMBER not in correct format');
+                $('#txtpanNumber').val('');
+            } else {
+                var serviceURL = '/workshop/Employee/CheckVendorForPan';
+                var data = {
+                    pan: $('#txtpanNumber').val()
+                }
+                $.ajax({
+                    type: "POST",
+                    url: serviceURL,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response !== 0) {
+                            alert('Vendor with same PanNumber already exists');
+                            $('#txtpanNumber').val('');
+                            $('#txtVendorName').val('');
+                            $('#txtgstNumber').val('');
+                            return false;
+                        }
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    }
+                    //error: function (response) {
+                    //    alert(response.responseText);
+                    //}
+                });
+            }
+            
+        });
+    });
+    $(function() {
+        $('#txtVendorName').blur(function() {
+            var vedName = $('#txtVendorName').val();
+            if (!vedName.match('^([a-zA-Z])*$')) {
+                alert("Name should not contain Numbers");
+                $('#txtVendorName').val('');
+                return false;
+            }
+        });
+    });
+
+    function Validations() {
+        var empName = $('#txtVendorName').val();
+        if (empName === "") {
+
+            //$('#btn').attr('onclick', '').unbind('click');
+
+            alert('Vendor Name is Mandatory');
+            return false;
+
+        }
+        var ddlDistricts = $('#Districts option:selected').text().toLowerCase();
+        if (ddlDistricts === '--select--' || ddlDistricts === '') {
+
+            alert('Please select District');
+            return false;
+            // return alert("Please select Department");
+
+        }
+        var vendorType = $('#txtvendor').val();
+        if (vendorType === 0) {
+
+            //$('#btn').attr('onclick', '').unbind('click');
+
+            alert('Vendor Type is Mandatory');
+            return false;
+
+        }
+        var contactNumber = $('#txtContactNumber').val();
+        if (contactNumber === "") {
+
+
+            alert('Contact Number is Mandatory');
+            return false;
+
+
+        }
+        var Pan = $('#txtpanNumber').val();
+        if (Pan === "") {
+
+
+            alert('PAN Number is Mandatory');
+            return false;
+
+
+        }
+        var GSt = $('#txtgstNumber').val();
+        if (GSt === "") {
+
+
+            alert('GST Number is Mandatory');
+            return false;
+
+
+        }
+      
+
+        
+    }
+
+    $(function() {
+        $('#btn').click(function() {
+
+            var serviceURL = '/workshop/Employee/SaveVendorDetails';
+            var data = {
+                VendorName: $('#txtVendorName').val(),
+                ContactNumber: $('#txtContactNumber').val(),
+                EmailAddress: $('#txtEmail').val(),
+                Districts: $('#Districts').val(),
+                VendorType: $('#VendorType').val(),
+                GstNumber: $('#txtgstNumber').val(),
+                PanNumber: $('#txtpanNumber').val(),
+                Location: $('#txtlocation').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceURL,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Inserted');
+                        location.reload();
+                    } else {
+                        alert('Insertion Failed Please fill all Mandatory fields');
+                        return false;
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+                //error: function (response) {
+                //    alert(response.responseText);
+                //}
+            });
+
+        });
+
+    });
+
+</script>
+@{ ViewContext.FormContext = new FormContext(); }
+<form onsubmit="return Validations()">
+    <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+        <div class="panel-heading">
+            Vendor Master
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Vendor Name</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtVendorName" placeholder="Vendor Name">
+                        </div>
+                    </div>
+                    <div class="form-group required" style="margin-top: 10px">
+                        <label class="control-label col-lg-4">Contact Number</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtContactNumber" placeholder="Contact Number" maxlength="10" style="margin: 10px;margin-left: -5px" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label  col-lg-4">District</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Districts", ViewBag.Districts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Email Address</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtEmail" placeholder="Email Address">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">GST Number</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" style="margin-top: 10px;" id="txtgstNumber" placeholder="GST Number">
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">PAN Number</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtpanNumber" maxlength="10" placeholder="PAN Number" data-val-regex-pattern="^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label  col-lg-4">Vendor Type</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("VendorType", ViewBag.VendorType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label  col-lg-4">Location</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtlocation" maxlength="10" placeholder="Location" >
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div style="margin-bottom: 90px" class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                            <input type="button" id="btn" value="Submit" class="btn btn-default" onclick="if (!Validations()) return false;" style="margin-bottom: -150px; background-color: blue; color: white">
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="col-lg-6" style="width: 100%">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div style="margin-top: 30px">
+                            @*@Html.Partial("GetEmployeeDetails");*@
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="panel-footer">
+
+        </div>
+    </div>
+</form>
+
+
+
+

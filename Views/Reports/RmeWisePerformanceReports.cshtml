@@ -1,7 +1,35 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.ReportsModel>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/jquery.table2excel.js"></script>
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    a {
+        color: white;
+        padding: 5px;
+        margin: 10px;
+        font-size: 14px;
+        position: fixed;
+        background-color: blueviolet;
+    }
+</style>
+<script>
+    $(function() {
+        $('#btn').click(function () {
+            $(".table").table2excel({
+                exclude: ".noExl",
+                name: "Workshop RME Wise  Report",
+                filename: "Workshop RME Wise  Report" //do not include extension
+
+            });
+        })
+    })
+</script>
 <h1 style="color: brown" align="center">RME Wise Report</h1>
-<table class="table" align="center">
+
+@Html.ActionLink("Back", "RmeWisePerformanceReport", new { id = 1 })
+<button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-left: 750px;margin-bottom: 20px">Export</button>
+<br/>
+<table class="table" align="center" style="width: 90%">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.WorkShopName)
@@ -80,4 +108,4 @@
 
 </table>
 <br/>
-@Html.ActionLink("Back", "RmeWisePerformanceReport",new {id=1})
+

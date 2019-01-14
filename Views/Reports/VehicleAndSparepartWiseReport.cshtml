@@ -1,4 +1,5 @@
 ﻿<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.table2excel.js"></script>
 <style>
     #tbl {
         width: 100%;
@@ -24,7 +25,8 @@
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
     });
     $(function() {
@@ -58,7 +60,16 @@
         });
 
     });
+    $(function () {
+        $('#btnExport').click(function () {
+            $("#tbl").table2excel({
+                exclude: ".noExl",
+                name: "Vehicle And Spares wise Report",
+                filename: "Vehicle And Spares wise Report" //do not include extension
 
+            });
+        });
+    });
     function generateDetailsList(response) {
         var eTable =
             "<table id=tbl><thead><tr><th >Id</th><th>Part Number</th><th>Vehicle Number</th><th>Quantity</th><th>Issued Date</th></tr></thead><tbody>";
@@ -75,28 +86,6 @@
         }
         eTable += "</tbody></table>";
         $('#SparesDetails').html(eTable);
-        //alert(res);
-        //if (res.length > 0) {
-
-        //    var $table = $('<table id=tbl/>');
-
-        //    $table.append(
-        //        '<thead><tr><th>Id</th><th>Part Number</th><th>Vehicle Number</th><th> Quantity</th><th>Issued Date</th>');
-
-        //    var $tbody = $('<tbody/>');
-        //    for (var i = 0; i < response.length; i++) {
-        //        var $row = $('<tr/>');
-        //        $row.append($('<td/>').html(response[i].Id));
-        //        $row.append($('<td/>').html(response[i].SparePart));
-        //        $row.append($('<td/>').html(response[i].VehicleNumber));
-        //        $row.append($('<td/>').html(response[i].Quantity));
-        //        $row.append($('<td />').html(response[i].IsssuedDate));
-        //        $tbody.append($row);
-        //    }
-        //    $table.append($tbody);
-
-        //    $('#SparesDetails').html($table);
-
     }
 
 </script>
@@ -147,7 +136,9 @@
                 <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 10px">
                     <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white">Submit</button>
                 </div>
-
+                <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                    <button type="submit" id="btnExport" class="btn btn-default" style="background-color: blue; color: white">Export</button>
+                </div>
             </div>
         </form>
 

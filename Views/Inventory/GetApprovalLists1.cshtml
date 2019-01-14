@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.InventoryModel>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.WorkShopName)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.ManName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PoNumber)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.PoDate)
+        </th>
+  
+        <th>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BillAmount)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.SentBy)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.WorkShopName)
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.ManName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PoNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PoDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Quantity)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BillAmount)
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.SentBy)
+        </td>
+  
+    </tr>
+}
+
+</table>

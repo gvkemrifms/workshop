@@ -1,0 +1,716 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.InventoryModel>
+
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
+<style>
+ 
+    hr {
+        border-style: solid;
+        border-width: 1px;
+        display: block;
+    }
+
+    #errmsg { color: red; }
+</style>
+<style>
+ 
+
+    span.error {
+        color: red;
+        display: block;
+        font-size: 90%;
+        visibility: hidden;
+    }
+
+
+    .container td { vertical-align: top; }
+
+    .tablecontainer table {
+        border-collapse: collapse;
+        border-right: 1px solid #BFAEAE;
+        border-top: 1px solid #BFAEAE;
+        display: block;
+        width: 100%;
+    }
+
+    .tablecontainer th { border-bottom: 2px solid #BFAEAE !important; }
+
+    .tablecontainer th, .tablecontainer td {
+        border-bottom: 1px solid #BFAEAE;
+        border-left: 1px solid #BFAEAE;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .ui-widget { font-size: 12px !important; }
+
+    #lblAmount, #lblBillAmount { text-align: left; }
+
+    .form-group.required .control-label:after {
+        content: "*";
+        color: red;
+    }
+</style>
+<script>
+    $(function() {
+        $('#Vendor').change(function() {
+            if ($('#Vendor').prop('selectedIndex') == 0) {
+                $(this).find('option').not(':selected').prop('disabled', false);
+                //$('#Vendor option:contains("--Select--")').attr("disabled", false);
+            } else {
+                $(this).find('option').not(':selected').prop('disabled', true);
+                $('#Vendor option:contains("--Select--")').attr("disabled", false);
+            }
+        });
+    });
+    $(function() {
+        $('#txtBillDate').change(function() {
+            if ($('#txtPODate').val() == '') {
+                alert('Please Enter PO Number');
+                $(this).val('');
+                return false;
+            } else {
+                var billdate = $('#txtBillDate').val();
+                var podate = $('#txtPODate').val();
+                if (new Date(billdate) < new Date(podate)) {
+                    alert("Bill Date should be greater than P.O Date.");
+                    $('#txtBillDate').val('');
+                    return false;
+                }
+
+            }
+        });
+    });
+    $(document).ready(function() {
+        //called when key is pressed in textbox
+        $("#txtQuantity").keypress(function(e) {
+            //if the letter is not digit then display error and don't type anything
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                //display error message
+                $("#errmsg").html("Digits Only").show().fadeOut("slow");
+                return false;
+            }
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function() {
+
+        $('#txtQuantity').blur(function() {
+            if ($('#SparePart option:selected').text() === "--Select--") {
+                $('#txtQuantity').val('');
+                return alert('Please select Manufacturer (And/Or) SparePart');
+
+            }
+            var data = {
+                qty: $('#txtQuantity').val(),
+                sparesid: $('#SparePart').val(),
+                poNumber: $('#txtPONumber').val()
+            };
+
+            $.ajax({
+                type: "Post",
+                url: '/workshop/Inventory/CheckQuantity/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response === 0) {
+                        alert("Quantity entered is more than P.O Quantity");
+                        $('#txtQuantity').val('');
+                        //$('#SparePart').prop('selectedIndex', 0);
+                        //$('#txtunitprice').val('');
+                        //$('#ManufacturerName').prop('selectedIndex', 0);
+                        $("#lblAmount").text('');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+            return true;
+        });
+    });
+
+
+    function Validations() {
+        var billNumber = $('#txtBillNumber').val();
+        if (billNumber === "") {
+            return alert('BillNumber is Mandatory');
+        }
+        var ddlvendor = $('#Vendor option:selected').text().toLowerCase();
+        if (ddlvendor === '--select--' || ddlvendor === '') {
+            return alert("Please select Vendor");
+        }
+        var billDate = $('#txtBillDate').val();
+        if (billDate === "") {
+            return alert('BillDate is Mandatory');
+        }
+        var poDate = $('#txtPODate').val();
+        if (poDate === "") {
+            return alert('P.O Date is Mandatory');
+        }
+        if (poDate > window.currentDate) {
+            return alert("P.O Date should not be greater than current date");
+        }
+        var poNumber = $('#txtPONumber').val();
+        if (poNumber === "") {
+            return alert('P.O Number is Mandatory');
+        }
+
+        var ddlmanufacturer = $('#ManufacturerName option:selected').text().toLowerCase();
+        if (ddlmanufacturer === '--select--' || ddlmanufacturer === '') {
+            return alert("Please select Manufacturer");
+        }
+        var ddlsparepart = $('#SparePart option:selected').text().toLowerCase();
+        if (ddlsparepart === '--select--' || ddlsparepart === '') {
+            return alert("Please select SparePart");
+        }
+        var quantity = $('#txtQuantity').val();
+        if (quantity === "") {
+            return alert('Enter Quantity');
+        }
+        var tbody = $("#tbl tbody");
+
+        if (tbody.children().length === 0) {
+            return alert('Please add Items');
+        }
+        return true;
+
+    }
+
+    $(function() {
+
+        var $bill = 0;
+
+        $("#txtQuantity,#txtunitprice").blur(function() {
+
+            var unitPrice = $("#txtunitprice").val();
+            var quantity = $("#txtQuantity").val();
+            var amount = parseInt(unitPrice) * parseInt(quantity);
+            $("#lblAmount").text(amount);
+
+        });
+
+    });
+    $(document).ready(function() {
+
+        $("#SparePart").prop("disabled", true);
+
+        $("#ManufacturerName").change(function() {
+            if ($('#ManufacturerName option:selected').text().toLowerCase() === "--select--") {
+                //$('#SparePart option:selected').text("");
+                $('#SparePart').prop("selectedIndex", 0);
+                $('#SparePart').prop("disabled", true);
+                $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
+                $("#lblAmount").text('');
+                $("#txtQuantity").val('');
+                return false;
+            } else {
+                $('#SparePart').prop("disabled", false);
+            }
+            return true;
+        });
+    });
+    //        var serviceURL = '/Inventory/GetSparePartsDetailsForManufacturer';
+
+    //        var data = {
+    //            ManufacturerId: $('#ManufacturerName option:selected').val()
+    //        }
+    //        $.ajax({
+    //            url: serviceURL,
+    //            type: "POST",
+    //            data: JSON.stringify(data),
+    //            datatype: "json",
+    //            contentType: 'application/json',
+
+    //            success: function (Response) {
+
+    //                $('#SparePart').empty();
+    //                $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
+    //                for (var i = 0; i < Response.length; i++) {
+
+    //                    $('#SparePart').append("<option value='" + Response[i].split('-')[1] + "' >" + Response[i].split('-')[0] + "</option>");
+
+    //                }
+
+    //                $('#SparePart').prop("disabled", false);
+
+
+    //            }
+    //            //error : function (err) {
+    //            //    alert("Error in Getting Vehicles!!");
+    //            //}
+
+    //        });
+
+
+    //    });
+    //});
+    $(function() {
+
+        $('#SparePart').change(function() {
+            var sparePartId = $('#SparePart option:selected').val();
+            if ($('#SparePart option:selected').text() === '--Select--') {
+                $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
+            }
+            $.ajax({
+                type: "Post",
+                url: '/workshop/Inventory/GetCostDetails/' + sparePartId,
+                data: JSON.stringify(sparePartId),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        $('#txtunitprice').val(response.Cost);
+                        $('#lblpartnumber').text(response.PartNumber);
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+    $(function() {
+
+        var serviceUrl = '/workshop/Inventory/GetSparePODetails';
+        $('#txtPONumber').blur(function() {
+            var data = {
+                Ponumber: $(this).val()
+            };
+            $('#txtPODate').val('');
+            $.ajax({
+                type: "Post",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response <= 0) {
+                        alert('Please enter valid P.O Number');
+                        $('#txtPONumber').val('');
+                        $('#poReceiptDetails').empty();
+                    } else {
+
+                        $('#txtPODate').val(response[0].PoDate);
+                        $('#ManufacturerName').empty();
+                        $('#ManufacturerName').append('<option value=0 selected="selected">--Select--</option>');
+                        generatePoDetailsList(response);
+                        var id = response[0].ManufacturerId;
+                        var name = response[0].ManufacturerName;
+                        $('#ManufacturerName').append("<option value='" + id + "' >" + name + "</option>");
+                        $('#SparePart').empty();
+                        $('#SparePart').append('<option value=0 selected="selected">--Select--</option>');
+                        var i;
+                        for (i = 0; i <= response.length; i++) {
+                            $('#SparePart').append("<option value='" +
+                                response[i].SparePartId +
+                                "' >" +
+                                response[i].PartName +
+                                "</option>");
+                        }
+
+
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+            function generatePoDetailsList(response) {
+
+                var res = JSON.stringify(response);
+                if (res.length > 0) {
+
+                    var $table = $('<table id=tbl/>');
+
+                    $table.append(
+                        '<thead><tr><th>Spare Part</th><th>Part Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Received Date</th></tr></thead>');
+
+                    var $tbody = $('<tbody/>');
+                    for (var i = 0; i < response.length; i++) {
+                        var $row = $('<tr/>');
+                        $row.append($('<td/>').html(response[i].PartName));
+                        $row.append($('<td/>').html(response[i].PartNumber));
+                        $row.append($('<td/>').html(response[i].PoQuantity));
+                        $row.append($('<td/>').html(response[i].ReceivedQuantity));
+                        $row.append($('<td />').html(response[i].PendingQuantity));
+                        $row.append($('<td />').html(response[i].GetLastReceivedDate));
+                        $tbody.append($row);
+                    }
+                    $table.append($tbody);
+
+                    $('#poReceiptDetails').html($table);
+
+                } else {
+                    $('#orderItems').html('');
+                    $('#lblAmount').text('');
+                    $('#txtQuantity').val('');
+                }
+            }
+        });
+    });
+
+    function getFinalBillAmount() {
+        var sum = parseFloat($("#lblAmount").text());
+        $('.amt').each(function() {
+            sum += parseFloat($(this).text());
+        });
+        $('#lblBillAmount').text(sum);
+    }
+
+    function getFinalBillAmount1() {
+        var sum = 0;
+        $('.amt').each(function() {
+            sum += parseFloat($(this).text());
+        });
+        $('#lblBillAmount').text(sum);
+    }
+
+</script>
+<script type="text/javascript">
+
+    $(function() {
+        $('#txtBillDate,#txtPODate,#txtLastReceivedDate').datepicker({
+            dateFormat: "dd-m-yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0",
+            maxDate: 0
+        });
+    });
+
+
+    $(function() {
+        var orderItems = [];
+        $('#btnAdd').click(function() {
+            if ($('#ManufacturerName option:selected').text() === "--Select--" ||
+                $('#ManufacturerName option:selected').text() === "") {
+                $('#SparePart').prop('selectedIndex', 0);
+                $('#txtunitprice').val('');
+                $('#lblpartnumber').text('');
+                return false;
+            }
+            if ($('#txtQuantity').val().trim() === "") {
+                return false;
+            }
+            getFinalBillAmount();
+            orderItems.push({
+                ManufacturerName: $('#ManufacturerName option:selected').text(),
+                ManufacturerId: $('#ManufacturerName option:selected').val(),
+                SparePartId: $('#SparePart').val(),
+                SparePartName: $('#SparePart option:selected').text(),
+                UnitPrice: $('#txtunitprice').val().trim(),
+                Quantity: $('#txtQuantity').val().trim(),
+                Amount: $('#lblAmount').text()
+            });
+            generatedItemsTable();
+            $("#SparePart option:selected").attr('disabled', 'disabled');
+            //$('#Vendor option:contains("--Select--")').attr("disabled", true);
+            $('#txtunitprice').val('');
+            $('#txtQuantity').val('');
+            $('#lblAmount').text('');
+            $('#SparePart').prop('selectedIndex', 0);
+            $('#lblpartnumber').text('');
+            return false;
+
+        });
+
+        function generatedItemsTable() {
+            if (orderItems.length > 0) {
+
+                var $table = $('<table id=tbl/>');
+
+                $table.append(
+                    '<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
+
+                var $tbody = $('<tbody/>');
+                $.each(orderItems,
+                    function(i, val) {
+
+                        var $row = $('<tr/>');
+
+                        $row.append($('<td/>').html(val.ManufacturerName));
+
+                        $row.append($('<td/>').html(val.SparePartName));
+
+                        $row.append($('<td/>').html(val.UnitPrice));
+
+                        $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td class=amt/>').html(val.Amount));
+                        var $remove = $('<a href="#">Remove</a>');
+                        $remove.click(function(e) {
+                            var vals = $(this).closest("tr").find('td:eq(1)').text();
+                            //alert(vals);
+                            $('#SparePart option').each(function() {
+
+                                if (this.text === vals) {
+                                    //alert(this.text);
+                                    $(this).attr('disabled', false);
+
+                                    //$('#SpareParts  option').attr('disabled', false);
+                                }
+
+                            });
+                            e.preventDefault();
+                            orderItems.splice(i, 1);
+                            generatedItemsTable();
+                            getFinalBillAmount1();
+                        });
+                        $row.append($('<td/>').html($remove));
+                        $tbody.append($row);
+                    });
+
+                $table.append($tbody);
+
+                $('#orderItems').html($table);
+
+            } else {
+                $('#orderItems').html('');
+                $('#lblAmount').text('');
+                $('#txtQuantity').val('');
+            }
+        }
+
+        $('#btn').click(function() {
+            var serviceUrl = '/workshop/Inventory/SaveInventoryDetails';
+            var data = {
+                BillNo: $('#txtBillNumber').val(),
+                BillDate: $('#txtBillDate').val(),
+                VendorName: $('#Vendor option:selected').text(),
+                VendorId: $('#Vendor option:selected').val(),
+                BillAmount: $('#lblBillAmount').text(),
+                PoNumber: $('#txtPONumber').val(),
+                PoDate: $('#txtPODate').val(),
+                itemmodel: orderItems
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response !== 0) {
+                        alert('Record Inserted');
+                        location.reload();
+                    } else {
+                        alert('Failed to insert record');
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+
+    });
+
+
+</script>
+@{ ViewContext.FormContext = new FormContext(); }
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        SpareParts(Receipts)
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group required">
+                    <label class="control-label col-lg-4">Bill Number</label>
+                    <div class="col-lg-8">
+
+                        <input type="text" class="form-control" id="txtBillNumber" placeholder="Name">
+
+                    </div>
+                </div>
+                <div class="form-group required">
+                    <label class="control-label col-lg-4">Bill Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtBillDate" onkeypress="return false" oncut="return false" onpaste="return false" placeholder="Bill Date">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group required">
+                    <label class="control-label  col-lg-4">Vendor</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Vendor", ViewBag.Vendors as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">Bill Amount</label>
+                    <div class="col-lg-8">
+                        <label id="lblBillAmount" class="form-control"></label>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">P.O Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtPODate" onkeypress="return false" placeholder="P.O Date" disabled="disabled">
+                    </div>
+                </div>
+
+                <div class="form-group required">
+                    <label class="control-label col-lg-4" style="margin-left: -500px; margin-top: -50px">P.O Number</label>
+                    <div class="col-lg-8">
+                        <input type="text" style="margin-left: -670px; margin-top: -50px" class="form-control" id="txtPONumber" placeholder="P.O Number">
+                    </div>
+                </div>
+                @*<div class="form-group">
+                    <label class="control-label  col-lg-4"> Last Received Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtLastReceivedDate" onkeypress="return false" placeholder="Last Received Date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-lg-4" style="margin-left: -500px; margin-top: -50px">Received Quantity</label>
+                    <div class="col-lg-8">
+                        <input type="text" style="margin-left: -670px; margin-top: -50px" class="form-control" id="txtReceivedQuantity" placeholder="Received Quantity">
+                    </div>
+                </div>*@
+
+            </form>
+
+        </div>
+
+        <hr/>
+        <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+            <div class="panel-heading">
+                P.O Details
+            </div>
+            <div class="panel-body" id="poReceiptDetails" style="align-content: center">
+            </div>
+        </div>
+
+    </div>
+    <hr/>
+    <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+        <div class="panel-heading">
+            Items
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Manufacturer</label>
+                        <div class="col-lg-8">
+
+                            <select id="ManufacturerName" class="form-control"> </select>
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Spare Parts</label>
+                        <div class="col-lg-4">
+                            @Html.DropDownList("SparePart", ViewBag.Spares as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control" @*, @onchange = "getValueOfSpares(this.value)"*@})
+                        </div>
+                        <label id="lblpartnumber" class="col-lg-4" style="color: red;"></label>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-lg-4">Unit Price</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" style="margin-top: 10px;" id="txtunitprice" placeholder="Unit Price" maxlength="12" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Quantity</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity">
+                            <span id="errmsg"></span>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group ">
+
+                        <label class="control-label   col-lg-4">Amount</label>
+                        <div class="col-lg-8">
+                            <label id="lblAmount" class="form-control" data-value="@Request.RequestContext.HttpContext.Session["Amount"]"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-6 col-lg-offset-10" style="margin-top: -50px">
+                            <button type="submit" id="btnAdd" class="btn btn-default" style="background-color: blue; color: white">Add</button>
+                        </div>
+                    </div>
+
+                </form>
+                @*<div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
+                    <div class="col-lg-6">
+                        PartNumber <label id="lblpartnumber" class="form-control" style="color: red"></label>
+                    </div>
+                </div>*@
+            </div>
+
+            <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
+                <div class="panel-heading">
+                    Items(In Cart)
+                </div>
+                <div class="panel-body" id="orderItems">
+                </div>
+
+            </div>
+            <div class="col-lg-6 col-lg-offset-6" style="margin-top: auto">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <button type="submit" id="btn" class="btn btn-default" onclick="if (!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <input type="text" id="myInput" class="form-control" placeholder="Search Bill Number.." style="float: left; width: 300px;" align="left">
+            <div class="col-lg-6" style="width: 100%">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div style="margin-top: 30px">
+                            @Html.Partial("GetReceiptDetails");
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(function() {
+        $("#myInput").on("keyup",
+            function() {
+                var value = $(this).val().toLowerCase();
+                $("tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+    });
+</script>
+<div class="panel-footer">
+
+</div>

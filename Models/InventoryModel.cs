@@ -11,7 +11,8 @@ namespace Fleet_WorkShop.Models
         public string SpareName { get; set; }
         public int WorkShopId { get; set; }
         public int Id { get; set; }
-
+        public string Name { get; set; }
+        public string Remarks { get; set; }
         [DisplayName("Manufacturer Name")]
         public string ManName { get; set; }
 
@@ -25,7 +26,7 @@ namespace Fleet_WorkShop.Models
         public decimal Uprice { get; set; }
 
         [DisplayName("Quantity")]
-        public int Qty { get; set; }
+        public decimal Qty { get; set; }
 
         [DisplayName("Amount")]
         public decimal Amt { get; set; }
@@ -63,6 +64,14 @@ namespace Fleet_WorkShop.Models
         public List<InventoryDetails> itemmodel { get; set; }
         public int ScrapBinId { get; set; }
         public int EmployeeId { get; internal set; }
+        public string Status { get; internal set; }
+        public int RoleId { get; internal set; }
+        public decimal Quantity { get; internal set; }
+        public string WorkShopName { get; internal set; }
+        public string SentBy { get; internal set; }
+        public DateTime SentOn { get; internal set; }
+        public string PONo { get; internal set; }
+        public decimal POQuantity { get; set; }
     }
 
     public class InventoryDetails
@@ -87,6 +96,7 @@ namespace Fleet_WorkShop.Models
         [Required(ErrorMessage = "Please select Quantity")]
         public int Quantity { get; set; }
 
+        public decimal LubesQty { get; set; }
         public string LubricantName { get; set; }
         public int LubricantId { get; set; }
     }
@@ -101,4 +111,11 @@ namespace Fleet_WorkShop.Models
         public decimal TotalAmount { get; set; }
         public int VendorId { get; set; }
     }
+
+    public class GetDistanceAndProject
+    {
+        public double distance { get; set; }
+        public string project { get; set; }
+    }
+
 }

@@ -8,8 +8,14 @@ namespace Fleet_WorkShop.Models
 {
     public class VehicleModel
     {
+        
+        public int? OffroadId { get; set; }
+        internal int pilotIdd;
+        internal DateTime DateOfDeliveryy;
+
         public int HelperId { get; set; }
         public string Helper { get; set; }
+        [Required(ErrorMessage = "Select Allotted Mechanic ")]
         [DisplayName("Mechanic Name")]
         public string AllotedMechanicName { get; set; }
 
@@ -22,45 +28,46 @@ namespace Fleet_WorkShop.Models
 
         [DisplayName("Vehicle")]
         public string VehicleId { get; set; }
-
+        [Required(ErrorMessage = "Select Vehicle")]
         public int VehId { get; set; }
 
         [DisplayName("Vehicle Number")]
         public string VehicleNumberString { get; set; }
-
+        [Required(ErrorMessage = "Enter Odometer Reading")]
         public int Odometer { get; set; }
-
+        [Required(ErrorMessage = "Enter Pilot Name")]
         [DisplayName("Pilot Name")]
         public string PilotName { get; set; }
 
-        [DisplayName("Labor Charges")]
+        [Required(ErrorMessage = "Labor Charges Required")]
         public int ApproximateCost { get; set; }
 
         public int IdCategory { get; set; }
 
-        [DisplayName("Date Of Recovery")]
-        public DateTime DateOfDelivery { get; set; }
 
-        [DisplayName("Nature Of Complaint")]
+        public DateTime DateOfDelivery { get; set; }
+        [Required(ErrorMessage = "Aggregates Required")]
+        [DisplayName("Aggregates")]
         public int NatureOfComplaint { get; set; }
 
         public SelectList ComplaintsNature { get; set; }
+        [Required(ErrorMessage = "PilotId Required")]
         public string PilotId { get; set; }
 
         [DisplayName("Date Of Repair")]
         public DateTime DateOfRepair { get; set; }
-
+        [Required(ErrorMessage = "District is Required")]
         public int DistrictId { get; set; }
 
         [DisplayName("District")]
         public string DistrictName { get; set; }
-
+        [Required(ErrorMessage = "Manufacturer is Required")]
         public int ManufacturerId { get; set; }
 
         [DisplayName("Manufacturer Name")]
         public string ManufacturerName { get; set; }
 
-        [Required(ErrorMessage = "Please select District")]
+    
         [DisplayName("District")]
         public SelectList District { get; set; }
 
@@ -85,15 +92,16 @@ namespace Fleet_WorkShop.Models
         [DisplayName("Model")]
         public int ModelYear { get; set; }
 
-        [Required(ErrorMessage = "Manufacturer Name is Required")]
+       
         public SelectList Manufacturer { get; set; }
 
         public DateTime? DateOfCommission { get; set; }
         public string DOC { get; set; }
+        [Required(ErrorMessage = "Enter Received Location")]
         public string ReceivedLocation { get; internal set; }
 
         public IEnumerable<VehicleJobCardModel> VehicleJodcard { get; set; }
-
+        [Required(ErrorMessage = "Model is Required")]
         [DisplayName("Model")]
         public int ModelNumber { get; internal set; }
 
@@ -116,9 +124,12 @@ namespace Fleet_WorkShop.Models
         public string SubCategoryName { get; internal set; }
         public string SubCategoryId { get; internal set; }
         public int EstimatedCost { get; internal set; }
+        [Required(ErrorMessage = "Service Engineer is Required")]
         public int ServiceEngineer { get; internal set; }
         public int LaborCharges { get; internal set; }
         public string Status { get; set; }
+        public int DistanceTravelled { get; internal set; }
+        public int EndOdo { get; internal set; }
     }
 }
 
@@ -175,40 +186,52 @@ public class Aggregates
     public int IdAggregate { get; set; }
     public int? ApproxCost { get; set; }
     public SelectList SubCategories { get; set; }
+    public int? Cost { get; set; }
 }
 
 public class VehicleJobCardModel
 {
+    public int EndOdo { get; set; }
     public int ManufacturerId { get; set; }
     public int LaborCharges { get; set; }
     public int WorkShopId { get; set; }
 
     [DisplayName("Vehicle Id")]
     public string VehicleId { get; set; }
-
+    [Required(ErrorMessage = "Please select VehicleId")]
     public int VehId { get; set; }
+    [Required(ErrorMessage = "Please select Model")]
     public int ModelNumber { get; set; }
+    [Required(ErrorMessage = "Please select Odometer")]
     public int Odometer { get; set; }
+    [Required(ErrorMessage = "Please select Pilot Name")]
     public string PilotName { get; set; }
+    [Required(ErrorMessage = "Please select Cost")]
     public int ApproximateCost { get; set; }
+
     public DateTime DateOfDelivery { get; set; }
     public int NatureOfComplaint { get; set; }
+    [Required(ErrorMessage = "Please select PilotId")]
     public string PilotId { get; set; }
     public DateTime DateOfRepair { get; set; }
+    [Required(ErrorMessage = "Please select District")]
     public int DistrictId { get; set; }
+    [Required(ErrorMessage = "Please select Received Location")]
     public string ReceivedLocation { get; set; }
     public string DistrictName { get; set; }
 
     public SelectList Vehicle { get; set; }
 
-    [Required(ErrorMessage = "Please select District")]
+ 
     [DisplayName("District")]
     public SelectList District { get; set; }
 
     [DisplayName("Alloted Mechanic")]
+    [Required(ErrorMessage = "Please select Allotted Mechanic")]
     public int AllotedMechanic { get; set; }
 
     [DisplayName("Service Incharge")]
+    [Required(ErrorMessage = "Please select Service Engineer")]
     public int ServiceEngineer { get; set; }
 
     public int LubricantId { get; set; }
@@ -219,10 +242,10 @@ public class VehicleJobCardModel
     public int SubCategory { get; internal set; }
     public string SubCategoryName { get; internal set; }
     public string SubCategoryId { get; internal set; }
-
+    [Required(ErrorMessage = "Please select Category")]
     [DisplayName("Category")]
     public int CategoryIdd { get; set; }
-
+    [Required(ErrorMessage = "Please select Sub Category")]
     public int SubCat { get; set; }
     public string SubCatName { get; set; }
 }
@@ -230,6 +253,7 @@ public class VehicleJobCardModel
 
 public class JobCardPendingCases
 {
+    public int EndOdo { get; set; }
     public int HiddenId { get; set; }
     public int LaborCharges { get; set; }
 
@@ -273,7 +297,7 @@ public class JobCardPendingCases
     public string LastEntryDate { get; set; }
     public int LubricantId { get; set; }
     public string LubricantName { get; set; }
-    public int LubesQuantity { get; set; }
+    public Decimal LubesQuantity { get; set; }
     public int LubesHandOverToId { get; set; }
     public string LubesHandOverToName { get; set; }
     public int TotalAmount { get; set; }
@@ -296,6 +320,16 @@ public class JobCardPendingCases
     public decimal FinalBillAmount { get; internal set; }
     public object CompletedDate { get; internal set; }
     public decimal OutSoucingSum { get; internal set; }
+    public int? ManufacturerId { get; internal set; }
+    [DisplayName("Estimated Time(In Min)")]
+    public string EstimatedTime { get; internal set; }
+
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public DateTime DateOfDelivery { get; internal set; }
+    public DateTime? StartTime1 { get; internal set; }
+    public DateTime? EndTime1 { get; internal set; }
+    public int Odometer { get; internal set; }
 }
 
 public class GetSparePartCostDetails
@@ -327,7 +361,7 @@ public class GetPODetailsSpareParts
     public string PartNumber { get; set; }
 
     [DisplayName("P.O Quantity")]
-    public int PoQuantity { get; set; }
+    public decimal PoQuantity { get; set; }
 
     [DisplayName("Last Received Date")]
     public DateTime? LastReceivedDate { get; set; }
@@ -336,7 +370,7 @@ public class GetPODetailsSpareParts
     public int ReceivedQuantity { get; set; }
 
     [DisplayName("Pending Quantity")]
-    public int PendingQuantity { get; set; }
+    public decimal PendingQuantity { get; set; }
 
     [DisplayName("P.O Date")]
     public string PoDate { get; set; }
@@ -348,5 +382,5 @@ public class GetPODetailsSpareParts
     public int SparePartId { get; internal set; }
     public int LubricantId { get; set; }
 public string GetLastReceivedDate { get; set; }
-
+    public decimal LubesReceivedQuantity { get; internal set; }
 }

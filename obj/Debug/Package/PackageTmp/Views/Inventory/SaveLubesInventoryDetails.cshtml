@@ -51,9 +51,29 @@
     #lblAmount, #lblBillAmount {
         text-align: left;
     }
+    .form-group.required .control-label:after {
+        content: "*";
+        color: red;
+    }
 </style>
 
 <script type="text/javascript">
+    $(function () {
+        $('#Vendor').change(function () {
+            if ($('#Vendor').prop('selectedIndex') == 0) {
+                $(this).find('option').not(':selected').prop('disabled', false);
+                //$('#Vendor option:contains("--Select--")').attr("disabled", false);
+            } else {
+                $(this).find('option').not(':selected').prop('disabled', true);
+                $('#Vendor option:contains("--Select--")').attr("disabled", false);
+            }
+        });
+    });
+    $(function () {
+        $("#txtQuantity").keyup(function () {
+            this.value = this.value.replace(/[^0-9\.]/g, '');
+        });
+    });
     $(function () {
         $("#myInput").on("keyup", function () {
             var value = $(this).val().toLowerCase();
@@ -67,6 +87,7 @@
     });
 </script>
 <script type="text/javascript">
+ 
     $(function () {
 
         $('#txtQuantity').blur(function () {
@@ -77,7 +98,8 @@
             }
             var data = {
                 qty: $('#txtQuantity').val(),
-                sparesid: $('#Lubes').val()
+                sparesid: $('#Lubes').val(),
+                poNumber: $('#txtPONumber').val()
             }
             $.ajax({
                 type: "Post",
@@ -103,11 +125,7 @@
             return true;
         });
     });
-    $(function () {
-        $("#txtQuantity").keyup(function () {
-            this.value = this.value.replace(/[^0-9\.]/g, '');
-        });
-    });
+   
     function Validations() {
         var billNumber = $('#txtBillNumber').val();
         if (billNumber === "") {
@@ -163,7 +181,7 @@
 
             var unitPrice = $("#txtunitprice").val();
             var quantity = $("#txtQuantity").val();
-            var amount = parseInt(unitPrice) * parseInt(quantity);
+            var amount = Math.round(parseFloat(unitPrice) * parseFloat(quantity));
             $("#lblAmount").text(amount);
 
         });
@@ -241,7 +259,7 @@
                 dataType: "json",
                 success: function (response) {
                     if (response != 0) {
-                        $('#txtunitprice').val(response.Cost);
+                        $('#txtunitprice').val(response);
                         $('#lblLubricantNumber').text(response.LubricantNumber);
                     }
 
@@ -327,7 +345,7 @@
                 var res = JSON.stringify(response);
                 if (res.length > 0) {
 
-                    var $table = $('<table id=tbl/>');
+                    var $table = $('<table id=tbl />');
 
                     $table.append('<thead><tr><th>Lubricant</th><th>Lubricant Number</th><th>PO Quantity</th><th>Received Quantity</th><th>Pending Quantity</th><th>Last Received Date</th></tr></thead>');
 
@@ -345,7 +363,7 @@
 
                         $row.append($('<td/>').html(response[i].PoQuantity));
 
-                        $row.append($('<td/>').html(response[i].ReceivedQuantity));
+                        $row.append($('<td/>').html(response[i].LubesReceivedQuantity));
                         $row.append($('<td />').html(response[i].PendingQuantity));
                         $row.append($('<td />').html(response[i].GetLastReceivedDate));
                         $tbody.append($row);
@@ -370,13 +388,33 @@
 
     $(function() {
         $('#txtBillDate,#txtPODate,#txtLastReceivedDate').datepicker({
-            dateFormat: "dd/M/yy",
+            dateFormat: "dd-mm-yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
+
         });
     });
+    $(function () {
+        $('#txtBillDate').blur(function () {
+            if ($('#txtPODate').val() == '') {
+                alert('Please Enter PO Number');
+                $(this).val('');
+                return false;
+            }
+            else {
+                var billdate = $('#txtBillDate').val();
+                var podate = $('#txtPODate').val();
+                if (new Date(billdate) < new Date(podate)) {
+                    alert("Bill Date should be greater than P.O Date.");
+                    $('#txtBillDate').val('');
+                    return false;
+                }
 
+            }
+        });
+    });
     $(function () {
         var orderItems = [];
         $('#btnAdd').click(function () {
@@ -397,7 +435,7 @@
                 LubricantId: $('#Lubes').val(),
                 LubricantName: $('#Lubes option:selected').text(),
                 UnitPrice: $('#txtunitprice').val().trim(),
-                Quantity: $('#txtQuantity').val().trim(),
+                LubesQty: $('#txtQuantity').val().trim(),
                 Amount: $('#lblAmount').text()
             });
 
@@ -432,7 +470,7 @@
 
                     $row.append($('<td/>').html(val.UnitPrice));
 
-                    $row.append($('<td/>').html(val.Quantity));
+                    $row.append($('<td/>').html(val.LubesQty));
                     $row.append($('<td class=amt/>').html(val.Amount));
                     var $remove = $('<a href="#">Remove</a>');
                     $remove.click(function (e) {
@@ -488,6 +526,8 @@
                     if (response !== 0) {
                         alert('Record Inserted');
                         location.reload();
+                    } else {
+                        alert('Failed to insert the record');
                     }
 
                 },
@@ -509,7 +549,7 @@
     <div class="panel-body">
         <div class="col-lg-6">
             <form class="form-horizontal">
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="control-label col-lg-4">Bill Number</label>
                     <div class="col-lg-8">
                         @*@Html.TextBoxFor(x => x.EmployeeName, new { @class = "form-control", placeholder = "Name",id="txtEmployeeName" })*@
@@ -517,7 +557,7 @@
                         @*@Html.ValidationMessageFor(m => m.EmployeeName, "", new { @class = "text-danger" })*@
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="control-label col-lg-4">Bill Date</label>
                     <div class="col-lg-8">
                         <input type="text" class="form-control" id="txtBillDate" onkeypress="return false;" placeholder="Bill Date">
@@ -528,7 +568,7 @@
         </div>
         <div class="col-lg-6">
             <form class="form-horizontal">
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="control-label  col-lg-4">Vendor</label>
                     <div class="col-lg-8">
                         @Html.DropDownList("Vendor", ViewBag.Vendors as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
@@ -548,7 +588,7 @@
                         <input type="text" class="form-control" id="txtPODate" placeholder="P.O Date">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="control-label col-lg-4" style="margin-left:-500px;margin-top:-50px">P.O Number</label>
                     <div class="col-lg-8">
                         <input type="text" style="margin-left:-670px ;margin-top:-50px" class="form-control" id="txtPONumber" placeholder="P.O Number">
@@ -572,14 +612,14 @@
             <div class="panel-body">
                 <div class="col-lg-6">
                     <form class="form-horizontal">
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label class="control-label col-lg-4">Manufacturer</label>
                             <div class="col-lg-8">
                                 @*@Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })*@
                                 <select id="ManufacturerName" class="form-control"> </select>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label class="control-label col-lg-4">Lubricant</label>
                             <div class="col-lg-4">
                                 @Html.DropDownList("Lubes", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new
@@ -600,10 +640,10 @@
                                 <input type="text" class="form-control" style="margin-top:10px;" id="txtunitprice" placeholder="Unit Price" maxlength="12" readonly="readonly">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label class="control-label col-lg-4">Quantity</label>
                             <div class="col-lg-8">
-                                <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity">
+                                <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" @*onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');"*@>
                             </div>
                         </div>
                         

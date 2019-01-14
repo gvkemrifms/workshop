@@ -1,7 +1,19 @@
 ﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
 <link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    a {
+        color: white;
+        padding: 5px;
+        margin: 10px;
+        font-size: 14px;
+        position: fixed;
+        background-color: blueviolet;
+    }
+</style>
 <h1 style="color: brown" align="center">SparePart Wise Consumption</h1>
-<table class="table" align="center">
+@Html.ActionLink("Back", "SparePartWiseConsumption", new { id = 1 })
+<br/>
+<table class="table" align="center" style="width:90%">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Id)
@@ -39,7 +51,7 @@
                 @Html.DisplayFor(modelItem => item.Sparepart)
             </td>
             <td>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @Html.DisplayNameFor(model => model.Quantityy)
             </td>
        
             <td>
@@ -51,4 +63,4 @@
 
 </table>
 <br/>
-@Html.ActionLink("Back", "SparePartWiseConsumption",new {id=1})
+

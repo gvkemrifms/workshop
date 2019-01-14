@@ -224,6 +224,7 @@
     <Compile Include="Models\ReportsModel.cs" />
     <Compile Include="Models\ScrapBinModel.cs" />
     <Compile Include="Models\SparePartsModel.cs" />
+    <Compile Include="Models\SS.cs" />
     <Compile Include="Models\VehicleModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -243,12 +244,17 @@
     <Content Include="Content\css\Site.css" />
     <Content Include="Content\Images\gvk.png" />
     <Content Include="Content\Images\GVK_Group.png" />
+    <Content Include="Content\jquery.datetimepicker.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\GVK_Group.png" />
+    <Content Include="Images\jquery.datetimepicker.css" />
+    <Content Include="Images\jquery.datetimepicker.js" />
+    <Content Include="Images\jquery.simple-dtpicker.css" />
+    <Content Include="Images\jquery.simple-dtpicker.js" />
     <Content Include="Images\print.png" />
     <Content Include="Images\Prints.jpg" />
     <Content Include="Rotativa\help-wkhtmltoimage.txt" />
@@ -258,8 +264,12 @@
     <Content Include="ScriptsCss\Bindings.css" />
     <Content Include="ScriptsCss\bootstrap.min.css" />
     <Content Include="ScriptsCss\bootstrap.min.js" />
+    <Content Include="ScriptsCss\combodate.js" />
     <Content Include="ScriptsCss\font-awesome.min.css" />
+    <Content Include="ScriptsCss\jquery.datetimepicker.css" />
     <Content Include="ScriptsCss\jquery.min.js" />
+    <Content Include="ScriptsCss\jquery.simple-dtpicker.css" />
+    <Content Include="ScriptsCss\jquery.simple-dtpicker.js" />
     <Content Include="ScriptsCss\metisMenu.min.css" />
     <Content Include="ScriptsCss\metisMenu.min.js" />
     <Content Include="ScriptsCss\sb-admin-2.js" />
@@ -293,6 +303,8 @@
     <Content Include="Scripts\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
     <Content Include="Scripts\jquery.ajax-combobox.min.js" />
+    <Content Include="Scripts\jquery.datetimepicker.js" />
+    <Content Include="Scripts\jquery.table2excel.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -304,6 +316,8 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\select2.full.min.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\tableexport.css" />
+    <Content Include="Scripts\tableexport.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -421,6 +435,23 @@
     <Content Include="Views\Reports\IssuedLubricantReport.cshtml" />
     <Content Include="Views\Reports\VehicleAndSparepartWiseReport.cshtml" />
     <Content Include="Views\Reports\VehicleAndLubricantWiseReport.cshtml" />
+    <Content Include="Views\Inventory\PendingPOApprovals.cshtml" />
+    <Content Include="Views\Inventory\GetApprovalList.cshtml" />
+    <Content Include="Views\Inventory\GetApprovalLists.cshtml" />
+    <Content Include="Views\Inventory\GetApprovalLists1.cshtml" />
+    <Content Include="Views\Inventory\RejectedPOs.cshtml" />
+    <Content Include="Views\Inventory\GetRejectedList.cshtml" />
+    <Content Include="Views\Inventory\SparePartsMaster.cshtml" />
+    <Content Include="Views\Inventory\GetSparesPOListDetails.cshtml" />
+    <Content Include="Views\Inventory\EditPurchaseOrderSparesDetaiList.cshtml" />
+    <Content Include="Views\Inventory\GetLubesPOListDetails.cshtml" />
+    <Content Include="Views\Inventory\EditPurchaseOrderLubesDetaiList.cshtml" />
+    <Content Include="Views\Reports\GetVehicleWiseScheduledServiceReport.cshtml" />
+    <Content Include="Views\Reports\_GetVehicleWiseScheduledServiceReport.cshtml" />
+    <Content Include="Views\Reports\GetVehicleWiseSSReport.cshtml" />
+    <Content Include="Views\Reports\GetVehicleWiseLubesConsumptionReport.cshtml" />
+    <Content Include="Views\Vehicle\_GetPrintJobCardDetails.cshtml" />
+    <Content Include="Views\Employee\GetVendorDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

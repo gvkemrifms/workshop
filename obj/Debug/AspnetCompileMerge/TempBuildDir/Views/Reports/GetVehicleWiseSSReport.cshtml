@@ -1,0 +1,135 @@
+﻿<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    #tbl {
+        width: 100%;
+        border: 3px solid #fff;
+        box-sizing: border-box; /* causes item size to include border and padding */
+        -moz-box-sizing: border-box; /*for browser compatibility*/
+    }
+
+    table th tr {
+        align-content: center;
+    }
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+</style>
+<script>
+    $(function () {
+        $('#txtStartDate,#txtEndDate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0",
+            maxDate:0
+        });
+    });
+    $(function() {
+        $('#btn').click(function () {
+            var data = {
+                startDate: $('#txtStartDate').val(),
+                endDate: $('#txtEndDate').val(),
+                vehicleNumber: $('#Vehicles option:selected').text()
+            }
+            $.ajax({
+                type: "Post",
+                url: '/workshop/Reports/VehicleWiseSSReport',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.length > 0) {
+                        generateDetailsList(response);
+                    } else {
+                        alert('No Data');
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+
+            });
+            return false;
+        });
+
+    });
+
+    function generateDetailsList(response) {
+        var eTable =
+            "<table id=tbl><thead><tr><th >Id</th><th>Vehicle Number</th><th>Quantity</th><th>Unit Price</th><th>Total Amount</th><th>Issued Date</th><th>SparePart</th><th>District</th><th>Project</th></tr></thead><tbody>";
+        for (var i = 0; i < response.length; i++) {
+
+                eTable += "<tr>";
+                eTable += "<td>" + response[i]['ID'] + "</td>";
+                eTable += "<td>" + response[i]['VEHICLENUMBER'] + "</td>";
+                eTable += "<td>" + response[i]['QUANTITY'] + "</td>";
+                eTable += "<td>" + response[i]['UnitPrice'] + "</td>";
+                eTable += "<td>" + response[i]['TotalAmount'] + "</td>";
+                eTable += "<td>" + response[i]['ISSUEDDATE'] + "</td>";
+                eTable += "<td>" + response[i]['SparePart'] + "</td>";
+                eTable += "<td>" + response[i]['District'] + "</td>";
+                eTable += "<td>" + response[i]['Project'] + "</td>";
+                eTable += "</tr>";
+
+        }
+        eTable += "</tbody></table>";
+        $('#SparesDetails').html(eTable);
+    }
+
+</script>
+
+<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+    <div class="panel-heading">
+        Vehicle Wise Consumption Report(Spare Parts)
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Start Date</label>
+                    <div class="col-lg-8">
+                        @*<select id="Vehicle" class="form-control" > </select>*@
+                        <input type="text" class="form-control" id="txtStartDate" placeholder="Start Date" onkeypress="return false;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">End Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtEndDate" placeholder="EndDate" maxlength="10" onkeypress="return false;">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Vehicles</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("Vehicles", ViewBag.VehiclesReport as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-6" style="margin-left: 400px; margin-top: -30px;">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 10px">
+                    <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white">Submit</button>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+    <br />
+
+</div>
+<div id="SparesDetails" align="center" style="width: 100%"></div>
+

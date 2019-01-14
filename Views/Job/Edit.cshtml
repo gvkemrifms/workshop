@@ -1,14 +1,202 @@
 ﻿@model Fleet_WorkShop.Models.VehicleModel
-<script type="text/javascript">
+@using System.Data
+<style>
+    hr {
+        border-style: solid;
+        border-width: 1px;
+        display: block;
+    }
+</style>
+<style>
+    span.error {
+        color: red;
+        display: block;
+        font-size: 90%;
+        visibility: hidden;
+    }
 
-    $(function() {
-        $('#DateOfRepair').datepicker({
-            dateFormat: "dd/M/yy",
-            changeMonth: true,
-            changeYear: true,
-            yearRange: "-60:+0"
+
+    .container td { vertical-align: top; }
+    .tablecontainer
+    {
+        margin-left:100px;
+   margin-top:10px;
+   margin-bottom:10px;
+    }
+    .tablecontainer table {
+        border-collapse: collapse;
+        border-right: 1px solid #BFAEAE;
+        border-top: 1px solid #BFAEAE;
+        display: block;
+        width: 100%;
+    }
+
+    .tablecontainer th { border-bottom: 2px solid #BFAEAE !important; }
+
+    .tablecontainer th, .tablecontainer td {
+        border-bottom: 1px solid #BFAEAE;
+        border-left: 1px solid #BFAEAE;
+        padding: 5px;
+        text-align: left;
+    }
+    </style>
+<link href="~/ScriptsCss/jquery.simple-dtpicker.css" rel="stylesheet" />
+<script src="~/ScriptsCss/jquery.simple-dtpicker.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#DateOfRepair').appendDtpicker({
+        
+            ////step: 15,
+            ////scrollTime: true,
+            //format: 'DD/MM/YY H:i',
+            ////inline: true
+        });
+    })
+    //$(function() {
+    //    $('#DateOfRepair').datepicker({
+    //        dateFormat: "dd/M/yy",
+    //        changeMonth: true,
+    //        changeYear: true,
+    //        yearRange: "-60:+0"
+    //    });
+    //});
+    $(function () {
+        $('#NatureOfComplaint').change(function () {
+            var serviceUrl = '/workshop/Job/LoadEditCategories';
+            var aggregateId = $(this).val();
+            var data = {
+                AggregateId: aggregateId
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != 0) {
+                        $('#CategoryName').empty();
+                        $('#CategoryName').append('<option value=0 selected="selected">--Select--</option>');
+                        for (var i = 0; i < response.length; i++) {
+
+                            $('#CategoryName').append("<option value='" +
+                                response[i].split('-')[1] +
+                                "' >" +
+                                response[i].split('-')[0] +
+                                "</option>");
+
+                        }
+
+                        $('#CategoryName').prop("disabled", false);
+                    }
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        })
+    })
+
+    $(function () {
+        $('#CategoryName').change(function () {
+            var serviceUrl = '/workshop/Job/LoadEditSubCategories';
+            var categoryId = $(this).val();
+            var data = {
+                CategoryId: categoryId
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != 0) {
+                        $('#SubCategory').empty();
+                        $('#SubCategory').append('<option value=0 selected="selected">--Select--</option>');
+                        for (var i = 0; i < response.length; i++) {
+                            $('#SubCategory').append("<option value='" +
+                                response[i].split('-')[1] +
+                                "' >" +
+                                response[i].split('-')[0] +
+                                "</option>");
+
+                        }
+
+                        $('#SubCategory').prop("disabled", false);
+                    }
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        })
+    })
+    $(document).ready(function () {
+        $("#SubCategory").change(function () {
+            if ($('#SubCategory option:selected').text().toLowerCase() === "--select--") {
+                $('#txtEstimatedCost').val('');
+                return false;
+            }
+            var serviceUrl = '/workshop/Job/GetEstimatedCostDetails';
+            var data = {
+                categoryId: $('#SubCategory').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function (response) {
+
+                    $('#ApproximateCost').val('');
+                    $('#ApproximateCost').val(response);
+                }
+
+            });
+            return true;
         });
     });
+    $(function() {
+        $('#btnEdit').click(function() {
+            var serviceUrl = '/workshop/Job/Edit';
+            var data = {
+                SubCategory: $('#SubCategory').val(),
+                IdCategory: $('#CategoryName').val(),
+                districtId: $('#DistrictId').val(),
+                VehicleId: $('#VehId').val(),
+                Model: $('#ModelYear').val(),
+                Odometer: $('#Odometer').val(),
+                ApproxCost: $('#ApproximateCost').val(),
+                AggregateId: $('#NatureOfComplaint').val(),
+                Dor: $('#DateOfRepair').val()
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+                    if (response > 0) {
+                        alert("Record Inserted");
+                        $('#NatureOfComplaint').prop('selectedIndex', 0);
+                        $('#CategoryName').prop('selectedIndex', 0);
+                        $('#SubCategory').prop('selectedIndex', 0);
+                        window.location.reload(true);
+                    }
+                }
+
+            });
+        });
+    });
+
 </script>
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
@@ -21,60 +209,141 @@
         @Html.AntiForgeryToken()
 
         <div class="form-horizontal">
+        <div class="tablecontainer panel panel-primary" style="height: 20%; width: 70%;">
+            @if (ViewBag.CartItems != null)
 
-            <hr/>
-            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+            {
+            <div class="panel-heading">
+                Items in Cart
+            </div>
+        
+            <div class="panel-body" id="AddedItemsId">
+
+
+                <table>
+
+                    <tr>
+
+                        <th>Id</th>
+
+                        <th>Vehicle</th>
+
+                        <th>Model</th>
+                        <th>Aggregates</th>
+                        <th>Categories</th>
+                        <th>Sub Categories</th>
+                    </tr>
+
+                    @*@if (ViewBag.CartItems != null)
+
+                    {*@
+                    @foreach (DataRow dr in (ViewBag.CartItems as DataTable).Rows)
+
+                    {
+                    <tr>
+
+                        <td>
+
+                            @dr["JobCardNumber"]
+
+                        </td>
+
+                        <td>
+
+                            @dr["vehicleNumber"]
+
+                        </td>
+
+                        <td>
+
+                            @dr["Model"]
+
+                        </td>
+                        <td>
+
+                            @dr["Aggregates"]
+
+                        </td>
+
+                        <td>
+
+                            @dr["Categories"]
+
+                        </td>
+                        <td>
+
+                            @dr["SubCategories"]
+
+                        </td>
+                        <td>
+                            @Ajax.ActionLink("Remove", "DeleteFromJobCard", new {id = dr["JobCardNumber"], vehicleId = dr["VehicleId"]}, new AjaxOptions {HttpMethod = "Delete", Confirm = "Are you sure you want to delete this Record?", OnComplete = "function() { $(this).parent().parent().remove() }", OnSuccess = "onSuccess"})
+
+                        </td>
+                    </tr>
+                    }
+                    @*}*@
+
+                </table>
+
+
+            </div>
+        }
+            else
+            {
+                <script>
+                    alert('Either Job card is completed (OR) It could be SS');
+                    window.location = '/workshop/job/SaveJobCardDetails';
+                </script>
+            }
+        </div>
+
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             @Html.HiddenFor(model => model.Id)
 
             <div class="col-lg-6">
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.District, new {@class = "control-label col-md-2", style = "margin-left:40px"})
+                    @Html.LabelFor(model => model.District, new { @class = "control-label col-md-2", style = "margin-left:40px" })
                     <div class="col-md-8">
                         @foreach (var districtName in Model.District)
                         {
                             if (districtName.Text == Model.DistrictName)
                             {
                                 Model.DistrictId = Convert.ToInt32(districtName.Value);
-                                @Html.DropDownListFor(model => model.DistrictId, Model.District, "--Select--", new {@class = "form-control", style = "margin-left:10px"})
-                                @Html.ValidationMessageFor(model => model.DistrictId, "", new {@class = "text-danger"})
+                                @Html.DropDownListFor(model => model.DistrictId, Model.District, "--Select--", new { @class = "form-control", style = "margin-left:10px", @readonly = true, @disabled = true })
+                                @Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
                             }
                         }
                     </div>
                 </div>
                 <div class="form-group">
 
-                    @Html.LabelFor(model => model.Vehicle, new {@class = "control-label col-md-2", style = "margin-left:40px"})
+                    @Html.LabelFor(model => model.Vehicle, new { @class = "control-label col-md-2", style = "margin-left:40px" })
                     <div class="col-md-8">
-                        @Html.DropDownListFor(model => model.VehId, Model.Vehicle, "--Select--", new {@class = "form-control", style = "margin-left:10px"})
-                        @Html.ValidationMessageFor(model => model.ManufacturerId, "", new {@class = "text-danger"})
+                        @Html.DropDownListFor(model => model.VehId, Model.Vehicle, "--Select--", new { @class = "form-control", style = "margin-left:10px", @readonly = true, @disabled = true })
+                        @Html.ValidationMessageFor(model => model.ManufacturerId, "", new { @class = "text-danger" })
 
 
                     </div>
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => model.NatureOfComplaint, new {@class = "control-label col-md-4", Style = "margin-left:-20px"})
-                    <div class="col-md-8">
-                        @Html.DropDownListFor(model => model.NatureOfComplaint, Model.ComplaintsNature, "--Select--", new {@class = "form-control", Style = "margin-left:-45px"})
 
-                    </div>
-                </div>
             </div>
             <div class="col-lg-6">
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.DateOfRepair, new {@class = "control-label col-md-4", Style = "margin-left:-20px"})
+                    @Html.LabelFor(model => model.DateOfRepair, new { @class = "control-label col-md-4", Style = "margin-left:-20px" })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.DateOfRepair, new {htmlAttributes = new {@class = "form-control", Style = "margin-left:-20px"}})
+                        @Html.EditorFor(model => model.DateOfRepair, new { htmlAttributes = new { @class = "form-control", Style = "margin-left:-20px" } })
 
                     </div>
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.ModelYear, new {@class = "control-label col-md-4", Style = "margin-left:-20px"})
+                    @Html.LabelFor(model => model.ModelYear, new { @class = "control-label col-md-4", Style = "margin-left:-20px" })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.ModelYear, new {htmlAttributes = new {@class = "form-control", Style = "margin-left:-20px"}})
-                        @Html.ValidationMessageFor(model => model.ModelYear, "", new {@class = "text-danger"})
+                        @Html.EditorFor(model => model.ModelYear, new { htmlAttributes = new { @class = "form-control", Style = "margin-left:-20px", @readonly = true, @disabled = true } })
+                        @Html.ValidationMessageFor(model => model.ModelYear, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
@@ -83,34 +352,84 @@
             <div class="col-lg-6" style="margin-left: -30px">
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.Odometer, new {@class = "control-label col-md-4"})
+                    @Html.LabelFor(model => model.Odometer, new { @class = "control-label col-md-4" })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.Odometer, new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.Odometer, "", new {@class = "text-danger"})
+                        @Html.EditorFor(model => model.Odometer, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Odometer, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.ApproximateCost, new {@class = "control-label col-md-4"})
+                    @Html.LabelFor(model => model.NatureOfComplaint, new { @class = "control-label col-md-4" })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.ApproximateCost, new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.ApproximateCost, "", new {@class = "text-danger"})
+                        @Html.DropDownListFor(model => model.NatureOfComplaint, Model.ComplaintsNature, "--Select--", new { @class = "form-control" })
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-lg-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ApproximateCost, new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.ApproximateCost, new { htmlAttributes = new { @class = "form-control", @readonly = true, @disabled = true } })
+                        @Html.ValidationMessageFor(model => model.ApproximateCost, "", new { @class = "text-danger" })
                     </div>
 
 
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-10" style="margin-left: -60px; margin-top: 20px;">
-                    <input type="submit" id="btnEdit" style="background-color: blue; color: white; width: 100px" value="Save" class="btn btn-default"/>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CategoryName, new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.DropDownList("CategoryName", ViewBag.Categories as IEnumerable<SelectListItem>, "--Select--", new
+                   {
+                       @class = "form-control",
+                       disabled = true,
+                   })
+
+                    </div>
                 </div>
             </div>
+            <div class="col-lg-6" style="margin-left:-25px;">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SubCategory, new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.DropDownList("SubCategory", ViewBag.SubCategories as IEnumerable<SelectListItem>, "--Select--", new
+                   {
+                       @class = "form-control",
+                       disabled = true
 
+                   })
 
+                    </div>
+                </div>
+             
+            </div>
+        <br />
+            <hr />
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10" style="margin-left: 150px;">
+                    <input type="submit" id="btnEdit" style="background-color: blue; color: white; width: 100px" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+         
+            
         </div>
     }
+
 </div>
+<script>
+    function onSuccess(result) {
+        if (result > 0) {
+            alert("Deleted");
+            window.location.reload(true);
+        }
+
+    }
+</script>
 <div>
     @Html.ActionLink("Back", "GetJobCardDetails")
 </div>

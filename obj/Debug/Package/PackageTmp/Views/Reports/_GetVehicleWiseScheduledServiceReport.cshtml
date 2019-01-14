@@ -1,0 +1,128 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleReport>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/jquery.table2excel.js"></script>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    a {
+        color: white;
+        padding: 5px;
+        margin: 10px;
+        font-size: 14px;
+        position: fixed;
+        background-color: blueviolet;
+    }
+</style>
+<script>
+    $(function() {
+        $('#btn').click(function () {
+            $(".table").table2excel({
+                exclude: ".noExl",
+                name: "SS",
+                filename: "SS" //do not include extension
+
+            });
+        })
+    })
+   
+</script>
+<h1 style="color: brown;" align="center"><u>Vehicle Wise Scheduled Service Report</u></h1>
+<button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white">Export</button>
+
+@Html.ActionLink("Back", "GetVehicleWiseScheduledServiceReport", new { id = 1 })
+<br />
+<table class="table" align="center" style="width: 90%">
+    <tr>
+        <th>
+            ID
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.District)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Workshop)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Vehicle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Project)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.VehicleLocation)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateOfRepair)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.DateOfDelivery)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Odometer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalCompletionTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DistanceTravelled)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ScheduledService)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OffroadId)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobcardId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.District)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Workshop)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vehicle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VehicleLocation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfRepair)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfDelivery)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Odometer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalCompletionTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DistanceTravelled)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ScheduledService)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OffroadId)
+            </td>
+
+        </tr>
+    }
+
+</table>
+<div id="aligned">
+
+</div>

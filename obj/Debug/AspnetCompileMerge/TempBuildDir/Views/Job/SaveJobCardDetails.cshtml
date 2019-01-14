@@ -1,0 +1,1316 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.VehicleModel>
+<style>
+    #tbl {
+        align: left;
+        height: 100px;
+        width: 70%;
+    }
+    .form-group.required .control-label:after {
+        content: "*";
+        color: red;
+    }
+</style>
+<script src="~/ScriptsCss/combodate.js"></script>
+<script src="~/Scripts/jquery.datetimepicker.js"></script>
+<link href="~/ScriptsCss/jquery.datetimepicker.css" rel="stylesheet"/>
+<script type="text/javascript">
+
+    $(function() {
+        $('#MaintenanceType').prop('selectedIndex', 1);
+        $('#txtDateOfDelivery').prop('disabled', true);
+        $('#btnss').hide();
+    });
+    $(function() {
+        $('#MaintenanceType').change(function() {
+
+
+            if ($(this).prop('selectedIndex') === 0) {
+                alert('Please select different Option');
+                $(this).prop('selectedIndex', 1);
+            }
+            if ($(this).prop('selectedIndex') === 1 || $(this).prop('selectedIndex') === 3) {
+                $('#btnss').hide();
+                $('#txtEstimatedCost').prop('readonly', true);
+            } else {
+                $('#btnss').show();
+                $('#txtEstimatedCost').prop('readonly', false);
+            }
+            if ($(this).prop('selectedIndex') === 1) {
+                $('#btn,#btnAddtest').show();
+           
+            }
+            if ($(this).prop('selectedIndex') === 3 || $(this).prop('selectedIndex') === 2) {
+                $('#SS').prop('disabled', false);
+                if ($(this).prop('selectedIndex') === 2) {                    
+                    $('#ManufacturerName').prop('selectedIndex', 0);
+                    $('#txtNatureOfComplaint,#txtCategory,#SubCategory').prop('selectedIndex', 0);
+                    $('#txtNatureOfComplaint,#txtCategory,#SubCategory').prop('disabled', true);
+                    $('#txtNatureOfComplaint,#txtCategory,#SubCategory').attr('placeholder', 'Disabled');
+                    $('#orderItems').empty();
+                    $('#txtEstimatedCost').prop('disabled', false);
+                    $('#txtEstimatedCost').prop('readonly', false);
+                    $('#btnAddtest').prop('disabled', true);
+                    $('#btn,#btnAddtest').hide();
+
+                } else {
+                    $('#txtNatureOfComplaint,#txtCategory,#SubCategory').prop('disabled', false);
+                    $('#txtNatureOfComplaint,#txtCategory,#SubCategory').attr('placeholder').remove();
+                    $('#txtEstimatedCost').prop('disabled', true);
+                    $('#txtEstimatedCost').prop('readonly', true);
+                    $('#btn,#btnAddtest').show();
+                }
+
+            } else {
+                $('#SS').prop('disabled', true);
+                $('#SS').prop('selectedIndex', 0);
+            }
+
+
+        });
+    });
+
+
+    $(function() {
+        $('#txtoffroad').blur(function() {
+            if ($(this).text() === '') {
+                $('#lbloffroaddate').text('');
+                $('#lblodo').text('');
+            }
+            if ($('#District').prop('selectedIndex') == 0) {
+                alert('Please select District and Vehicle');
+                $('#txtoffroad').val('');
+                return false;
+            }
+            if ($('#txtOdo').val() === '') {
+                alert('Please select Current Odo');
+                $('#txtoffroad').val('');
+                $('#txtOdo').focus();
+                return false;
+            }
+            if ($('#Vehicle').prop('selectedIndex') !== 0) {
+                var serviceUrl = '';
+                var offload = $(this).val();
+                var project = $('#lblproject').text();
+                switch (project) {
+                case '102':
+
+                    serviceUrl = '/workshop/Job/GetOffroadVehicleDetails102';
+                    break;
+                default:
+                    alert(project);
+                    serviceUrl = '/workshop/Job/GetOffroadVehicleDetailsALS108';
+                    break;
+                }
+                var data = {
+                    offroadid: offload
+                };
+                alert(JSON.stringify(data));
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response !== 0) {
+                            var data = $.parseJSON(response);
+                            var odo = "";
+                            var offroaddate = "";
+                            for (var i = 0; i < data.Vehicles_emri.length; i++) {
+                                odo += data.Vehicles_emri[i].Odometer;
+                                offroaddate += data.Vehicles_emri[i].OffRoadDate;
+                            }
+                            $('#lbloffroaddate').text(offroaddate);
+                            $('#lblodo').text(odo);
+                            var curOdo = $('#txtOdo').val();
+                            var distanceTraveled = parseInt(curOdo) - parseInt(odo);
+                            //$('#lblDistance').text(distanceTraveled);
+                            if (parseInt(distanceTraveled) <= 0) {
+                                $('#lblDistance').text(0);
+                                $('#txtOdo').val('');
+                                $('#txtOdo').focus();
+                                alert('Distance Travelled should be greater than 0 KM');
+                                $('#txtoffroad').val('');
+                                return false;
+                            } else {
+                                $('#lblDistance').text(distanceTraveled);
+                            }
+                        }
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+                    }
+                });
+            } else {
+                alert('Please select Vehicle');
+                $('#txtoffroad').val('');
+                return false;
+            }
+        });
+    });
+
+
+    $(function() {
+        $('#txtpilotid').blur(function() {
+            var pilotIdd = $(this).val();
+            var serviceUrl = '/workshop/Job/CheckPilotId';
+            var data = {
+                PilotId: pilotIdd
+            };
+
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response <= 0) {
+                        alert('Specified Pilot Id does not exist');
+                        $('#txtpilotid').val('');
+                    }
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+
+        });
+    });
+    $(function() {
+        $('#txtDor').datetimepicker({
+            format: "d/M/Y H:i",
+            step: 15,
+            minDate: 0,
+            maxDate: 0,
+            addSliderAccess: true,
+            sliderAccessArgs: { touchonly: false }
+
+        });
+    });
+
+    $(function() {
+
+
+        $('#txtDor').blur(function() {
+            var dor = $(this).val();
+            if (dor !== '') {
+                $('#txtDateOfDelivery').prop('disabled', false);
+
+            } else {
+                $('#txtDateOfDelivery').prop('disabled', true);
+            }
+
+        });
+        //$('#txtOdoEnd').blur(function() {
+        //    var currentOdo = $('#txtOdo').val();
+        //    var endingOdo = $('#txtOdoEnd').val();
+        //    if (currentOdo !== '' && endingOdo !== '') {
+        //        if (parseInt(currentOdo) > parseInt(endingOdo)) {
+        //            alert('Current Odo should not be greater than end Odo');
+        //            $('#txtOdoEnd').val('');
+        //            $('#btnAddtest,#btnss').prop('disabled', true);
+        //            return false;
+        //        } else {
+        //            $('#btnAddtest,#btnss').prop('disabled', false);
+        //        }
+        //    }
+        //    return true;
+        //});
+    });
+    $(function() {
+
+        $('#txtDateOfDelivery').datetimepicker({
+            format: "d/M/Y H:i",
+            step: 10,
+            minDate: 0,
+            //maxDate: '+1970/01/08',
+            addSliderAccess: true,
+            sliderAccessArgs: { touchonly: false }
+            //"minDate": getMinDate(),
+            //"maxDate":new Date()
+        });
+    });
+
+
+    function getMinDate() {
+        var minDate = new Date(); //alert(minDate.getDate() - (7));    
+        minDate.setDate(minDate.getDate() - (7));
+    }
+
+    //$(function() {
+    //    $('#MaintenanceType').change(function() {
+    //        if ($(this).prop('selectedIndex') === 3) {
+
+    //            if ($('#SS option:selected').text() === '--Select--') {
+    //                $('#btnAddtest').prop('disabled', true);
+    //            }
+    //        }
+
+    //    });
+
+
+    //});
+    $(function() {
+        $(
+                '#SubCategory,#AllotedMechanic,#ServiceEngineer,#txtDateOfDelivery,#District,#Vehicle,#txtDor,#txtOdo,#txtpilotid,#txtEstimatedCost,#MaintenanceType,#SS,#txtVehicleRecivedLoc,#txtNatureOfComplaint,#txtCategory')
+            .blur(function() {
+                if ($('#MaintenanceType').prop('selectedIndex') !== 2) {
+                    if ($('#District').prop('selectedIndex') !== 0 &&
+                        $('#Vehicle').prop('selectedIndex') !== 0 &&
+                        $('#txtDor').val() !== '' &&
+                        $('#txtOdo').val() !== '' &&
+                        $('#txtpilotid').val() !== '' &&
+                        $('#SubCategory').prop('selectedIndex') !== 0 &&
+                        $('#ServiceEngineer').prop('selectedIndex') !== 0 &&
+                        $('#AllotedMechanic').prop('selectedIndex') !== 0 &&
+                        $('#txtDateOfDelivery').val() !== '' &&
+                        $('#MaintenanceType').prop('selectedIndex') !== 0 &&
+                        $('#txtVehicleRecivedLoc').val() !== '' &&
+                        $('#txtNatureOfComplaint').prop('selectedIndex') !== 0 &&
+                        $('#txtCategory').prop('selectedIndex') !== 0 )
+                   
+                    {
+
+                        $('#btnAddtest').prop('disabled', false);
+                    } else {
+                        $('#btnAddtest').prop('disabled', true);
+                    }
+                } else {
+                    if ($('#District').prop('selectedIndex') !== 0 &&
+                        $('#Vehicle').prop('selectedIndex') !== 0 &&
+                        $('#txtDor').val() !== '' &&
+                        $('#txtOdo').val() !== '' &&
+                        $('#txtpilotid').val() !== '' &&
+                        $('#ServiceEngineer').prop('selectedIndex') !== 0 &&
+                        $('#AllotedMechanic').prop('selectedIndex') !== 0 &&
+                        $('#txtDateOfDelivery').val() !== '' &&
+                        $('#MaintenanceType').prop('selectedIndex') !== 0 &&
+                        $('#txtVehicleRecivedLoc').val() !== '' &&
+                        $('#txtEstimatedCost').val() !== '' &&
+                        $('#SS').prop('selectedIndex') !== 0) {
+
+                        $('#btnss').prop('disabled', false);
+                    } else {
+                        $('#btnss').prop('disabled', true);
+                    }
+                }
+            });
+
+    });
+    $(function() {
+        var orderItems = [];
+        $('#btnAddtest').click(function() {
+            var maintenance = $('#MaintenanceType option:selected').text();
+            var ss = $('#SS option:selected').text();
+
+            if (maintenance === 'Both' && ss === '--Select--') {
+
+                alert('Please select Scheduled Service');
+                $('#btn').prop('disabled', true);
+                return false;
+            } else {
+                orderItems.push({
+                    VehicleNumberString: $('#Vehicle option:selected').text(),
+                    Category: $('#txtCategory option:selected').text(),
+                    CategoryIdd: $('#txtCategory option:selected').val(),
+                    SubCategoryName: $('#SubCategory option:selected').text(),
+                    SubCategory: $('#SubCategory option:selected').val(),
+                    EstimatedCost: $('#txtEstimatedCost').val(),
+                    DistrictId: $('#District').val(),
+                    VehId: $('#Vehicle option:selected').val(),
+                    ModelNumber: $('#txtModel').val(),
+                    DateOfRepair: $('#txtDor').val(),
+                    Odometer: $('#txtOdo').val(),
+                    PilotName: $('#txtPilotName').val(),
+                    PilotId: $('#txtpilotid').val(),
+                    ApproximateCost: $('#txtEstimatedCost').val(),
+                    NatureOfComplaint: $('#txtNatureOfComplaint').val(),
+                    DateOfDelivery: $('#txtDateOfDelivery').val(),
+                    ReceivedLocation: $('#txtVehicleRecivedLoc').val(),
+                    AllotedMechanic: $('#AllotedMechanic option:selected').val(),
+                    ServiceEngineer: $('#ServiceEngineer option:selected').val(),
+                    Aggregates: $('#txtNatureOfComplaint option:selected').text(),
+                    SubCat: $('#SubCategory option:selected').val(),
+                    SubCatName: $('#SubCategory option:selected').text(),
+                    ManufacturerId: $('#Manufacturer option:selected').val()
+                });
+                if ($('#District').prop('selectedIndex') === 0 ||
+                    $('#Vehicle').prop('selectedIndex') === 0 ||
+                    $('#txtDor').val() === '' ||
+                    $('#txtOdo').val() === '' ||
+                    $('#txtpilotid').val() === '' ||
+                    $('#SubCategory').prop('selectedIndex') === 0 ||
+                    $('#txtEstimatedCost').val() === '' ||
+                    $('#ServiceEngineer').prop('selectedIndex') === 0 ||
+                    $('#AllotedMechanic').prop('selectedIndex') === 0) {
+                    alert("Please Add Aggregates/Categories/Sub Categories");
+                    $("#btn").prop("disabled", true);
+
+                    return false;
+                } else {
+                    generatedItemsTable();
+                    $("#Manufacturer option").filter(":selected").siblings('option').prop('disabled', true);
+                    $('#SubCategory option:selected').prop('disabled', true);
+                    $('#SubCategory').prop('selectedIndex', 0);
+                    $('#txtCategory').prop('selectedIndex', 0);
+                    $('#txtNatureOfComplaint').prop('selectedIndex', 0);
+                    $('#SubCategory').prop('disabled', true);
+                    $('#txtCategory').prop('disabled', true);
+                    $('#txtNatureOfComplaint').prop('disabled', true);
+                    $('#txtEstimatedCost').val('0');
+                    $('#txtEstimatedCost').prop('disabled', true);
+                    $("#btn").prop("disabled", false);
+                    $('#btnAddtest').prop("disabled", true);
+                    $('#Manufacturer').prop('selectedIndex', 0);
+
+                    return false;
+                }
+            }
+        });
+
+        function generatedItemsTable() {
+
+            var $table = $('<table id=tbl/>');
+
+            $table.append(
+                '<thead><tr><th>Aggregates</th><th>Category</th><th>Sub Category</th><th>Cost</th></tr></thead>');
+
+            var $tbody = $('<tbody/>');
+            $.each(orderItems,
+                function(i, val) {
+
+                    var $row = $('<tr/>');
+
+                    $row.append($('<td/>').html(val.Aggregates));
+                    $row.append($('<td/>').html(val.Category));
+                    $row.append($('<td/>').html(val.SubCategoryName));
+
+                    $row.append($('<td/>').html(val.EstimatedCost));
+
+                    var $remove = $('<a href="#">Remove</a>');
+                    $remove.click(function(e) {
+                        e.preventDefault();
+                        orderItems.splice(i, 1);
+                        if (i === 0) {
+                            $("#Manufacturer option").filter(":selected").siblings('option').prop('disabled', false);
+                            $('#SubCategory option:selected').prop('disabled', false);
+                            $("#btn").prop("disabled", true);
+                        }
+                        generatedItemsTable();
+                    });
+                    $row.append($('<td/>').html($remove));
+                    $tbody.append($row);
+
+                });
+
+            $table.append($tbody);
+
+            $('#orderItems').html($table);
+        }
+
+
+        $('#btn').click(function() {
+            if ($('#District').prop('selectedIndex') !== 0 &&
+                $('#Vehicle').prop('selectedIndex') !== 0 &&
+                $('#txtDor').val() !== '' &&
+                $('#txtOdo').val() !== '' &&
+                $('#txtpilotid').val() !== '' &&
+                $('#ServiceEngineer').prop('selectedIndex') !== 0 &&
+                $('#AllotedMechanic').prop('selectedIndex') !== 0) {
+                var maintenance = $('#MaintenanceType option:selected').text();
+                var maintenanceId = $('#MaintenanceType option:selected').val();
+                var ssId = $('#SS option:selected').val();
+                var ss = $('#SS option:selected').text();
+                if (maintenance !== 'Both' || ss !== '--Select--') {
+                    var vehicleNumber = $('#Vehicle option:selected').text();
+
+                    var helperIdd = $('#Helper option:selected').val();
+                    var offroadid = $('#txtoffroad').val();
+                    var distancetravelled = $('#lblDistance').text();
+                    var serviceUrl = '/workshop/Job/SaveJobCardDetails';
+                    var data = {
+                        jobcarditems: orderItems,
+                        vehicleNumber: vehicleNumber,
+                        helperId: helperIdd,
+                        distanceTravelled: distancetravelled,
+                        MaintenanceId: maintenanceId,
+                        SSId: ssId,
+                        OffroadId: offroadid
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        url: serviceUrl,
+                        data: JSON.stringify(data),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(response) {
+                            if (response !== 0) {
+                                alert('Record Inserted');
+                                location.reload();
+                            } else {
+                                alert('Failed to insert record.Please check the Validations');
+                                return false;
+                            }
+                        },
+                        failure: function(response) {
+                            alert(response.responseText);
+                        }
+                    });
+                } else {
+                    alert('Please select Scheduled Service');
+                    return false;
+                }
+            } else {
+                alert('Please select all required fields');
+                return false;
+            }
+
+        });
+    });
+
+    $(function() {
+        $('#btnss').click(function() {
+            if ($('#District').prop('selectedIndex') !== 0 &&
+                $('#Vehicle').prop('selectedIndex') !== 0 &&
+                $('#txtDor').val() !== '' &&
+                $('#txtOdo').val() !== '' &&
+                $('#txtpilotid').val() !== '' &&
+                $('#ServiceEngineer').prop('selectedIndex') !== 0 &&
+                $('#AllotedMechanic').prop('selectedIndex') !== 0) {
+                var maintenance = $('#MaintenanceType option:selected').text();
+                var maintenanceId = $('#MaintenanceType option:selected').val();
+                var ssId = $('#SS option:selected').val();
+                var ss = $('#SS option:selected').text();
+                var offroadid = $('#txtoffroad').val();
+                var vehicleNumber = $('#Vehicle option:selected').text();
+                var helperIdd = $('#Helper option:selected').val();
+                var distancetravelled = $('#lblDistance').text();
+                var serviceUrl = '/workshop/Job/SaveScheduledServiceDetails';
+                var data = {
+                    CategoryId: $('#txtCategory option:selected').val(),
+                    SubCategoryId: $('#SubCategory option:selected').val(),
+                    EstimatedCost: $('#txtEstimatedCost').val(),
+                    DistrictId: $('#District').val(),
+                    VehId: $('#Vehicle option:selected').val(),
+                    ModelNumber: $('#txtModel').val(),
+                    DateOfRepair: $('#txtDor').val(),
+                    Odometer: $('#txtOdo').val(),
+                    PilotId: $('#txtpilotid').val(),
+                    PilotName: $('#txtPilotName').val(),
+                    ApproximateCost: $('#txtEstimatedCost').val(),
+                    AggregateId: $('#txtNatureOfComplaint').val(),
+                    DateOfDelivery: $('#txtDateOfDelivery').val(),
+                    ReceivedLocation: $('#txtVehicleRecivedLoc').val(),
+                    AllotedMechanic: $('#AllotedMechanic option:selected').val(),
+                    ServiceEngineer: $('#ServiceEngineer option:selected').val(),
+                    ManufacturerId: $('#Manufacturer option:selected').val(),
+                    vehicleNumber: vehicleNumber,
+                    helperId: helperIdd,
+                    distanceTravelled: distancetravelled,
+                    MaintenanceId: maintenanceId,
+                    SSId: ssId,
+                    OffroadId: offroadid
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response !== 0) {
+                            alert('Record Inserted');
+                            location.reload();
+                        } else {
+                            alert('Failed to insert record.Please check the Validations');
+                            return false;
+                        }
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+                    }
+                });
+
+            } else {
+                alert('Please select all required fields');
+                return false;
+            }
+
+        });
+    });
+  
+
+    $(function() {
+        $('#txtOdo').blur(function() {
+            var serviceUrl = '/workshop/Job/CheckOdoReading';
+            var data = {
+                Odo: $(this).val(),
+                vehicleid: $('#Vehicle option:selected').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response != null) {
+                        $('#txtOdo').val('');
+                        alert('Odometer reading should be greater than' + " " + response);
+                    }
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+    $(function() {
+
+        var serviceUrl = '/workshop/Job/GetModelNumber';
+        $('#District').change(function() {
+            $('#txtModel').val('');
+        });
+        $("#Vehicle").blur(function() {
+            var data = { vehicleid: $('#Vehicle').val() };
+            if (true) {
+                $.ajax({
+                    url: serviceUrl,
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: 'application/json',
+
+                    success: function(response) {
+                        $('#txtModel').val('');
+                        $('#txtModel').val(response);
+                    }
+
+                });
+            }
+        });
+    });
+
+
+    $(function() {
+
+        var serviceUrl = '/workshop/Job/getDistancelatlong';
+        $("#Vehicle").change(function() {
+            var data = { vehicleid: $('#Vehicle').val() };
+            if (true) {
+                $.ajax({
+                    url: serviceUrl,
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: 'application/json',
+
+                    success: function(response) {
+                        if (response != 0)
+                            //$('#lblDistance').text(response.distance);
+                            $('#lblDistance').text(0);
+                        $('#lblproject').text(response.project);
+                    }
+
+                });
+            }
+        });
+    });
+
+    $(document).ready(function() {
+
+        $("#Vehicle").prop("disabled", true);
+
+        $("#District").change(function() {
+            if ($('#District option:selected').text().toLowerCase() == "--select--") {
+                $('#Vehicle option:selected').text("");
+                $('#Vehicle').prop("disabled", true);
+                $('#lblDistance').text('');
+                return false;
+            }
+            var serviceUrl = '/workshop/Job/GetDistrictIds';
+            var data = {
+                districtId: $('#District').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+                    if (response != null && response.length > 0) {
+                        $('#Vehicle').empty();
+                        $('#Vehicle').append('<option value=0>--Select--</option>');
+                        for (var i = 0; i < response.length; i++) {
+
+                            $('#Vehicle').append("<option value='" +
+                                response[i].split('-')[1] +
+                                "' >" +
+                                response[i].split('-')[0] +
+                                "</option>");
+
+                        }
+
+                        $('#Vehicle').prop("disabled", false);
+
+                        $("#Vehicle").children().removeAttr('disabled');
+                    } else {
+                        $('#Vehicle').prop('selectedIndex', 0);
+                        $('#Vehicle').prop("disabled", true);
+                        $('#lblDistance').text('');
+                    }
+                }
+
+            });
+            return true;
+        });
+    });
+    //GetAggregatesBasedOnManufacturers
+    $(document).ready(function() {
+
+        $("#txtNatureOfComplaint").prop("disabled", true);
+
+        $("#Manufacturer").change(function() {
+            if ($('#Manufacturer option:selected').text().toLowerCase() === "--select--" ||
+                $('#MaintenanceType').prop('selectedIndex') === 2) {
+                $('#txtNatureOfComplaint option:selected').text("");
+                $('#SubCategory option:selected').text('');
+                $('#txtCategory option:selected').text('');
+                $('#txtNatureOfComplaint').prop("disabled", true);
+                $('#SubCategory').prop("disabled", true);
+                $('#txtCategory').prop('disabled', true);
+                $('#txtEstimatedCost').val('');
+                return false;
+            }
+            var serviceUrl = '/workshop/Job/GetAggregatesBasedOnManufacturers';
+            debugger;
+            var data = {
+                manufacturerId: $('#Manufacturer').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+
+                    $('#txtNatureOfComplaint').empty();
+                    $('#txtNatureOfComplaint').append('<option value=0 selected="selected">--Select--</option>');
+                    for (var i = 0; i < response.length; i++) {
+
+                        $('#txtNatureOfComplaint').append("<option value='" +
+                            response[i].split('-')[1] +
+                            "' >" +
+                            response[i].split('-')[0] +
+                            "</option>");
+
+                    }
+
+                    $('#txtNatureOfComplaint').prop("disabled", false);
+                    $("#txtNatureOfComplaint").children().removeAttr('disabled');
+                }
+
+            });
+            return true;
+        });
+    });
+
+
+    $(document).ready(function() {
+
+        $("#txtCategory").prop("disabled", true);
+
+        $("#txtNatureOfComplaint").change(function() {
+            $('#btnss').prop('disabled', true);
+            if ($('#txtNatureOfComplaint option:selected').text().toLowerCase() === "--select--") {
+                $('#txtCategory option:selected').text("");
+                $('#SubCategory option:selected').text("");
+                $('#txtCategory').prop("disabled", true);
+                $('#SubCategory').prop("disabled", true);
+                $('#txtEstimatedCost').val('');
+                return false;
+            }
+            var serviceUrl = '/workshop/Job/GetCategoryIds';
+            debugger;
+            var data = {
+                aggregatedId: $('#txtNatureOfComplaint').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+
+                    $('#txtCategory').empty();
+                    $('#txtCategory').append('<option value=0 selected="selected">--Select--</option>');
+                    for (var i = 0; i < response.length; i++) {
+
+                        $('#txtCategory').append("<option value='" +
+                            response[i].split('-')[1] +
+                            "' >" +
+                            response[i].split('-')[0] +
+                            "</option>");
+
+                    }
+
+                    $('#txtCategory').prop("disabled", false);
+                    $("#txtCategory").children().removeAttr('disabled');
+
+                }
+
+            });
+            return true;
+        });
+    });
+
+    $(document).ready(function() {
+
+        $("#SubCategory").prop("disabled", true);
+
+        $("#txtCategory").change(function() {
+            $('#btnss').prop('disabled', true);
+            if ($('#txtCategory option:selected').text().toLowerCase() === "--select--") {
+                $('#SubCategory option:selected').text("");
+                $('#SubCategory').prop("disabled", true);
+                $('#txtEstimatedCost').val('');
+                return false;
+            }
+            var serviceUrl = '/workshop/Job/GetSubCategoryIds';
+            debugger;
+            var data = {
+                categoryId: $('#txtCategory').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+
+                    $('#SubCategory').empty();
+                    $('#SubCategory').append('<option value=0 selected="selected">--Select--</option>');
+                    for (var i = 0; i < response.length; i++) {
+
+                        $('#SubCategory').append("<option value='" +
+                            response[i].split('-')[1] +
+                            "' >" +
+                            response[i].split('-')[0] +
+                            "</option>");
+
+                    }
+
+
+                    $('#SubCategory').prop("disabled", false);
+
+                    $("#SubCategory").children().removeAttr('disabled');
+                }
+            });
+            return true;
+        });
+    });
+    $(document).ready(function() {
+
+
+        $("#SubCategory").change(function() {
+            $('#btnss').prop('disabled', true);
+            if ($('#SubCategory option:selected').text().toLowerCase() === "--select--") {
+                $('#txtEstimatedCost').val('');
+                return false;
+            }
+            var issues = '';
+            $('#tbl').find('tr').each(function(i, el) {
+                var $tds = $(this).find('td');
+                issues = $tds.eq(2).text();
+                if ($('#SubCategory option:selected').text() === issues) {
+                    alert('Selected Issues are already added Please choose different issue');
+                    $('#SubCategory').prop('selectedIndex', 0);
+                    return false;
+                }
+                // do something with productId, product, Quantity
+            });
+            var serviceUrl = '/workshop/Job/GetEstimatedCostDetails';
+            var data = {
+                categoryId: $('#SubCategory').val()
+
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+
+                    $('#txtEstimatedCost').val('');
+                    $('#txtEstimatedCost').val(response);
+
+                }
+
+            });
+            return true;
+        });
+    });
+    $(function() {
+        $('#txtDateOfDelivery').change(function() {
+            var serviceUrl = '/workshop/Job/ValidateDateOfReceiving';
+            var data = {
+                Dor: $('#txtDor').val(),
+                Dod: $('#txtDateOfDelivery').val()
+            };
+            $.ajax({
+                url: serviceUrl,
+                type: "POST",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: 'application/json',
+
+                success: function(response) {
+                    if (response != '0') {
+                        alert('Date Of Delivery should be greater than Receiving Date');
+                        $('#txtDor').val(response);
+                        $('#txtDateOfDelivery').val('');
+                    }
+                }
+
+            });
+        });
+    });
+
+    $(function() {
+
+        //$('#btn').click(function () {
+        //    var serviceURL = '/Job/SaveJobCardDetails';
+        //    var data = {
+        //        DistrictId: $('#District').val(),
+        //        VehId: $('#Vehicle option:selected').val(),
+        //        ModelNumber: $('#txtModel').val(),
+        //        DateOfRepair: $('#txtDor').val(),
+        //        Odometer: $('#txtOdo').val(),
+        //        PilotName: $('#txtPilotName').val(),
+        //        PilotId: $('#txtpilotid').val(),
+        //        ApproximateCost: $('#txtCostApprox').val(),
+        //        NatureOfComplaint: $('#txtNatureOfComplaint').val(),
+        //        DateOfDelivery: $('#txtDateOfDelivary').val(),
+        //        ReceivedLocation: $('#txtVehicleRecivedLoc').val(),
+        //        AllotedMechanic: $('#AllotedMechanic option:selected').val(),
+        //        ServiceEngineer: $('#ServiceEngineer option:selected').val()
+        //    };
+
+        //    $.ajax({
+        //        type: "POST",
+        //        url: serviceURL,
+        //        data: JSON.stringify(data),
+        //        contentType: "application/json; charset=utf-8",
+        //        dataType: "json",
+        //        success: function (response) {
+        //            if (response != 0) {
+        //                alert('Record Inserted');
+        //            }
+        //            //else {
+        //            //    alert("Failed to Insert Please check ");
+        //            //}
+        //        },
+        //        failure: function (response) {
+        //            alert(response.responseText);
+        //        }
+        //        //error: function (response) {
+        //        //    alert(response.responseText);
+        //        //}
+        //    });
+
+        //})
+
+    });
+
+    function Validations() {
+        var ddlDistrict = $('#District option:selected').text().toLowerCase();
+        if (ddlDistrict === '--select--' || ddlDistrict === '') {
+            alert("Please select District");
+            return false;
+
+        }
+        var ddlVehicle = $('#Vehicle option:selected').text().toLowerCase();
+        if (ddlVehicle === '--select--' || ddlVehicle === '') {
+            alert("Please select Vehicle");
+            return false;
+        }
+        var txtDor = $('#txtDor').val();
+        if (txtDor === '') {
+            alert("Please enter Vehicle Receipt Date");
+            return false;
+        }
+
+        var txtmodel = $('#txtModel').val();
+        if (txtmodel === "") {
+            alert('Please select Model');
+            return false;
+        }
+        var txtOdo = $('#txtOdo').val();
+        if (txtOdo === "") {
+            alert('Please enter ODO');
+            return false;
+        }
+        var txtRecivedLoc = $('#txtVehicleRecivedLoc').val();
+        if (txtRecivedLoc === "") {
+            alert('Please enter Vehicle Location');
+            return false;
+        }
+        var txtpilotId = $('#txtpilotid').val();
+        if (txtpilotId === "") {
+            alert('Please enter Pilot Id');
+            return false;
+        }
+        //if ($('#Manufacturer').prop('selectedIndex')==0)
+        //{
+        //    alert('Please Select  Manufacturer');
+        //    return false;
+        //}
+        //if ($('#txtNatureOfComplaint').prop('selectedIndex') == 0)
+        //{
+        //    alert('Please Select  Aggregates');
+        //    return false;
+        //}
+        //if ($('#txtCategory').prop('selectedIndex') == 0)
+        //{
+        //    alert('Please Select  Category');
+        //    return false;
+        //}
+        //if ($('#SubCategory').prop('selectedIndex')==0) {
+        //    alert('Please Select  Sub Category');
+        //    return false;
+        //}
+        //var txtCost = $('#txtEstimatedCost').val();
+        //if (txtCost === "") {
+        //    alert('Please enter Cost');
+        //    return false;
+        //}
+
+        var ddlAllotedMechanic = $('#AllotedMechanic option:selected').text().toLowerCase();
+        if (ddlAllotedMechanic === '--select--' || ddlAllotedMechanic === '') {
+            alert('Please select Mechanic');
+            return false;
+        }
+        var ddlEngineer = $('#ServiceEngineer option:selected').text().toLowerCase();
+        if (ddlEngineer === '--select--' || ddlEngineer === '') {
+            alert('Please select Service Engineer');
+            return false;
+        }
+        var dateOfDelivery = $('#txtDateOfDelivery').val();
+        if (dateOfDelivery === '') {
+            alert('Delivery Date is Mandatory');
+            return false;
+        }
+        $('#btn').prop('disabled', false);
+        return false;
+    }
+
+    $(function() {
+        $('#isNewVehicle').prop('disabled', true);
+        $('#isNewVehicle').change(function() {
+            if ($('input[type=checkbox]').prop('checked')) {
+                $('#Vehicle').replaceWith($('<input/>',
+                    { 'type': 'text', 'value': '', 'class': "form-control", 'id': 'test' }));
+            } else {
+                //$('#test').replaceWith('<select id="Vehicle" class= "form-control"></select>');
+                //    //'<option value="0">--Select--</option>' +
+                //    //'</select>');
+                //$('#District').prop('selectedIndex', 0);
+                //if ($('#District option:selected').text() === '--Select--') {
+                //    $('#Vehicle').prop('disabled', true);
+                //}
+                location.reload();
+
+            }
+
+
+        });
+    });
+
+</script>
+
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+<div class="panel-heading">
+    Repair And Maintenance
+</div>
+<br/>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Maintenance Type </label>
+            <div class="col-lg-8">
+                @Html.DropDownList("MaintenanceType", ViewBag.MaintenanceType as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-lg-4">Scheduled Service </label>
+            <div class="col-lg-8">
+                @Html.DropDownList("SS", ViewBag.SS as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", disabled = true})
+            </div>
+        </div>
+    </form>
+</div>
+<br/>
+<hr/>
+
+<div class="panel-body" style="margin-top: 30px">
+
+<div class="col-lg-3" style="margin-top: -30px; float: left" align="right">
+    Vehicle Type : <label id="lblproject" align="right" style="color: red; size: 10px"></label>
+</div>
+<div class="col-lg-3" style="margin-top: -30px; float: right" align="right">
+    Distance Travelled(KM) : <label id="lblDistance" align="right" style="color: red; size: 10px"></label>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required">
+            <label class="control-label col-lg-4">District</label>
+            <div class="col-lg-8">
+                @Html.DropDownList("District", ViewBag.Districts as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+            </div>
+        </div>
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Received Date</label>
+            <div class="col-lg-8">
+
+                <input type="text" class="form-control" id="txtDor" placeholder="Date Of Repair" onkeypress="return false">
+
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required">
+            <label class="control-label  col-lg-4">Vehicle Number</label>
+            <div class="col-lg-5">
+                <select id="Vehicle" class="form-control"> </select>
+            </div>
+            <div class="col-lg-3">
+                @Html.CheckBox("isNewVehicle", false) New Vehicle
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-4">Model</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtModel" placeholder="Model Number" readonly="readonly" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Current Odometer</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtOdo" placeholder="OdoMeter" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+            </div>
+        </div>
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Vehicle Location</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtVehicleRecivedLoc" placeholder="Vehicle Location">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Pilot Id</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtpilotid" placeholder="Pilot Id" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+            </div>
+        </div>
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Pilot Name</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtPilotName" placeholder="Pilot Name">
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required">
+
+            <label class="control-label col-lg-4">Manufacturer</label>
+            <div class="col-lg-8">
+                @Html.DropDownList("Manufacturer", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+            </div>
+
+        </div>
+
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Aggregates</label>
+            <div class="col-lg-8">
+                @Html.DropDownList("txtNatureOfComplaint", ViewBag.NatureOfComplaint as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Category</label>
+            <div class="col-lg-8">
+                <select id="txtCategory" class="form-control"> </select>
+            </div>
+        </div>
+        <div class="form-group required" style="margin-bottom: 40px">
+            <label class="control-label col-lg-4">SubCategory</label>
+            <div class="col-lg-8">
+                <select id="SubCategory" class="form-control"> </select>
+
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-lg-6">
+    <form class="form-horizontal">
+
+        <div class="form-group">
+            <label class="control-label col-lg-4">Labor Charges</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtEstimatedCost" placeholder="Labor Charges" readonly="readonly" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group required" style="margin-top: -30px">
+            <label class="control-label col-lg-4">Alloted Mechanic </label>
+            <div class="col-lg-8">
+                @Html.DropDownList("AllotedMechanic", ViewBag.AllotedMechanic as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+            </div>
+        </div>
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Service Engineer </label>
+            <div class="col-lg-8">
+                @Html.DropDownList("ServiceEngineer", ViewBag.ServiceEngineer as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+            </div>
+        </div>
+    </form>
+</div>
+@*<div class="col-lg-6">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-lg-4">Labor Charges</label>
+                <div class="col-lg-8">
+                    <input type="text" id="txtLaborCharges" placeholder="Labor Charges" class="form-control" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');"/>
+                </div>
+            </div>
+        </form>
+    </div>*@
+
+<div class="col-lg-6">
+
+    <form class="form-horizontal">
+        <div class="form-group required">
+            <label class="control-label col-lg-4">Date Of Delivary(Approx)</label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtDateOfDelivery" placeholder="Date Of Delivery(Approx)" onkeypress="return false;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-lg-4">OffRoad Id </label>
+            <div class="col-lg-8">
+                <input type="text" class="form-control" id="txtoffroad" placeholder="Offroad Id" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-lg-6">
+
+    <form class="form-horizontal">
+
+        <div class="form-group">
+            <label class="control-label col-lg-4">Helper </label>
+            <div class="col-lg-8">
+                @Html.DropDownList("Helper", ViewBag.Helper as IEnumerable<SelectListItem>, "N/A", new {@class = "form-control"})
+            </div>
+        </div>
+    </form>
+</div>
+<br/>
+<div style="margin-left: -500px;">
+    Odometer : <label id="lblodo" style="color: red; size: 10px"></label>
+    OffRoad Date : <label id="lbloffroaddate" style="color: red; size: 10px"></label>
+</div>
+<br/>
+
+<div class="form-group" style="margin-bottom: -200px; position: relative;">
+    <div class="col-lg-8">
+        <div class="panel-body" style="width: 100%" id="orderItems"></div>
+
+    </div>
+</div>
+<br/>
+
+<div style="margin-bottom: 90px;" class="col-lg-6">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-2" style="margin-bottom: 30px">
+                <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: 1px;" disabled="disabled">Submit</button>
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" id="btnAddtest" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: 1px;" disabled="disabled" onclick="if (!Validations()) return false;">Add</button>
+            </div>
+            <div class="col-sm-offset-2 col-sm-2" style="margin-bottom: 30px">
+                <button type="submit" id="btnss" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: 1px;" disabled="disabled">Save</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<div class="col-lg-6" style="width: 100%">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <div style="margin-top: -100px">
+                @Html.Partial("GetJobCardDetails");
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+</div>
+</div>
+
+<div class="panel-footer">
+
+</div>

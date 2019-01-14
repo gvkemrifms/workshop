@@ -1,0 +1,152 @@
+﻿<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    #tbl {
+        width: 100%;
+        border: 3px solid #fff;
+        box-sizing: border-box; /* causes item size to include border and padding */
+        -moz-box-sizing: border-box; /*for browser compatibility*/
+    }
+
+    table th tr {
+        align-content: center;
+    }
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+</style>
+<script>
+    $(function () {
+        $('#txtStartDate,#txtEndDate').datepicker({
+            dateFormat: "dd/M/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:+0",
+            maxDate:0
+        });
+    });
+    $(function() {
+        $('#btn').click(function () {
+            var data = {
+                sparesid: $('#SparesIssue').val(),
+                startDate: $('#txtStartDate').val(),
+                endDate: $('#txtEndDate').val()
+            }
+            $.ajax({
+                type: "Post",
+                url: '/workshop/Reports/GetIssuedLubesByLubricantNumber',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.length > 0) {
+                        generateDetailsList(response);
+                    } else {
+                        alert('No Data');
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+
+            });
+            return false;
+        });
+
+    });
+
+    function generateDetailsList(response) {
+        var eTable =
+            "<table id=tbl><thead><tr><th >Id</th><th>Lubricant</th><th>Vehicle Number</th><th>Quantity</th><th>Issued Date</th></tr></thead><tbody>";
+        for (var i = 0; i < response.length; i++) {
+
+                eTable += "<tr>";
+                eTable += "<td>" + response[i]['ID'] + "</td>";
+                eTable += "<td>" + response[i]['OILNAME'] + "</td>";
+                eTable += "<td>" + response[i]['VEHICLENUMBER'] + "</td>";
+                eTable += "<td>" + response[i]['QUANTITY'] + "</td>";
+                eTable += "<td>" + response[i]['ISSUEDDATE'] + "</td>";
+                eTable += "</tr>";
+
+        }
+        eTable += "</tbody></table>";
+        $('#SparesDetails').html(eTable);
+        //alert(res);
+        //if (res.length > 0) {
+
+        //    var $table = $('<table id=tbl/>');
+
+        //    $table.append(
+        //        '<thead><tr><th>Id</th><th>Part Number</th><th>Vehicle Number</th><th> Quantity</th><th>Issued Date</th>');
+
+        //    var $tbody = $('<tbody/>');
+        //    for (var i = 0; i < response.length; i++) {
+        //        var $row = $('<tr/>');
+        //        $row.append($('<td/>').html(response[i].Id));
+        //        $row.append($('<td/>').html(response[i].SparePart));
+        //        $row.append($('<td/>').html(response[i].VehicleNumber));
+        //        $row.append($('<td/>').html(response[i].Quantity));
+        //        $row.append($('<td />').html(response[i].IsssuedDate));
+        //        $tbody.append($row);
+        //    }
+        //    $table.append($tbody);
+
+        //    $('#SparesDetails').html($table);
+
+    }
+
+</script>
+
+<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+    <div class="panel-heading">
+        Lubricant Issue Report(Vehicle Wise)
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Start Date</label>
+                    <div class="col-lg-8">
+                        @*<select id="Vehicle" class="form-control" > </select>*@
+                        <input type="text" class="form-control" id="txtStartDate" placeholder="Start Date" onkeypress="return false;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-4">End Date</label>
+                    <div class="col-lg-8">
+                        <input type="text" class="form-control" id="txtEndDate" placeholder="EndDate" maxlength="10" onkeypress="return false;">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label  col-lg-4">Lubricant</label>
+                    <div class="col-lg-8">
+                        @Html.DropDownList("SparesIssue", ViewBag.LubesIssueReport as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-6" style="margin-left: 400px; margin-top: -60px;">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                    <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white">Submit</button>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+    <br />
+
+</div>
+<div id="SparesDetails" align="center" style="width: 100%"></div>

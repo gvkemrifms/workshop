@@ -46,7 +46,18 @@
 </style>
 
 
-<script type="text/javascript">
+  <script type="text/javascript">
+
+        $(function () {
+            $('#txtBillDate').blur(function () {
+                alert('hello');
+                if ($('#txtPODate').prop('disabled') == true) {
+                    alert('Please Enter PO Number');
+                    $(this).val('');
+                    return false;
+                }
+            })
+        })
     $(function () {
         
         $('#txtQuantity').blur(function () {
@@ -341,7 +352,7 @@
             yearRange: "-60:+0"
         });
     });
-
+   
 
     $(function() {
         var orderItems = [];
@@ -468,6 +479,7 @@
 
 
 </script>
+    
 @{ ViewContext.FormContext = new FormContext(); }
 <div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
     <div class="panel-heading">
@@ -487,7 +499,7 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Bill Date</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtBillDate" onkeypress="return false" oncut="return false" onpaste="return false" placeholder="Bill Date">
+                        <input type="text" class="form-control" id="txtBillDate" onkeypress="return false"  placeholder="Bill Date">
                     </div>
                 </div>
 

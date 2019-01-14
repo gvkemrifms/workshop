@@ -1,0 +1,321 @@
+﻿@using System.Data
+@model IEnumerable<Fleet_WorkShop.Models.InventoryModel>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    table.minimalistBlack {
+        border: 3px solid #000000;
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+    }
+    table.minimalistBlack td, table.minimalistBlack th {
+        border: 1px solid #000000;
+        padding: 5px 4px;
+    }
+    table.minimalistBlack tbody td {
+        font-size: 13px;
+    }
+    table.minimalistBlack thead {
+        background: #CFCFCF;
+        background: -moz-linear-gradient(top, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+        background: -webkit-linear-gradient(top, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+        background: linear-gradient(to bottom, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+        border-bottom: 3px solid #000000;
+    }
+    table.minimalistBlack thead th {
+        font-size: 15px;
+        font-weight: bold;
+        color: #000000;
+        text-align: left;
+    }
+    table.minimalistBlack tfoot {
+        font-size: 14px;
+        font-weight: bold;
+        color: #000000;
+        border-top: 3px solid #000000;
+    }
+    table.minimalistBlack tfoot td {
+        font-size: 14px;
+    }
+</style>
+<script>
+   
+    function Validation() {
+        var valsub = $('#Roles option:selected').text().toLowerCase();
+        if (valsub == "--select--") {
+            alert('Please select Role');
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        return true;
+    }
+</script>
+
+<script>
+    $(function() {
+        if (@ViewBag.TotalAmount != 0) {
+            $('#btnApprove').prop('disabled', true);
+        }
+        if (@ViewBag.RoleId == 6) {
+            $('#btnFarword').prop('disabled', true);
+        }
+
+    })
+    $(function () {
+
+        $('#btnApprove').click(function() {
+            var data = {
+                Id: 1
+            };
+            $.ajax({
+                type: "Post",
+                url: '/workshop/Inventory/UpdateApprovalList/',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response > 0) {
+                        alert('Record Inserted');
+                        window.location.href = "/workshop/Inventory/PendingPOApprovals";
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+    $(function() {
+        $('#btnReject').click(function() {
+            if (confirm('Are you sure to Reject??')) {
+                var data = {
+                    Id: 1
+                };
+                $.ajax({
+                    type: "Post",
+                    url: '/workshop/Inventory/DeleteApprovalList/',
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response != null)
+                            alert('Record Reverted');
+                        window.location.href = "/workshop/Inventory/PendingPOApprovals";
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+                    }
+                });
+            }
+        });
+
+    });
+    $(function() {
+
+        $('#btnFarword').click(function() {
+            if ($('#Roles option:selected').text().toLowerCase() != '--select--') {
+
+                var data = {
+                    Id: $('#Roles option:selected').val(),
+                };
+                $.ajax({
+                    type: "Post",
+                    url: '/workshop/Inventory/FarwordApprovalList/',
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response != 0)
+                            alert('Record Updated');
+                        window.location.href = "/workshop/Inventory/PendingPOApprovals";
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+                    }
+                });
+            } else {
+                alert('please select Role');
+                return false;
+            }
+        });
+
+    });
+</script>
+@if (Model != null)
+{
+    <table style="border: 1px solid red; width: 50%;  margin-top: 10px; margin-bottom: 10px" align="center" id="tblview" class="minimalistBlack">
+        <tr>
+            <th colspan="2" align="center">
+                P.O Details
+            </th>
+        </tr>
+        <tr>
+            <td>
+                Manufacturer:
+            </td>
+            <td>
+                @ViewBag.Manufacturer
+            </td>
+        </tr>
+        <tr>
+            <td>Workshop:
+            </td>
+            <td>
+                @ViewBag.WorkShop
+            </td>
+        </tr>
+        <tr>
+            <td>PO Number:
+            </td>
+            <td>
+                @ViewBag.PONumber
+            </td>
+        </tr>
+        <tr>
+            <td>PO Date:
+            </td>
+            <td>
+                @ViewBag.PODate
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Sent On:
+            </td>
+            <td>
+                @ViewBag.SentOn
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Sent By:
+            </td>
+            <td>
+                @ViewBag.SentBy
+            </td>
+        </tr>
+    </table>
+    
+    <table class="table" style="margin-top: 10px">
+        <tr>
+            @*<th>
+                @Html.DisplayNameFor(model => model.WorkShopName)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.ManName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PoNumber)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.PoDate)
+            </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BillAmount)
+            </th>
+            
+            @*<th>
+                @Html.DisplayNameFor(model => model.SentBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SentOn)
+            </th>*@
+        </tr>
+
+        @foreach (var item in Model) {
+            <tr>
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.WorkShopName)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.ManName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PoNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PoDate)
+                </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BillAmount)
+                </td>
+
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.SentBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SentOn)
+                </td>*@
+            </tr>
+        }
+
+    </table>
+    @*<table class="table table-hover" style="margin-top: 15px;">
+        <thead>
+        <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+                <th>@col.ColumnName</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (DataRow row in Model.Rows)
+        {
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    <td>
+                        @row[col.ColumnName]
+                    </td>
+                }
+
+            </tr>
+        }
+        </tbody>
+    </table>*@
+
+}
+
+@if (ViewBag.Roles != null)
+{
+    <div class="col-lg-6">
+        <form class="form-horizontal">
+            <div class="form-group">
+
+                <label class="control-label col-lg-4">Role</label>
+                <div class="col-lg-8">
+                    @Html.DropDownList("Roles", ViewBag.Roles as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                </div>
+
+            </div>
+        </form>
+    </div>
+}
+<button type="submit" id="btnApprove" class="btn btn-default" style="background-color: blue; color: white;">Approve</button>
+
+<button type="submit" id="btnReject" class="btn btn-default" style="background-color: blue; color: white;">Reject</button>
+<button type="submit" id="btnFarword" class="btn btn-default" style="background-color: blue; color: white;" onclick="if (!Validation()) return false;">Farword</button>

@@ -2,21 +2,73 @@
 
 @{
     ViewBag.Title = "EmployeeDetails";
+    
 }
+<style>
+    .form-group.required .control-label:after { 
+        content:"*";
+        color:red;
+    }
 
+</style>
 <script type="text/javascript">
     $(function() {
-        $('#txtDob,#txtJoiningDate,#txtRelievingDate').datepicker({
+        $('#Workshops').change(function() {
+            if ($(this).prop('selectedIndex') !== 0) {
+                $('#txtTransferredDate').prop('disabled', false);
+            } else {
+                $('#txtTransferredDate').prop('disabled', true);
+            }
+        });
+    });
+    $(function() {
+        $('#txtTransferredDate').blur(function() {
+            var transferdate = $(this).val();
+            var tdate = new Date(transferdate);
+            var joiningdate = $('#txtJoiningDate').val();
+            var jdate = new Date(joiningdate);
+            if (joiningdate == '') {
+                alert('Please select joining date');
+                $('#txtTransferredDate').val('');
+                return false;
+            }
+            if (tdate < jdate) {
+                alert('Transfer Date should not be less than joining date');
+                $('#txtTransferredDate').val('');
+                return false;
+            }
+        })
+    })
+    $(function () {
+        $('#txtRelievingDate').prop('disabled', true);
+        $('#Status').prop('selectedIndex', 1);      
+    })
+    $(function () {
+        $('#Status').change(function () {
+            if ($('#Status').prop('selectedIndex') > 1) {
+                $('#txtRelievingDate').prop('disabled', false);
+                $('#txtRelievingDate').append('<style type="text/css">.form-group #requires .control-label:after{content:"*",color:red}</style>');
+            }
+            else
+            {
+                $('#txtRelievingDate').prop('disabled', true);
+                $('#txtRelievingDate').append('<style type="text/css">.form-group #requires .control-label:after{content:" ",color:red}</style>');
+            }
+        })
+    })
+    $(function() {
+        $('#txtDob,#txtJoiningDate,#txtRelievingDate,#txtTransferredDate').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
     });
-   
-    $(function () {
+
+    $(function() {
         var serviceURL = '/workshop/Employee/CheckEmployeeId';
-        $('#txtEmpId').blur(function () {
+        $('#txtEmpId').blur(function() {
             var data = {
                 empId: $(this).val()
             }
@@ -27,86 +79,176 @@
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     if (response !== 0) {
                         alert('Employee Id already exists');
                         $('#txtEmpId').val('');
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
                 //error: function (response) {
                 //    alert(response.responseText);
                 //}
             });
-        })
-    })
+        });
+    });
 
     function Validations() {
-        var ddlDepartment = $('#Department option:selected').text().toLowerCase();
-        if (ddlDepartment === '--select--' || ddlDepartment === '') {
-            return alert("Please select Department");
+        var empName = $('#txtEmployeeName').val();
+        if (empName === "") {
+
+            //$('#btn').attr('onclick', '').unbind('click');
+
+            alert('Employee Name is Mandatory');
+            return false;
+
         }
         var ddlDesignation = $('#Designation option:selected').text().toLowerCase();
         if (ddlDesignation === '--select--' || ddlDesignation === '') {
-            return alert("Please select Designation");
-        }
 
-        var empName = $('#txtEmployeeName').val();
-        if (empName === "") {
-            return alert('Employee Name is Mandatory');
-        }
-        var contactNumber = $('#txtContactNumber').val();
-        if (contactNumber === "") {
-            return alert('Contact Number is Mandatory');
-        }
-        var dob = $('#txtDob').val();
-        if (dob === "") {
-            return alert('Date Of Birth is Required');
-        }
-        var aadhar = $('#txtAadhar').val();
-        if (aadhar === "") {
-            return alert('Aadhar Number is Required');
-        }
-        var doj = $('#txtJoiningDate').val();
-        if (doj === "") {
-            return alert('Date of Joining is Required');
-        }
-        //.replace(/\D/g, '/')
-        //.replace(/\D/g, '/')
-        var dateOfJoining = doj;
-        var dob = dob;
-        var ordFromDate = new Date(dob);
-        var ordToDate = new Date(dateOfJoining);
-        var currentDate = new Date();
-        if (ordFromDate > currentDate) {
-            return alert("Current Date Should be greater than Birth date");
-        }
-        if (ordToDate < ordFromDate) {
-            return alert("Date of Joining date should be greater than birth date");
-        }
-        var phoneno = /^\d{10}$/;
-        if (!($('#txtContactNumber').val().match(phoneno))) {
-            return alert("Contact Number is not in correct format");
-        }
-        var aadharregex = /^\d{12}$/;
-        if (!($('#txtAadhar').val().match(aadharregex))) {
-            return alert("Aadhar Number is not in correct format");
+            //$('#btn').attr('onclick', '').unbind('click');
+
+            alert('Please select Designation');
+            return false;
+
+
         }
         var empId = $('#txtEmpId').val();
         if (empId === "") {
-            return alert('Employee Id is Required');
+
+
+            alert('Employee Id is Required');
+            return false;
+
         }
-        return true;
+        var contactNumber = $('#txtContactNumber').val();
+        if (contactNumber === "") {
+
+
+            alert('Contact Number is Mandatory');
+            return false;
+
+
+        }
+        var qualification = $('#txtQualification').val();
+        if (qualification === "") {
+            alert('Qualification is Required');
+            return false;
+
+        }
+        var dob = $('#txtDob').val();
+        if (dob === "") {
+
+
+            alert('Date Of Birth is Required');
+            return false;
+
+
+        }
+        var experience = $('#txtExperience').val();
+        if (experience === "") {
+            alert('experience is Required');
+            return false;
+
+        }
+        var ctc = $('#txtSalary').val();
+        if (ctc === "") {
+            alert('Salary is Required');
+            return false;
+
+        }
+        var aadhar = $('#txtAadhar').val();
+        if (aadhar === "") {
+
+
+            alert('Aadhar Number is Required');
+            return false;
+
+
+        }
+        var ddlPayroll = $('#Payroll option:selected').text().toLowerCase();
+        if (ddlPayroll === '--select--' || ddlPayroll === '') {
+            alert('Select Payroll');
+            return false;
+
+
+        }
+        var relievingDate = $('#txtRelievingDate').val();
+        if ($('#txtRelievingDate').prop('disabled') == false &&  relievingDate==='') {
+            alert('Relieving Date is Mandatory');
+            return false;
+        }
+        var doj = $('#txtJoiningDate').val();
+        if (doj === "") {
+
+
+            alert('Date of Joining is Required');
+            return false;
+
+
+        }
+        var ddlDepartment = $('#Department option:selected').text().toLowerCase();
+        if (ddlDepartment === '--select--' || ddlDepartment === '') {
+
+            alert('Please select Department');
+            return false;
+            // return alert("Please select Department");
+
+        }
+       
+        //.replace(/\D/g, '/')
+        //.replace(/\D/g, '/')
+        var dateOfJoining = doj;
+        var ordFromDate = new Date(dob);
+        var ordToDate = new Date(doj);
+        var relDate = new Date(relievingDate);
+        var currentDate = new Date();
+        if (ordToDate < ordFromDate) {
+            alert('Date of Joining date should be greater than birth date');
+            $('#txtJoiningDate').val('');
+            $('#txtDob').val('');
+            return false;
+
+
+        }
+        if (relDate < ordToDate)
+        {
+            alert('Date of Relieving  should be greater than Joining date');
+            $('#txtJoiningDate').val('');
+            $('#txtRelievingDate').val('');
+            return false;
+        }
+        if (relDate < ordToDate) {
+            alert('Date of Relieving  should be greater than Birth date');
+            $('#txtDob').val('');
+            $('#txtRelievingDate').val('');
+            return false;
+        }
+        var phoneno = /^\d{10}$/;
+        if (!($('#txtContactNumber').val().match(phoneno))) {
+
+
+            alert("Contact Number is not in correct format");
+            return false;
+
+
+        }
+        var aadharregex = /^\d{12}$/;
+        if (!($('#txtAadhar').val().match(aadharregex))) {
+            alert("Aadhar Number is not in correct format");
+            return false;
+        }
     }
-    $(function () {
-        $('#btn').click(function () {
+
+    $(function() {
+        $('#btn').click(function() {
 
             var serviceURL = '/workshop/Employee/SaveEmployeeDetails';
             var data = {
-                EmployeeId:$('#txtEmpId').val(),
+                EmployeeId: $('#txtEmpId').val(),
                 EmployeeName: $('#txtEmployeeName').val(),
                 ContactNumber: $('#txtContactNumber').val(),
                 EmailAddress: $('#txtEmail').val(),
@@ -119,7 +261,10 @@
                 Qualification: $('#txtQualification').val(),
                 Experience: $('#txtExperience').val(),
                 Salary: $('#txtSalary').val(),
-                PayrollId: $('#Payroll').val()
+                PayrollId: $('#Payroll').val(),
+                StatusId:$('#Status').val(),
+                TransferId: $('#Workshops').val(),
+                TransferredDate: $('#txtTransferredDate').val()
 
             };
             $.ajax({
@@ -128,13 +273,17 @@
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function (response) {
-                    if (response != 0) {
+                success: function(response) {
+                    if (response !== 0) {
                         alert('Record Inserted');
+                        location.reload();
+                    } else {
+                        alert('Insertion Failed Please fill all Mandatory fields');
+                        return false;
                     }
 
                 },
-                failure: function (response) {
+                failure: function(response) {
                     alert(response.responseText);
                 }
                 //error: function (response) {
@@ -142,183 +291,205 @@
                 //}
             });
 
-        })
+        });
 
     });
 
 </script>
 @{ ViewContext.FormContext = new FormContext(); }
-<div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
-    <div class="panel-heading">
-        Employee Information
-    </div>
-    <div class="panel-body">
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Employee Name</label>
-                    <div class="col-lg-8">
-                        @*@Html.TextBoxFor(x => x.EmployeeName, new { @class = "form-control", placeholder = "Name",id="txtEmployeeName" })*@
-                        <input type="text" class="form-control" id="txtEmployeeName" placeholder="Name" >
-                        @*@Html.ValidationMessageFor(m => m.EmployeeName, "", new { @class = "text-danger" })*@
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Employee Id</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtEmpId" placeholder="ID" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
-                    </div>
-                </div>
-                
-            </form>
+<form onsubmit="return Validations()">
+    <div class="panel panel-primary" style="width: 100%; height: 100%; margin-top: 20px;" align="center">
+        <div class="panel-heading">
+            Employee Information
         </div>
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label  col-lg-4">Designation</label>
-                    <div class="col-lg-8">                                      
-                            @Html.DropDownList("Designation", ViewBag.Designation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })                                       
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Employee Name</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtEmployeeName" placeholder="Name">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Contact Number</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtContactNumber" placeholder="Contact Number" maxlength="10" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Employee Id</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtEmpId" placeholder="ID" maxlength="7" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                        </div>
                     </div>
-                </div>
-                
-            </form>
-        </div>
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Email Address</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtEmail" placeholder="Email Address" >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Date Of Birth</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtDob" placeholder="DOB" onkeypress="return false;" >
-                    </div>
-                </div>
-                
-            </form>
-        </div>
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Qualification</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" style="margin-top:10px;" id="txtQualification" placeholder="Qualification" >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Experience</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtExperience" placeholder="Experience" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" >
-                    </div>
-                </div>
 
-            </form>
-        </div>
-
-
-
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">CTC</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" style="margin-top:10px;" id="txtSalary" placeholder="CTC" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label  col-lg-4">Designation</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Designation", ViewBag.Designation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label  col-lg-4">Payroll</label>
-                    <div class="col-lg-8">
-                        @Html.DropDownList("Payroll", ViewBag.Payroll as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Contact Number</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtContactNumber" placeholder="Contact Number" maxlength="10" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                        </div>
                     </div>
-                </div>
 
-            </form>
-        </div>
-
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Aadhar Number</label>
-                    <div class="col-lg-8">
-                        <input type="text"  class="form-control" style="margin-top:10px;" id="txtAadhar" placeholder="Aadhar Number" maxlength="12" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-4">Date Of Joining</label>
-                    <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtJoiningDate" placeholder="Joining Date" onkeypress="return false;" >
-                    </div>
-                </div>
-               
-            </form>
-        </div>
-    <div class="col-lg-6">
-        <form class="form-horizontal">
-            <div class="form-group">
-
-                    <label class="control-label  col-lg-4">Department</label>
-                    <div class="col-lg-8 ">
-
-                  @Html.DropDownList("Department", ViewBag.DepartmentName as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
-                    </div>
-                </div>          
-        </form>
-        </div>
-        <div class="col-lg-6">
-            <form class="form-horizontal">
-                <div class="form-group">
-
-                    <label class="control-label  col-lg-4">Relieving Date</label>
-                    <div class="col-lg-8 ">
-
-                        <input type="text" class="form-control" id="txtRelievingDate" placeholder="Relieving Date"  onkeypress="return false;"  >
-                    </div>
-                </div>
-            </form>
-        </div>
-            <div style="margin-bottom: 90px" class="col-lg-6">
+                </form>
+            </div>
+            <div class="col-lg-6">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
-                            <button type="submit" id="btn" class="btn btn-default" onclick="if(!Validations()) return false;" style="margin-bottom: -150px; background-color: blue; color: white">Submit</button>
+                        <label class="control-label col-lg-4">Email Address</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtEmail" placeholder="Email Address">
                         </div>
-                        <div class="col-sm-2">
-                            <button type="submit" class="btn btn-default"  style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Date Of Birth</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtDob" placeholder="DOB" onkeypress="return false;">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Qualification</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" style="margin-top: 10px;" id="txtQualification" placeholder="Qualification">
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Experience</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtExperience" placeholder="Experience" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '')">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">CTC</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" style="margin-top: 10px;" id="txtSalary" placeholder="CTC" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '')">
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label  col-lg-4">Payroll</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Payroll", ViewBag.Payroll as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Aadhar Number</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" style="margin-top: 10px;" id="txtAadhar" placeholder="Aadhar Number" maxlength="12" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '')">
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="control-label col-lg-4">Date Of Joining</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtJoiningDate" placeholder="Joining Date" onkeypress="return false;">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+
+                        <label class="control-label  col-lg-4">Department</label>
+                        <div class="col-lg-8 ">
+
+                            @Html.DropDownList("Department", ViewBag.DepartmentName as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
                         </div>
                     </div>
                 </form>
-
             </div>
-        <div  class="col-lg-6" style="width:100%">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <div style="margin-top:30px">
-                       @Html.Partial("GetEmployeeDetails");
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group required">
+
+                        <label class="control-label  col-lg-4">Status</label>
+                        <div class="col-lg-8 ">
+                            @Html.DropDownList("Status", ViewBag.Status as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group" id="requires">
+
+                        <label class="control-label   col-lg-4">Relieving Date</label>
+                        <div class="col-lg-8 ">
+
+                            <input type="text" class="form-control" id="txtRelievingDate" placeholder="Relieving Date" onkeypress="return false;">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div style="margin-top:-20px;"  class="col-lg-6">
+                <form class="form-horizontal" style="margin-top:-20px;">
+                    <div class="form-group">
+
+                        <label class="control-label  col-lg-4">Transferred To</label>
+                        <div class="col-lg-8">
+                            @Html.DropDownList("Workshops", ViewBag.WorkShops as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <label class="control-label  col-lg-4">Transferred Date</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtTransferredDate" placeholder="Transferred Date" onkeypress="return false;" disabled="disabled">
+                        </div>
                     </div>
                     
+                    </form>
                 </div>
-            </form>
+                    <div style="margin-bottom: 90px" class="col-lg-6">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                                    <input type="button" id="btn" value="Submit" class="btn btn-default" onclick="if (!Validations()) return false;" style="margin-bottom: -150px; background-color: blue; color: white">
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="submit" class="btn btn-default" style="margin-bottom: -150px; background-color: blue; color: white">Reset</button>
+                                </div>
+                            </div>
+                        </form>
 
+                    </div>
+                    <div class="col-lg-6" style="width: 100%">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div style="margin-top: 30px">
+                                    @Html.Partial("GetEmployeeDetails");
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+
+            </div>
+
+            <div class="panel-footer">
+
+            </div>
         </div>
-
-
-        </div>
-   
-
-    <div class="panel-footer">
-       
-    </div>
-</div>
-
+</form>
 
 
 

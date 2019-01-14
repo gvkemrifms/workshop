@@ -1,0 +1,595 @@
+﻿@using System.Data
+@model Fleet_WorkShop.Models.InventoryModel
+<style>
+    hr {
+        border-style: solid;
+        border-width: 1px;
+        display: block;
+    }
+     body{
+     font-size:12px;
+     font-family:'Times New Roman', Times, serif;
+     font-style:initial;
+ }
+</style>
+<style>
+    span.error {
+        color: red;
+        display: block;
+        font-size: 90%;
+        visibility: hidden;
+    }
+
+
+    .container td {
+        vertical-align: top;
+    }
+
+    .tablecontainer table {
+        border-collapse: collapse;
+        border-right: 1px solid #BFAEAE;
+        border-top: 1px solid #BFAEAE;
+        display: block;
+        width: 100%;
+    }
+
+    .tablecontainer th {
+        border-bottom: 2px solid #BFAEAE !important;
+    }
+
+    .tablecontainer th, .tablecontainer td {
+        border-bottom: 1px solid #BFAEAE;
+        border-left: 1px solid #BFAEAE;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .ui-widget {
+        font-size: 12px !important;
+    }
+
+    #lblAmount, #lblBillAmount {
+        text-align: left;
+    }
+    #errmsg {
+        color: red;
+    }
+</style>
+
+<script type="text/javascript">
+
+        $(document).ready(function () {
+            //called when key is pressed in textbox
+            $("#Qty").keypress(function (e) {
+                //if the letter is not digit then display error and don't type anything
+                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                    //display error message
+                    $("#errmsg").html("Digits Only").show().fadeOut("slow");
+                    return false;
+                }
+            });
+        });
+   
+    function Validations()
+    {
+        var tbody = $("#tbl tbody");
+
+        if (tbody.children().length === 0) {
+            return alert('Please add Items');
+        }
+        if ($('#SparePartId').prop('selectedIndex') == 0)
+        {
+            return alert('Please select SparePart');
+
+        }
+        if ($("#Qty").val() == '')
+        {
+            return alert('Please select Quantity');
+        }
+
+    }
+
+    $(function () {
+        if ($('#SparePartId').prop('selectedIndex') == 0) {
+            $('#btnAdd').prop('disabled', true);
+        }
+        else {
+            $('#btnAdd').prop('disabled', false);
+
+        }
+        if ($("#Qty").val() == '')
+        {
+            $('#btnAdd').prop('disabled', true);
+
+        }
+        else
+        {
+            $('#btnAdd').prop('disabled', false);
+        }
+        $("#Qty,#Uprice").blur(function () {
+            if ($('#SparePartId').prop('selectedIndex') == 0) {
+                $("#Amt").val('');
+                $('#Qty').val('');
+                $('#SparePartId').prop('selectedIndex', 0);
+                $("#Uprice").val('');
+                alert('Please select SparePart');
+            }
+            else {
+                if ($("#Qty").val() == '') {
+                    $('#btnAdd').prop('disabled', true);
+
+                }
+                else {
+                    $('#btnAdd').prop('disabled', false);
+                }
+                var unitPrice = $("#Uprice").val();
+                var quantity = $("#Qty").val();
+                var amount = parseInt(unitPrice) * parseInt(quantity);
+                $("#Amt").val('');
+                $("#Amt").val(amount);
+
+                $("#Amt").focus();
+
+                var sparePartId = $('#SparePartId option:selected').val();
+                var serviceUrl = '/workshop/Inventory/CheckQuantitySparesEditPODetails';
+                var data = {
+                    qty: $('#Qty').val(),
+                    sparesid: sparePartId,
+                    ponumber: $('#PoNumber').val()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response == 0) {
+                            $("#Amt").val('');
+                            $('#Qty').val('');
+                            $('#SparePartId').prop('selectedIndex', 0);
+                            $("#Uprice").val('');
+                     
+                            alert('Error');
+                            return false;
+                        }
+                        else
+                        {
+                            $('#Qty').val(response);
+                        }
+                        
+
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            }
+        });
+
+        $('#SparePartId').change(function () {
+            if ($('#SparePartId').prop('selectedIndex') == 0) {
+                $('#btnAdd').prop('disabled', true);
+            }
+            else {
+                $('#btnAdd').prop('disabled', false);
+
+            }
+            var sparePartId = $('#SparePartId option:selected').val();
+            $.ajax({
+                type: "Post",
+                url: '/workshop/Inventory/GetSpareCostDetails/' + sparePartId,
+                data: JSON.stringify(sparePartId),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response >= 0) {
+                        $('#Uprice').val(response);
+                        $('#Qty').val('');
+                        $('#Amt').val('');                
+                    }
+
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+
+    });
+
+    $(function() {
+        var orderItems = [];
+        $('#btnAdd').click(function () {
+            if ($('#SparePartId').prop('selectedIndex') == 0) {
+                return alert("Please select sparepart");
+
+            }
+            if ($('#Qty').val() == '') {
+                return alert("Please select Quantity");
+
+            }
+            orderItems.push({
+                ManufacturerName: $('#ManufacturerId option:selected').text(),
+                ManufacturerId: $('#ManufacturerId option:selected').val(),
+                SparePartId: $('#SparePartId').val(),
+                SparePartName: $('#SparePartId option:selected').text(),
+                UnitPrice: $('#Uprice').val().trim(),
+                Quantity: $('#Qty').val().trim(),
+                Amount: $('#Amt').val()
+            });
+            generatedItemsTable();
+            $("#SparePartId option:selected").attr('disabled', 'disabled');
+            $('#Uprice').val('');
+            $('#Qty').val('');
+            $('#Amt').text('');
+            $('#SparePartId').prop('selectedIndex', 0);
+            return false;
+
+        });
+
+        function generatedItemsTable() {
+            if (orderItems.length > 0) {
+
+                var $table = $('<table id=tbl/>');
+
+                $table.append(
+                    '<thead><tr><th>Manufacturer Name</th><th>SpareParts Name</th><th>Unit Price</th><th>Quantity</th><th>Amount</th></tr></thead>');
+
+                var $tbody = $('<tbody/>');
+                $.each(orderItems,
+                    function(i, val) {
+
+                        var $row = $('<tr/>');
+
+                        $row.append($('<td/>').html(val.ManufacturerName));
+
+                        $row.append($('<td/>').html(val.SparePartName));
+
+                        $row.append($('<td/>').html(val.UnitPrice));
+
+                        $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td class=amt/>').html(val.Amount));
+                        var $remove = $('<a href="#">Remove</a>');
+                        $remove.click(function (e) {
+                            var vals = $(this).closest("tr").find('td:eq(1)').text();
+                            //alert(vals);
+                            $('#SparePartId option').each(function () {
+
+                                if (this.text === vals) {
+                                    //alert(this.text);
+                                    $(this).attr('disabled', false);
+
+                                    //$('#SpareParts  option').attr('disabled', false);
+                                }
+
+                            });
+                            e.preventDefault();
+                            orderItems.splice(i, 1);
+                            generatedItemsTable();
+                        });
+                        $row.append($('<td/>').html($remove));
+                        $tbody.append($row);
+                    });
+
+                $table.append($tbody);
+
+                $('#orderItems').html($table);
+
+            } else {
+                $('#orderItems').html('');
+                $('#lblAmount').text('');
+                $('#txtQuantity').val('');
+            }
+        }
+
+
+
+        $('#btnEdit').click(function() {
+            var serviceUrl = '/workshop/Inventory/EditOrderItemsInventoryPODetails';
+            var data = {
+                itemmodel: orderItems,
+                PONumber: $('#PoNumber').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response !== 0) {
+                        alert('Record Updated');
+                        window.location.href = '/workshop/Inventory/SavePODetails'
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        });
+    });
+
+</script>
+<div class="panel panel-primary" style="height: 100%; margin-top: 20px; width: 100%;" align="center">
+    <div class="panel-heading">
+        Billing Edit
+    </div>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PoNumber, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.PoNumber, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
+                            @*@Html.ValidationMessageFor(model => model.BillNo, "", new {@class = "text-danger"})*@
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Manufacturer, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.DropDownListFor(model => model.ManufacturerId, Model.Manufacturer, "--Select--", new { @class = "form-control" })
+                            @*@Html.ValidationMessageFor(model => model.Manufacturer, "", new {@class = "text-danger"})*@
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PoDate, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.PoDate, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
+                            @*@Html.ValidationMessageFor(model => model.BillDate, "", new {@class = "text-danger"})*@
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SpareParts, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+
+                            @Html.DropDownListFor(model => model.SparePartId, Model.SpareParts, "--Select--", new { @class = "form-control" })
+                            @*@Html.ValidationMessageFor(model => model.SpareParts, "", new {@class = "text-danger"})*@
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Uprice, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Uprice, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
+                            @*@Html.ValidationMessageFor(model => model.Uprice, "", new {@class = "text-danger"})*@
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Qty, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Qty, new { htmlAttributes = new { @class = "form-control" } })
+                            @*@Html.ValidationMessageFor(model => model.Qty, "", new {@class = "text-danger"})*@
+                            <span id="errmsg"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Amt, new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Amt, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
+                            @*@Html.ValidationMessageFor(model => model.Amt, "", new {@class = "text-danger"})*@
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        @*<div class="tablecontainer panel panel-primary" style="height: 40%; margin-left:10px; margin-top: 50px; width: 70%; ">
+                                <div class="panel-heading">
+                                    Available Spares Quantity
+                                </div>
+                                <div class="panel-body" id="AddedItemsId">
+
+
+                                    <table>
+
+                                        <tr>
+
+                                            <th>SparePartId </th>
+
+                                            <th>Name</th>
+
+                                            <th>Avaialble Quantity</th>
+
+                                        </tr>
+
+                                        @if (ViewBag.SparesQty != null)
+
+                                        {
+                                            var dataTable = ViewBag.SparesQty as DataTable;
+                                            if (dataTable != null)
+                                            {
+                                                foreach (DataRow dr in dataTable.Rows)
+
+                                                {
+                                                    <tr>
+
+                                                        <td>
+
+                                                            @dr["sparepartId"]
+
+                                                        </td>
+
+                                                        <td>
+
+                                                            @dr["partname"]
+
+                                                        </td>
+
+                                                        <td>
+
+                                                            @dr["AvailableQuantity"]
+
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+
+                                    </table>
+
+
+                                </div>
+
+                            </div>*@
+
+
+                        <div class="tablecontainer panel panel-primary" style="height:10%;margin-top:70px; margin-bottom:-100px;margin-left:30px; width: 90%;">
+                            <div class="panel-heading">
+                                Added Items
+                            </div>
+                            <div class="panel-body" id="AddedItemsId">
+
+
+                                <table>
+
+                                    <tr>
+
+                                        <th>Manufacturer Name</th>
+
+                                        <th>SparePart Name</th>
+
+                                        <th>Unit Price</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+
+                                    </tr>
+
+                                    @if (ViewBag.CartItems != null)
+
+                                    {
+                                        foreach (DataRow dr in (ViewBag.CartItems as DataTable).Rows)
+
+                                        {
+                                            <tr>
+
+                                                <td>
+
+                                                    @dr["ManufacturerName"]
+
+                                                </td>
+
+                                                <td>
+
+                                                    @dr["PartName"]
+
+                                                </td>
+
+                                                <td>
+
+                                                    @dr["UnitPrice"]
+
+                                                </td>
+                                                <td>
+
+                                                    @dr["Quantity"]
+
+                                                </td>
+                                                <td>
+
+                                                    @dr["Amount"]
+
+                                                </td>
+                                                <td>
+                                                    @Ajax.ActionLink("Remove", "DeletePOSparesDetailList", new { id = dr["sparepartId"], ponumber = dr["PONumber"], quantity = dr["Quantity"] }, new AjaxOptions
+                                               {
+                                                   HttpMethod = "Delete",
+                                                   Confirm = "Are you sure you want to delete this Record?",
+                                                   OnComplete = "function() { $(this).parent().parent().remove() }",
+                                                   OnSuccess = "onSuccess"
+                                               })
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+                                </table>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+
+            @*<div class="form-group">
+                    @Html.LabelFor(model => model.Qty, new {@class = "control-label col-md-4"})
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Qty, new {htmlAttributes = new {@class = "form-control"}})
+
+                    </div>
+                </div>*@
+
+
+            <script>
+                function onSuccess(result) {
+                    alert(result);
+                    if (result > 0) {
+                        alert("Deleted");
+                        window.location.href = '/workshop/Inventory/EditPurchaseOrderSparesDetaiList';
+                    }
+                    else {
+                        alert('Error deleting the record');
+                    }
+
+                }
+            </script>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top:-75px;margin-left: 15px; width: 90%;margin-right:5px" align="center">
+                            <div class="panel-heading" style="align-content:center">
+                                Modify Cart Items
+                            </div>
+                            <div class="panel-body" id="orderItems">
+                            </div>
+
+                        </div>
+                        </div>
+                    </form>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10" style="margin-left: -60px; margin-top: 20px;">
+                            <input type="submit" id="btnEdit" style="background-color: blue;margin-left:-200px; color: white; width: 100px" value="Save" class="btn btn-default" />
+                        </div>
+
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" id="btnAdd" style="background-color: blue;  margin-left:-430px;margin-top:-85px; color: white; width: 100px" value="Add Items" class="btn btn-default" />
+                    </div>
+
+
+            </div>
+            }
+        </div>
+<div>
+    @Html.ActionLink("Back", "SavePoDetails")
+</div>
+

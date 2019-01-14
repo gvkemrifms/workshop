@@ -68,7 +68,7 @@
                     @Html.DisplayFor(modelItem => item.JobCardNumber)
                 </td>
                 <td>
-                    @Html.ActionLink("ReOpen","ReOpenCompletedJobs",new { vehicleNumber = item.VehicleNumber })
+                    @Html.ActionLink("ReOpen","ReOpenCompletedJobs",new { vehicleNumber = item.VehicleNumber,DOR=item.DateOfRepair })
                 </td>
             </tr>
         }

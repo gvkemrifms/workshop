@@ -1,0 +1,50 @@
+﻿@using System.Data
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<style>
+    table a {
+        color: red;
+    }
+</style>
+
+
+@if (Model != null)
+{
+
+    <table class="table table-hover" style="margin-top: 15px;" id="tbl">
+        <thead>
+        <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+                <th>@col.ColumnName</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (DataRow row in Model.Rows)
+        {
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    <td>        
+                        @if (col.ColumnName == "PONumber")
+                        {
+                            @Html.ActionLink(row[col.ColumnName].ToString(), "GetApprovalList", new {id = Convert.ToString(row[col.ColumnName])})
+                        }
+                        else
+                        {
+                            @row[col.ColumnName]
+                        }
+
+
+                    </td>
+                }
+
+            </tr>
+        }
+        </tbody>
+       
+    </table>
+}
+
+
+

@@ -10,6 +10,8 @@ namespace Fleet_WorkShop
 {
     public class MvcApplication : System.Web.HttpApplication
     {
+       
+        
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -17,5 +19,6 @@ namespace Fleet_WorkShop
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+        
     }
 }

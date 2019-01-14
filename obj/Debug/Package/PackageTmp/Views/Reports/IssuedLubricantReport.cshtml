@@ -1,4 +1,5 @@
 ﻿<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.table2excel.js"></script>
 <style>
     #tbl {
         width: 100%;
@@ -24,7 +25,8 @@
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
     });
     $(function() {
@@ -57,7 +59,16 @@
         });
 
     });
+    $(function () {
+        $('#btnExport').click(function () {
+            $("#tbl").table2excel({
+                exclude: ".noExl",
+                name: "Issued Lubricant's Report",
+                filename: "Issued Lubricants's  Report" //do not include extension
 
+            });
+        });
+    });
     function generateDetailsList(response) {
         var eTable =
             "<table id=tbl><thead><tr><th >Id</th><th>Lubricant</th><th>Vehicle Number</th><th>Quantity</th><th>Issued Date</th></tr></thead><tbody>";
@@ -140,7 +151,9 @@
                 <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
                     <button type="submit" id="btn" class="btn btn-default" style="background-color: blue; color: white">Submit</button>
                 </div>
-
+                <div class="col-sm-offset-2 col-sm-4" style="margin-bottom: 30px">
+                    <button type="submit" id="btnExport" class="btn btn-default" style="background-color: blue; color: white">Export</button>
+                </div>
             </div>
         </form>
 

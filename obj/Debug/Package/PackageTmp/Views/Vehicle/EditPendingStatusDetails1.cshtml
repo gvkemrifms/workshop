@@ -1,10 +1,137 @@
 ﻿@using System.Data
 @model IEnumerable<JobCardPendingCases>
-
+<style>
+    #errmsg {
+        color: red;
+    }
+</style>
 @{
+
+    <script>
+        $(function () {
+            var serviceUrl = '/workshop/Job/CheckEndingOdoReading';
+            $('#txtEndOdo').blur(function () {
+               
+          var data= {
+              endOdo: $(this).val(),
+              vehicleNumber:'@ViewBag.VehicleNumber'
+          }
+          $.ajax({
+              type: "POST",
+              url: serviceUrl,
+              data: JSON.stringify(data),
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              success: function (response) {
+                  if (response ==0) {
+                      alert("EndOdo should not be less than current Odo");
+                      $('#txtEndOdo').val('');
+                      $('#btnSubmit').prop('disabled', true);
+                      return false;
+                  }
+                  if(response==1) {
+                      $('#btnSubmit').prop('disabled', false);
+                  }
+
+                  //costItems[0].ResponseCostDetails;
+
+
+              },
+              failure: function (response) {
+                  alert(response.responseText);
+
+              }
+
+          });
+        })
+    })
+        $(function() {
+            $('input[name = "clkradio"]').click(function () {
+
+                if ($(this).val() == 'Completed') {
+                    $('#txtEndOdo').prop('disabled', false);
+                    $('#btnSubmit').prop('disabled', true);
+                } else {
+                    $('#txtEndOdo').prop('disabled', true);
+                    $('#btnSubmit').prop('disabled', false);
+                }
+        
+            })
+        })
+        $(function() {
+            $("#txtLubesQuantity").keyup(function() {
+                this.value = this.value.replace(/[^0-9\.]/g, '');
+            });
+        });
+        $(function() {
+            var serviceUrl = '/workshop/Vehicle/UpdateJobCardIssues';
+            $('.gettimes').click(function() {
+                var $row = $(this).closest('tr');
+                var data = {
+                    id : $row.find('td:eq(0)').text(),
+                    startdate : $row.find('td:eq(7) input[type = "text"]').val(),
+                    enddate :  $row.find('td:eq(8) input[type = "text"]').val(),
+                    mechanicId:$row.find('#AllotedMechanic').val()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response == -2) {
+                            alert("Mechanic Already assigned to different work for the specified time interval");
+                            location.reload();
+                        }
+                        if (response == -1) {
+                            alert("Start Date greater than end date");
+                            location.reload();
+                        }
+                        if (response > 0) {
+                            alert('record updated');
+                            location.reload();
+                        }
+
+                        else {
+                            alert('Failed to update record please check all the required fields');
+                            location.reload();
+                        }
+
+                        //costItems[0].ResponseCostDetails;
+
+
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+
+                    }
+
+                });
+
+
+            })
+
+        })
+
+
+    </script>
     var webGrid = new WebGrid(Model, canSort: false, canPage: false);
 }
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
+<script>
+    $(document).ready(function () {
+        //called when key is pressed in textbox
+        $("#txtQuantity").keypress(function (e) {
+            //if the letter is not digit then display error and don't type anything
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                //display error message
+                $("#errmsg").html("Digits Only").show().fadeOut("slow");
+                return false;
+            }
+        });
+    });
+</script>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
 <style>
     #tbldiv {
         margin-bottom: 20px;
@@ -14,33 +141,80 @@
         width: 95%;
     }
 
+    .myclass {
+        margin-top: 1px;
+        width: 100px;
+        transition: none;
+        transform: none;
+    }
 </style>
-
+<script src="~/Scripts/jquery.datetimepicker.js"></script>
+<link href="~/ScriptsCss/jquery.datetimepicker.css" rel="stylesheet" />
 @Html.Hidden("HiddenId");
-<link href="~/ScriptsCss/Bindings.css" rel="stylesheet"/>
-<link href="~/Content/css/outsourcing.css" rel="stylesheet"/>
+<link href="~/ScriptsCss/Bindings.css" rel="stylesheet" />
+<link href="~/Content/css/outsourcing.css" rel="stylesheet" />
 <script>
+
+    $(function() {
+        var dateOfDelivery = '@ViewBag.DateOfDelivery';
+        var delivery= dateOfDelivery.split(' ')[0];
+        var deliveryDates = delivery.split('-');
+        var currentDeliveryDate = deliveryDates[2] + '-' + deliveryDates[1] + '-' + deliveryDates[0];
+        var repairDate = '@ViewBag.DateOfRepair';
+        var date=repairDate.split(' ')[0];
+        var time = repairDate.split(' ')[1];
+        var currenttime = time.split(':');
+        var currentDates = date.split('-');
+        var currentDate = currentDates[2] + '-' + currentDates[1] + '-' + currentDates[0]+' '+currenttime[0]+':'+currenttime[1];
+        $('#txtStartTime,#txtEndTime').datetimepicker({
+
+            format: "d/M/Y H:i",
+            step: 10,
+            //minDate: '-1970/01/01','minDate': '-'+minLimitDate
+            minDate: new Date(currentDate),
+            //minTime:gettime.getHours()+":"+(parseInt(gettime.getMinutes())),
+            @*minDate:moment('@ViewBag.DateOfRepair'),*@
+            maxDate: new Date(currentDeliveryDate),
+          
+            addSliderAccess: true,
+            sliderAccessArgs: { touchonly: false }
+
+        });
+    });
+
     $(function() {
         $('#txtcompleteddate').datepicker({
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
+
     });
+
+
 </script>
 
 <script type="text/javascript">
     var responseObj = 0;
     var costDetailsData = [];
     var responseData = null;
-    $(function() {
+    $(function () {
+
         $('#btnSubmit').filter(function() {
             //$(this).hide();
             //$('#divradio').hide();
 
         });
     });
+
+    $(function() {
+        $('#btnUpdateJobCard').click(function() {
+            var vals = $(this).closest("tr").find('td:eq(0)').text();
+            alert(vals);
+        })
+    })
     $(function() {
         var serviceUrl = '/workshop/Vehicle/GetCostForEachSpare';
         $('#SpareParts').blur(function() {
@@ -102,7 +276,30 @@
             return false;
 
     }
+    function ValidateOutSourceJob()
+    {
+        if($('#txtvendor').val()=="")
+        {
+            return alert('Please select Vendor')
+        }
+        if ($('#txtjobwork').val() == "") {
+            return alert('Please enter work details for the current Job')
+        }
+        if ($('#txtworkorder').val() == "") {
+            return alert('Please enter Work Order for the current Job')
+        }
+        if ($('#txtStatus').prop('selectedIndex') == 0)
+        {
+            return alert('Please select Status ')
+        }
+        if ($('#txtcompleteddate').val() == '') {
+            return alert('Please enter Completed Date ')
+        }
+        if ($('#Amount').val() == '') {
+            return alert('Please enter Completed Date ')
+        }
 
+    }
     function ValidateLubes() {
         var valid = true;
         if ($('#Lubricant option:selected').text() === '--Select--') {
@@ -125,7 +322,7 @@
     //        search_contains: true,
     //        minimumResultsForSearch: 20,
     //        placeholder: "--Select--"
-    //    });      
+    //    });
     //});
     $(function() {
         var serviceUrl = '/workshop/Vehicle/GetSparePartCost';
@@ -297,7 +494,7 @@
                         alert('Item not available in the stock');
                         $('#Lubricant').prop('selectedIndex', 0);
                     } else {
-                        CostDetails(response);
+                        CostDetailsLubes(response);
                     }
                     //StatusDetails(response);
 
@@ -310,7 +507,23 @@
         });
     });
 
-
+    function CostDetailsLubes(data) {
+        costDetailsData = JSON.stringify(data);
+        // alert(costDetailsData);
+        var eTable =
+            "<table id=tblCosts><thead><tr><th id=datess >Last Entry Date</th><th>Quantity</th><th>Cost</th></tr></thead><tbody>";
+        for (var i = 0; i < data.length; i++) {
+            if (data[i]['LastEntryDate'] != null && data[i]['LubesQuantity'] !== 0) {
+                eTable += "<tr>";
+                eTable += "<td>" + data[i]['LastEntryDate'] + "</td>";
+                eTable += "<td>" + data[i]['LubesQuantity'] + "</td>";
+                eTable += "<td>" + data[i]['Cost'] + "</td>";
+                eTable += "</tr>";
+            }
+        }
+        eTable += "</tbody></table>";
+        $('#tblCost').html(eTable);
+    }
     $(function() {
         var orderItems = [];
         var lubesorderrItems = [];
@@ -360,8 +573,6 @@
                     LubesHandOverToName: $('#HandOverLubes option:selected').text(),
                     responseCost: $('#txtCost1').val()
                 });
-                //orderItems.concat(costItems);
-                //alert(orderItems);
                 generatedItemsTable();
                 $("#SpareParts option:selected").attr('disabled', 'disabled');
                 $('#SpareParts,#Lubricant').prop('selectedIndex', 0);
@@ -384,30 +595,6 @@
                 var $tbody = $('<tbody/>');
                 $.each(orderItems,
                     function(i, val) {
-
-                        var id = val.SparePartName;
-
-                        //if (i !== 0 ) {
-                        //    alert(i);
-
-                        //    $('#tbl tr td').each(function() {
-                        //        if (id === $(this).text()) {
-
-                        //            alert(id + "  " + "Already exists");
-                        //            if(i<=0)
-                        //                orderItems.splice(i, 1);
-
-
-                        //            //location.reload();
-
-
-                        //        }
-
-                        //    });
-
-                        //    }
-
-
                         var $row = $('<tr class=nn/>');
                         $row.append($('<td/>').html(val.SparePartName));
                         //$row.append($('<td/>').html(val.IssuedDate));
@@ -419,14 +606,10 @@
 
 
                             var vals = $(this).closest("tr").find('td:eq(0)').text();
-                            alert(vals);
                             $('#SpareParts option').each(function() {
 
                                 if (this.text === vals) {
-                                    alert(this.text);
                                     $(this).attr('disabled', false);
-
-                                    //$('#SpareParts  option').attr('disabled', false);
                                 }
 
                             });
@@ -439,14 +622,12 @@
                         $tbody.append($row);
 
                     });
-                //duplicates = '';
 
                 $table.append($tbody);
                 $('#orderItems').html($table);
             } else {
                 $('#orderItems').html('');
                 if ($('#LubesorderItems').val() == null) {
-                    $('#btnSubmit').hide();
                 }
 
             }
@@ -461,7 +642,7 @@
                     VehicleNumber: '@ViewBag.VehicleNumber',
                     LubricantId: $('#Lubricant').val(),
                     LubricantName: $('#Lubricant option:selected').text(),
-                    Quantity: $('#txtLubesQuantity').val().trim(),
+                    LubesQuantity: $('#txtLubesQuantity').val().trim(),
                     HandOverToId: $('#HandOverLubes').val(),
                     HandOverToName: $('#HandOverLubes option:selected').text(),
                     Status: $('input[name="clkradio"]:checked').val()
@@ -502,16 +683,14 @@
 
                         var $row = $('<tr/>');
                         $row.append($('<td/>').html(val.LubricantName));
-                        $row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td/>').html(val.LubesQuantity));
                         $row.append($('<td class=amt/>').html(val.HandOverToName));
                         var $remove = $('<a href="#">Remove</a>');
                         $remove.click(function(e) {
                             var vals = $(this).closest("tr").find('td:eq(0)').text();
-                            alert(vals);
                             $('#Lubricant option').each(function() {
 
                                 if (this.text === vals) {
-                                    alert(this.text);
                                     $(this).attr('disabled', false);
 
                                     //$('#SpareParts  option').attr('disabled', false);
@@ -542,45 +721,64 @@
         $('#btnSubmit').click(function() {
             var serviceUrl;
             var data;
-            //if (orderItems.length > 0) {
-            serviceUrl = '/workshop/Vehicle/SaveCalculateFIFO';
-            data = {
-                Status: $('input[name="clkradio"]:checked').val(),
-                itemmodel: orderItems,
-                itemmodelPending: costDetailsData
-            };
-            $.ajax({
-                type: "POST",
-                url: serviceUrl,
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(response) {
-                    if (response > 0) {
-                        alert('Record Inserted');
-                        window.location.reload(true);
-                        //location.reload();
-                        //window.location.href = "/Vehicle/GetPendingStatusDetails";
-                    }
-                    else if (response < 0) {
-                        alert('Available SpareParts Quantity in Stock is less than Requested Quantity');
-                    }
-                    else if (response === 0) {
-                        alert('Record Inserted');
-                        window.location.href = "/workshop/Vehicle/GetCompletedStatusDetails";
-                    }
+            var status = $('input[name="clkradio"]:checked').val();
+            if (status === 'Completed') {
+                alert('Record Inserted');
+            }
+            
+            //var enableSubmit = function (ele) {
+            //    $(ele).removeAttr("disabled");
+            //}
+            //var that = this;
+            //$(this).attr("disabled", true);
+            //setTimeout(function () { enableSubmit(that) }, 7000);
+            if (orderItems.length > 0) {
+                serviceUrl = '/workshop/Vehicle/SaveCalculateFIFO';
+                data = {
+                    Status: $('input[name="clkradio"]:checked').val(),
+                    EndOdo:$('#txtEndOdo').val(),
+                    itemmodel: orderItems,
+                    itemmodelPending: costDetailsData
+                };
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response > 0) {
+                            alert('Record Inserted');
+                            if (lubesorderrItems.length === 0)
+                            {
+                                window.location.href = "/workshop/Vehicle/GetPendingStatusDetails";
+                            }
+                            //location.reload();
+                            //window.location.href = "/Vehicle/GetPendingStatusDetails";
+                        }
+                        else if (response < 0) {
+                            alert('Available SpareParts Quantity in Stock is less than Requested Quantity');
+                        }
+                        else if (response === 0) {
+                            alert('Record Inserted');
+                            if (lubesorderrItems.length === 0)
+                            {
+                                window.location.href = "/workshop/Vehicle/GetPendingStatusDetails";
+                            }
+                        }
 
-                },
-                failure: function(response) {
-                    //alert(response.responseText);
-                    window.location.reload(true);
-                }
-            });
-            // }
+                    },
+                    failure: function(response) {
+                        //alert(response.responseText);
+                        window.location.reload(true);
+                    }
+                });
+            }
             if (lubesorderrItems.length > 0) {
                 serviceUrl = '/workshop/Vehicle/SaveCalculateLubesFIFO';
                 data = {
                     Status: $('input[name="clkradio"]:checked').val(),
+                    EndOdo: $('#txtEndOdo').val(),
                     itemmodel: lubesorderrItems
                 };
                 $.ajax({
@@ -592,10 +790,34 @@
                     success: function(response) {
                         if (response >= 0) {
                             alert('Record Inserted');
-                            window.location.href = "/workshop/Vehicle/GetPendingStatusDetails";
+                                window.location.href = "/workshop/Vehicle/GetPendingStatusDetails";
                         } else if (response < 0) {
                             alert('Available  Quantity of Lubes is less than Requested Quantity');
                         }
+
+                    },
+                    failure: function(response) {
+                        //alert(response.responseText);
+                    }
+                });
+            }
+            if (orderItems.length <= 0 && lubesorderrItems.length <= 0 && status =='Completed') {
+                serviceUrl = '/workshop/Vehicle/FlipStatus';
+                data = {
+                    Status: $('input[name="clkradio"]:checked').val(),
+                    EndOdo: $('#txtEndOdo').val()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response == 0) {
+                            alert('Record Inserted');
+                            window.location.href = "/workshop/Vehicle/GetPendingStatusDetails";
+                        } 
 
                     },
                     failure: function(response) {
@@ -627,9 +849,14 @@
 </script>
 <h3 style="background-color:teal; color: white; margin-top: -12px; padding: 10px;" align="center">Job Card</h3>
 
-@Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass"})
-@Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new {vehicleNumber = ViewBag.VehicleNumber}, new {@class = "myclass", style = "margin-right:-10px"})
-<table class="table1" style="margin-left: 150px; margin-top: 1px; width: 700px;">
+@Html.ActionLink("Previous Repairs", "GetPreviousRepairs", "Vehicle", new { vehicleNumber = ViewBag.VehicleNumber }, new { @class = "myclass", style = "margin-left:850px" })
+<br />
+@if (Model.Count() != 0)
+{
+    @Html.ActionLink("Add Issues", "AddIssues", "Vehicle", new { vehicleNumber = ViewBag.VehicleNumber }, new { @class = "myclass", style = "margin-left:850px;margin-top:15px;" })
+}
+<br />
+<table class="table1" style="margin-left: 150px; margin-top: 10px; width: 700px;">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.WorkShopName)
@@ -662,53 +889,105 @@
 
     </tr>
 </table>
-<br/>
-<table class="table" style="margin-top: 5px; width: 100%;">
-    <tr>
-
-        @*<th>
-                    @Html.DisplayNameFor(model => model.VehicleNumber)
-                </th>*@
-        <th>
-            @Html.DisplayNameFor(model => model.AggregateName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Complaint)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.SubCategory)
-        </th>
-
-        <th>
-            @Html.DisplayNameFor(model => model.Cost)
-        </th>
-
-
-    </tr>
-
-    @foreach (var item in Model)
-    {
+<br />
+@if (Model.Count() != 0)
+{
+    <table class="table" style="margin-top: 5px; width: 100%;">
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AggregateName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryData)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SubCategoryName)
-            </td>
 
-            <td>
-                @Html.DisplayFor(modelItem => item.CostApproximate)
-            </td>
+            <th>
+                @*@Html.DisplayNameFor(model => model.JobCardNumber)*@Id
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AggregateName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Complaint)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubCategory)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Cost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EstimatedTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mechanic)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndTime)
+            </th>
         </tr>
-    }
+
+        @foreach (var item in Model)
+        {
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.JobCardNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AggregateName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryData)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubCategoryName)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.CostApproximate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EstimatedTime)
+                </td>
+                <td>
+
+                    @Html.DropDownList("AllotedMechanic", ViewBag.AllotedMechanic as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="txtStartTime" value="@item.StartTime1" onkeypress="return false" placeholder="Start Time">
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="txtEndTime" value="@item.EndTime1" onkeypress="return false" placeholder="End Time">
+                </td>
+                <td>
 
 
+                    @Html.ActionLink("Update", "UpdateJobCardIssues", new { id = item.JobCardNumber }, new { @class = "gettimes" })
+
+                    @*<button type="submit" id="btnUpdateJobCard" class="btn btn-default" style="background-color: blue; color: white; margin-bottom: 1px;">Update</button>*@
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+@*<script>
+
+    $(function() {
+        var modelItems = @Html.Raw(Json.Encode(Model));
+        var i = $("#AllotedMechanic option:contains('@ViewBag.Mechanic')").index();
+        $.each(modelItems,
+            function(index, item) {
+
+                index = i;
+
+                $("#AllotedMechanic").prop('selectedIndex', index);
+
+            });
+
+    });
 
 
-</table>
+</script>*@
 <input type="text" id="txtCost1" placeholder="Labor Cost" onkeypress="return false;" style="margin-top: -5px; visibility: hidden" readonly="readonly">
 <div class="form-group" style="margin-left: 730px">
     <label class="control-label  col-lg-4" style="color: red;">Labor :</label>
@@ -722,6 +1001,7 @@
         <input type="text" class="form-control" value="@ViewBag.OutSourcingAmount" id="txttotallaborCost" placeholder="Total Cost" onkeypress="return false;" style="margin-left: -40px; margin-top: -5px" readonly="readonly">
     </div>
 </div>
+
 <div class="form-group" style="margin-left: 680px; margin-top: 10px">
     <label class="control-label  col-lg-6" style="color: red; margin-right: 10px; width: 160px;">SpareParts :</label>
     <div class="col-lg-6">
@@ -741,7 +1021,7 @@
     </div>
 </div>
 
-<br/>
+<br />
 <div class="panel panel-primary" style="height: 40%; margin-left: -5px; margin-top: -100px; position: relative; width: 65%;" align="center">
     <div class="panel-heading">
         Items Issued
@@ -803,13 +1083,13 @@
 
                             </td>
                             <td>
-                                @Ajax.ActionLink("Remove", "DeleteStockIssueDetails", new {id = dr["id"]}, new AjaxOptions
-                                {
-                                    HttpMethod = "Delete",
-                                    Confirm = "Are you sure you want to delete this Record?",
-                                    OnComplete = "function() { $(this).parent().parent().remove() }",
-                                    OnSuccess = "onSuccess"
-                                })
+                                @Ajax.ActionLink("Remove", "DeleteStockIssueDetails", new { id = dr["id"] }, new AjaxOptions
+                           {
+                               HttpMethod = "Delete",
+                               Confirm = "Are you sure you want to delete this Record?",
+                               OnComplete = "function() { $(this).parent().parent().remove() }",
+                               OnSuccess = "onSuccess"
+                           })
                                 @*@Html.ActionLink("Remove", "DeleteStockIssueDetails", new {id = dr["id"]})*@
                             </td>
                         </tr>
@@ -818,7 +1098,7 @@
             }
 
         </table>
-        <br/>
+        <br />
         <table style="border-collapse: collapse; margin-top: 2px; position: relative" align="right">
 
             <tr>
@@ -874,13 +1154,13 @@
 
                             </td>
                             <td>
-                                @Ajax.ActionLink("Remove", "DeleteLubesIssueDetails", new {id = dr["id"]}, new AjaxOptions
-                                {
-                                    HttpMethod = "Delete",
-                                    Confirm = "Are you sure you want to delete this Record?",
-                                    OnComplete = "function() { $(this).parent().parent().remove() }",
-                                    OnSuccess = "onSuccess"
-                                })
+                                @Ajax.ActionLink("Remove", "DeleteLubesIssueDetails", new { id = dr["id"] }, new AjaxOptions
+                           {
+                               HttpMethod = "Delete",
+                               Confirm = "Are you sure you want to delete this Record?",
+                               OnComplete = "function() { $(this).parent().parent().remove() }",
+                               OnSuccess = "onSuccess"
+                           })
                                 @*@Html.ActionLink("Remove", "DeleteStockIssueDetails", new {id = dr["id"]})*@
                             </td>
                         </tr>
@@ -901,7 +1181,7 @@
     }
 </script>
 
-<br/>
+<br />
 <div class="panel panel-primary" style="height: 100%; margin-bottom: 50px; margin-top: 10px; position: relative; width: 100%;" align="center">
     <div class="panel-heading">
         Vehicle Pending Status Details
@@ -913,15 +1193,16 @@
                 <div class="form-group">
                     <label class="control-label col-lg-4">Spare Part</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("SpareParts", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
+                        @Html.DropDownList("SpareParts", ViewBag.SpareParts as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
                     </div>
                     <label class="control-label col-lg-4" style="margin-top: 15px;">Quantity</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                        <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;">
+                        <span id="errmsg"></span>
                     </div>
                     <label class="control-label  col-lg-4" style="margin-top: 15px;">HandOver To</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", placeholder = "HandOver To", style = "margin-top:15px "})
+                        @Html.DropDownList("HandOver", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", placeholder = "HandOver To", style = "margin-top:15px " })
                     </div>
                 </div>
 
@@ -939,22 +1220,22 @@
 
             </form>
         </div>
-        <hr/>
+        <hr />
 
         <div class="col-lg-6" style="margin-left: -500px; margin-top: 35px;">
             <form class="form-horizontal">
                 <div class="form-group">
                     <label class="control-label col-lg-4">Lubricant</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("Lubricant", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", style = "margin-left:-10px"})
+                        @Html.DropDownList("Lubricant", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", style = "margin-left:-10px" })
                     </div>
                     <label class="control-label col-lg-4" style="margin-top: 15px;">Quantity</label>
                     <div class="col-lg-8">
-                        <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
+                        <input type="text" class="form-control" id="txtLubesQuantity" placeholder="Quantity" style="border: 1px solid grey; margin-top: 15px;">
                     </div>
                     <label class="control-label  col-lg-4" style="margin-top: 15px;">HandOver To</label>
                     <div class="col-lg-8">
-                        @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control", placeholder = "HandOver To", style = "margin-top:10px"})
+                        @Html.DropDownList("HandOverLubes", ViewBag.HandOver as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", placeholder = "HandOver To", style = "margin-top:10px" })
                     </div>
                 </div>
                 <div class="form-group">
@@ -978,8 +1259,8 @@
             </div>
         </div>
         <div class="col-lg-6" style="margin-bottom: 10px; margin-left: 500px; margin-top: 10px;" id="divradio">
-            <input name="clkradio" type="radio" value="Inprogress"/>In progress
-            <input style="margin-left: 30px" name="clkradio" type="radio" value="Completed"/>Completed
+            <input name="clkradio" type="radio" value="Inprogress" />In progress
+            <input style="margin-left: 30px" id="radcompdate" name="clkradio" type="radio" value="Completed" />Completed
             <button type="submit" id="btnSubmit" class="btn btn-default" style="background-color: blue; color: white;" onclick="if (!Validations()) return false;">Submit</button>
         </div>
         <table id="tblCost" style="float: right; width: 30%;"></table>
@@ -1005,10 +1286,12 @@
                         <input id="txtcompleteddate" name="Completed Date" type="text" onkeypress="return false;" style="border: 1px solid grey;">
                         <label>Amount:</label>
                         <input id="txtAmount" name="Amount" type="text" style="border: 1px solid grey;" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
-                        <input id="submit" type="submit" value="Submit">
+                        <input id="submit" type="submit" value="Submit" onclick="if (!ValidateOutSourceJob()) { return false; }">
                     </form>
                 </div>
                 <input id="button" type="button" value="Out Sourcing Job" style="margin-left: 30px">
+                <br />
+                <input id="txtEndOdo" name="Ending Odo" placeholder="End Odo" type="text" class="form-control"  style="border: 1px solid grey; width: 45%; margin-top: 250px;margin-left: -170px" disabled="disabled" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g, '');">
 
             </div>
 
@@ -1016,7 +1299,23 @@
         </div>
 
     </div>
+    <script>
+        $(function(){
+            $('#txtcompleteddate').change(function(){
+                var completedDate = $('#txtcompleteddate').val();
+                @*var receivedDate=@(((DateTime)ViewBag.DateOfRepair).ToString("dd/MMM/yyyy"));*@
+                var receivedDate='@ViewBag.DateOfRepair';
+                if(new Date(completedDate)<=new Date(receivedDate))
+                {
+                    alert('Completed Date should be greater than Received Date');
+                    $('#txtcompleteddate').val('');
+                    return false;
+                }
+            })
+        })
 
+
+    </script>
     <script>
         $(document).ready(function() {
             $(function() {
@@ -1050,7 +1349,7 @@
                                 if (response !== 0) {
                                     alert('Records Updated');
                                     window.location.href = newUrl;
-                                  
+
                                 }
 
                             },

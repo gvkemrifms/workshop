@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Fleet_WorkShop.Models.InventoryModel>
+
+<table class="table">
+    <tr>
+
+        <th>
+            @Html.DisplayNameFor(model => model.PoNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PoDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ManName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LubricantName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Uprice)
+        </th>
+
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PoNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PoDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ManName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LubricantName)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Uprice)
+            </td>
+
+            <td>
+                @Html.ActionLink("Edit", "EditPurchaseOrderLubesDetaiList", new { id = item.Id })
+                @*@Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})*@
+            </td>
+        </tr>
+    }
+
+</table>
+
+

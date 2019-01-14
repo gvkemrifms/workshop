@@ -40,10 +40,18 @@
     .ui-widget { font-size: 12px !important; }
 
     #lblAmount, #lblBillAmount { text-align: left; }
+    .form-group.required .control-label:after {
+        content: "*";
+        color: red;
+    }
 </style>
 
 <script type="text/javascript">
-  
+    $(function () {
+        $("#txtQuantity").keyup(function () {
+            this.value = this.value.replace(/[^0-9\.]/g, '');
+        });
+    });
     $(function() {
         $("#myInput").on("keyup",
             function() {
@@ -92,6 +100,10 @@
         if (quantity === "") {
             return alert('Enter Quantity');
         }
+        var remarks = $('#txtRemarks').val();
+        if (remarks === "") {
+            return alert('Enter Remarks');
+        }
         var tbody = $("#tbl tbody");
 
         if (tbody.children().length === 0) {
@@ -105,13 +117,41 @@
 
         var $bill = 0;
 
-        $("#txtQuantity,#txtunitprice").blur(function() {
-
+        $("#txtQuantity,#txtunitprice").blur(function () {
+            var serviceUrl = '/workshop/Inventory/checkForValidUnitPrice';
             var unitPrice = $("#txtunitprice").val();
             var quantity = $("#txtQuantity").val();
-            var amount = parseInt(unitPrice) * parseInt(quantity);
-            $("#lblAmount").text(amount);
+            var amount = Math.round(parseFloat(unitPrice) * parseFloat(quantity));
+            var data = {
+                uPrice: $("#txtunitprice").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response != null) {
+                        $("#lblAmount").text(amount);
 
+                        if (amount > response) {
+                            $('#btnApproval').prop('disabled', false);
+                            $('#btn').prop('disabled', true);
+                            $('#txtRemarks').prop('disabled', false);
+                            $('#Roles').prop('disabled', false);
+                        } else {
+                            $('#btnApproval').prop('disabled', true);
+                            $('#btn').prop('disabled', false);
+                            $('#txtRemarks').prop('disabled', true);
+                            $('#Roles').prop('disabled', true);
+                        }
+                    }
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
         });
 
     });
@@ -177,7 +217,7 @@
                 dataType: "json",
                 success: function(response) {
                     if (response != 0) {
-                        $('#txtunitprice').val(response.Cost);
+                        $('#txtunitprice').val(response);
                         $('#lblLubricantNumber').text(response.LubricantNumber);
                     }
 
@@ -254,11 +294,13 @@
             dateFormat: "dd/M/yy",
             changeMonth: true,
             changeYear: true,
-            yearRange: "-60:+0"
+            yearRange: "-60:+0",
+            maxDate:0
         });
     });
 
-    $(function() {
+    $(function () {
+        var serviceUrl = '/workshop/Inventory/checkForValidUnitPrice';
         var orderItems = [];
         $('#btnAdd').click(function() {
             if ($('#ManufacturerName option:selected').text() === "--Select--" ||
@@ -275,16 +317,45 @@
                 LubricantId: $('#Lubes').val(),
                 LubricantName: $('#Lubes option:selected').text(),
                 UnitPrice: $('#txtunitprice').val().trim(),
-                Quantity: $('#txtQuantity').val().trim(),
+                //Quantity: $('#txtQuantity').val().trim(),
+                LubesQty:$('#txtQuantity').val().trim(),
                 Amount: $('#lblAmount').text()
             });
             generatedItemsTable();
+            $("#ManufacturerName option").filter(":selected").siblings('option').prop('disabled', true);
             $("#Lubes option:selected").attr('disabled', 'disabled');
             $('#txtunitprice').val('');
             $('#txtQuantity').val('');
             $('#lblAmount').text('');
             $('#Lubes').prop('selectedIndex', 0);
             $('#lblLubricantNumber').text('');
+            var finalBill = 0;
+            finalBill = parseInt($('#lblBillAmount').text());
+            var UnitPrice = $('#txtunitprice').val().trim();
+            var data = {
+                uPrice: 0
+            }
+            $.ajax({
+                type: "POST",
+                url: serviceUrl,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(response) {
+                    if (response != null) {
+                        if (finalBill > parseInt(response[0]["POValue"]) |
+                            UnitPrice > parseInt(response[0]["ItemValue"])) {
+                            $('#btnApproval').prop('disabled', false);
+                            $('#btn').prop('disabled', true);
+                            $('#txtRemarks').prop('disabled', false);
+                            $('#Roles').prop('disabled', false);
+                        }
+                    }
+                },
+                failure: function(response) {
+                    alert(response.responseText);
+                }
+            });
             return false;
 
         });
@@ -309,7 +380,8 @@
 
                         $row.append($('<td/>').html(val.UnitPrice));
 
-                        $row.append($('<td/>').html(val.Quantity));
+                        //$row.append($('<td/>').html(val.Quantity));
+                        $row.append($('<td/>').html(val.LubesQty));
                         $row.append($('<td class=amt/>').html(val.Amount));
                         var $remove = $('<a href="#">Remove</a>');
                         $remove.click(function (e) {
@@ -325,8 +397,52 @@
                             });
                             e.preventDefault();
                             orderItems.splice(i, 1);
+                            if (i === 0) {
+                                $("#ManufacturerName option").filter(":selected").siblings('option').prop('disabled', false);
+                                $('#btnApproval').prop('disabled', true);
+                                $('#txtRemarks').prop('disabled', true);
+                                $('#Roles').prop('disabled', true);
+                            }
                             generatedItemsTable();
                             getFinalBillAmount1();
+                            var finalBill = 0;
+                             finalBill = parseInt($('#lblBillAmount').text());
+                             var serviceUrl = '/workshop/Inventory/checkForValidUnitPrice';
+                             var data = {
+                                 uPrice: 0
+                             }
+                             $.ajax({
+                                 type: "POST",
+                                 url: serviceUrl,
+                                 data: JSON.stringify(data),
+                                 contentType: "application/json; charset=utf-8",
+                                 dataType: "json",
+                                 success: function (response) {
+                                     if (response != null) {
+                                         $('#tbl').find('tr').each(function (i, el) {
+                                             var $tds = $(this).find('td'),
+                                                 productId = $tds.eq(4).text();
+                                             alert(productId)
+                                             var itemVal = parseInt(response[0]["ItemValue"]);
+                                             if (parseInt(productId) > itemVal ||
+                                                 finalBill > parseInt(response[0]["POValue"])) {
+                                                 $('#btnApproval').prop('disabled', false);
+                                                 $('#btn').prop('disabled', true);
+                                                 $('#txtRemarks').prop('disabled', false);
+                                                 $('#Roles').prop('disabled', false);
+                                             } else {
+                                                 $('#btnApproval').prop('disabled', true);
+                                                 $('#btn').prop('disabled', false);
+                                                 $('#txtRemarks').prop('disabled', true);
+                                                 $('#Roles').prop('disabled', true);
+                                             }
+                                         });
+                                     }
+                                 },
+                                 failure: function (response) {
+                                     alert(response.responseText);
+                                 }
+                             });
                         });
                         $row.append($('<td/>').html($remove));
                         $tbody.append($row);
@@ -356,7 +472,8 @@
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                success: function(response) {
+                success: function (response) {
+                    if (response == null) alert('All fields are Mandatory');
                     if (response !== 0) {
                         alert('Record Inserted');
                         location.reload();
@@ -368,7 +485,38 @@
                 }
             });
         });
+        $('#btnApproval').click(function () {
+            if ($('#Roles option:selected').text() !== '--Select--' && $('#txtRemarks').val() !== '') {
+                var serviceUrl = '/workshop/Inventory/ApproveLubesPODetails';
+                var data = {
+                    PoNumber: $('#txtPONumber').val(),
+                    PoDate: $('#txtPODate').val(),
+                    Remarks: $('#txtRemarks').val(),
+                    EmployeeId1: $('#Roles option:selected').val(),
+                    itemmodel: orderItems
+                };
+                $.ajax({
+                    type: "POST",
+                    url: serviceUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response !== 0) {
+                            alert('Record Inserted');
+                            location.reload();
+                        }
 
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+                    }
+                });
+            } else {
+                alert('Please enter Remarks (And) Roles');
+                return false;
+            }
+        });
     });
 
     $(function () {
@@ -405,7 +553,7 @@
     <div class="panel-body">
         <div class="col-lg-6">
             <form class="form-horizontal">
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="control-label col-lg-4">P.O Number</label>
                     <div class="col-lg-8">
                         <input type="text" class="form-control" id="txtPONumber" placeholder="P.O Number">
@@ -415,7 +563,7 @@
         </div>
         <div class="col-lg-6">
             <form class="form-horizontal">
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="control-label  col-lg-4">P.O Date</label>
                     <div class="col-lg-8">
                         <input type="text" class="form-control" id="txtPODate" placeholder="P.O Date" onkeypress="return false;">
@@ -434,13 +582,13 @@
             <div class="panel-body">
                 <div class="col-lg-6">
                     <form class="form-horizontal">
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label class="control-label col-lg-4">Manufacturer</label>
                             <div class="col-lg-8">
                                 @Html.DropDownList("ManufacturerName", ViewBag.VehicleManufacturer as IEnumerable<SelectListItem>, "--Select--", new {@class = "form-control"})
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label class="control-label col-lg-4">Lubricant</label>
                             <div class="col-lg-4">
                                 @Html.DropDownList("Lubes", ViewBag.Lubes as IEnumerable<SelectListItem>, "--Select--", new
@@ -462,10 +610,10 @@
                                 <input type="text" class="form-control" style="margin-top: 10px;" id="txtunitprice" placeholder="Unit Price" maxlength="12" readonly="readonly">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label class="control-label col-lg-4">Quantity</label>
                             <div class="col-lg-8">
-                                <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity">
+                                <input type="text" class="form-control" id="txtQuantity" placeholder="Quantity" @*onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')"*@>
                             </div>
                         </div>
 
@@ -486,31 +634,85 @@
                             </div>
                         </div>
                     </form>
-                    @*<div class="form-group " style="margin-left: 600px; margin-top: -60px; width: 400px">
-                        <div class="col-lg-6">
-                            LubricantNumber <label id="lblLubricantNumber" class="form-control" style="color: red"></label>
-                        </div>
-                    </div>*@
-                </div>
+                    <div class="col-lg-6" style="margin-left: 630px;margin-top: -70px;margin-bottom: 10px;" >
+                        <form class="form-horizontal">
+                            <div class="form-group ">
+                                <label class="control-label  col-lg-4">Farword</label>
+                                <div class="col-lg-8">
+                                    @Html.DropDownList("Roles", ViewBag.Roles as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control",disabled=true })
+                                      
+                                    @*<label id="lblBillAmount" class="form-control" style="visibility: hidden"></label>*@
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    @*<label id="lblBillAmount" style="visibility: hidden"></label>*@
+                    @*<div class="col-lg-6" style="margin-left: 600px;margin-top: -70px;margin-bottom: 10px;" >
+                        <form class="form-horizontal">
+                            <div class="form-group ">
+
+                                <div class="col-lg-8">
+                                    <textarea name="remarks" id="txtRemarks" placeholder="Remarks" cols="40" rows="4" disabled="disabled"></textarea>
+                                      
+                                    <label id="lblBillAmount" class="form-control" style="visibility: hidden"></label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>*@
 
 
-                <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
+                    @*<div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 200px; width: 100%;" align="center">
                     <div class="panel-heading">
                         Items(In Cart)
                     </div>
                     <div class="panel-body" id="orderItems">
                     </div>
+                </div>*@
+                    <div class="tablecontainer panel panel-primary" style="height: 100%; margin-top: 40px; width: 100%;margin-left: 10px" align="left">
+                        <div class="panel-heading">
+                            Items(in Cart)
+                        </div>
+                        <div class="panel-body" id="orderItems">
+                        
+                        </div>
+                   
+                    </div>
+                <div class="col-lg-6" style="margin-left: 670px;margin-top: -90px;margin-bottom: 5px;" >
+                    <form class="form-horizontal">
+                        <div class="form-group ">
+
+                            <div class="col-lg-8">
+                                <textarea name="remarks" id="txtRemarks" placeholder="Remarks" cols="40" rows="4" disabled="disabled" style="border: 1px solid burlywood"></textarea>
+                                      
+                                <label id="lblBillAmount" class="form-control" style="visibility: hidden"></label>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+            </div>
+                <div class="col-lg-6" style="width: 100%">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div style="margin-top: 30px">
+                                @Html.Partial("GetLubesPOListDetails");
+                            </div>
 
+                        </div>
+                    </form>
 
+                </div>
             </div>
 
         </div>
         <div class="col-lg-6 col-lg-offset-6" style="margin-top: auto">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <div class="col-sm-4">
+                    <div class="col-sm-2">
                         <button type="submit" id="btn" class="btn btn-default" onclick="if (!Validations()) return false;" style="background-color: blue; color: white">Submit</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" id="btnApproval" class="btn btn-default" style="background-color: blue; color: white" disabled="disabled">Approval</button>
                     </div>
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-default" style="background-color: blue; color: white">Reset</button>

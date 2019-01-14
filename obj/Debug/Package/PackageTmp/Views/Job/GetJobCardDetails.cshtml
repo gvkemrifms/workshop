@@ -68,14 +68,22 @@
 
             <td>
                 @Html.ActionLink("Edit", "Edit", new {id = item.Id}) |
-                @Ajax.ActionLink("Delete", "Delete", new {id = item.Id}, new AjaxOptions
-                {
-                    HttpMethod = "Delete",
-                    Confirm = "Are you sure you want to delete this Record?",
-                    OnComplete = "function() { $(this).parent().parent().remove() }"
-                })
+                @Ajax.ActionLink("Delete", "Delete", new {id = item.VehId }, new AjaxOptions
+           {
+               HttpMethod = "Delete",
+               Confirm = "Are you sure you want to delete this Record?",
+               //OnComplete = "function() { $(this).parent().parent().remove(); window.location.href = 'www.google.com' }"
+               OnComplete="Refresh();"
+           })
             </td>
         </tr>
     }
 
 </table>
+
+<script>
+    function Refresh()
+    {
+        window.location.href ='/workshop/Job/SaveJobCardDetails'
+    }
+</script>
